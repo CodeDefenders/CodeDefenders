@@ -277,4 +277,11 @@ public class PuzzleGame extends AbstractGame {
     public boolean isChatEnabled() {
         return false;
     }
+
+    @Override
+    public boolean isUserAuthorized(int userId) {
+        return creatorId == userId
+                || userId == DUMMY_ATTACKER_USER_ID && getActiveRole() == Role.DEFENDER
+                || userId == DUMMY_DEFENDER_USER_ID && getActiveRole() == Role.ATTACKER;
+    }
 }

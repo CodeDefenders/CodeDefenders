@@ -9912,6 +9912,25 @@ msgstr ""
 "Der Ersteller von Mutant {0} hat bewiesen, dass dieser nicht äquivalent ist "
 "und dafür einen zusätzlichen Punkt erhalten."
 
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:94
+msgid "Equivalence duel triggered!"
+msgstr "Zum Äquivalenzduell herausgefordert!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:95
+msgid ""
+"Your mutant {0} was claimed as being equivalent to the CUT by another "
+"player. You have to defend your mutant before you can submit another one. "
+"After the duel you can continue creating your current mutant."
+msgstr ""
+"Dein Mutant {0} wurde von einem anderen Spieler als äquivalent zur CUT "
+"markiert. Du musst deinen Mutant verteidigen, bevor du einen neuen "
+"einreichen kannst. Nach dem Duell kannst du mit der Erstellung deines "
+"aktuellen Mutanten fortfahren."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:99
+msgid "Go to the duel"
+msgstr "Duell anzeigen"
+
 #: src/main/webapp/WEB-INF/tags/game_time.tag:43
 msgid "Change the game duration."
 msgstr "Spieldauer ändern."
@@ -10926,3 +10945,35 @@ msgstr "Schreibe im Testeditor einen JUnit-Test, der bei der Originalklasse best
 
 msgid "If the mutant survives, use the feedback to narrow down the change: no relevant coverage, the mutated method covered, or the changed line covered. Select an attempt to see its test and coverage, then refine your next test. You have six attempts."
 msgstr "Wenn der Mutant überlebt, grenze die Änderung anhand der Rückmeldung ein: keine relevante Abdeckung, mutierte Methode abgedeckt oder geänderte Zeile abgedeckt. Wähle einen Versuch aus, um seinen Test und seine Abdeckung zu sehen, und verbessere dann deinen nächsten Test. Du hast sechs Versuche."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:136
+msgid "Missing Parameter: {0}"
+msgstr "Fehlender Parameter: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:251
+msgid "Successfully installed default puzzles."
+msgstr "Die Standardrätsel wurden erfolgreich installiert."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:54
+msgid "Install default puzzles"
+msgstr "Standardrätsel installieren"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:295
+msgid "Install Default Puzzles"
+msgstr "Standard-Puzzles installieren"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:299
+msgid ""
+"Are you sure you want to install the default puzzle chapers? This will take "
+"a few minutes."
+msgstr ""
+"Möchtest Du die Standard-Puzzle-Kapitel wirklich installieren? Das wird ein "
+"paar Minuten dauern."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:304
+msgid "Installing..."
+msgstr "Wird installiert..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:305
+msgid "Install"
+msgstr "Installieren"

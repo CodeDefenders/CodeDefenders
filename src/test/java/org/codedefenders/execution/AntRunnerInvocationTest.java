@@ -34,6 +34,8 @@ import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.Player;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -141,6 +143,10 @@ class AntRunnerInvocationTest {
         rejected.setInputStream(new BufferedReader(new StringReader("[javac] Sample.java:1: error: invalid\nBUILD FAILED\n")));
         try (var execution = execution(rejected); var database = mockStatic(TargetExecutionDAO.class)) {
             if (target.equals("compile-mutant")) {
+                Player player = mock(Player.class);
+                UserEntity user = mock(UserEntity.class);
+                when(players.getPlayerForUserAndGame(101, 42)).thenReturn(player);
+                when(player.getUser()).thenReturn(user);
                 runner.compileMutant(root.resolve("mutant").toFile(), "Sample.java", 42, cut, 101);
             } else {
                 runner.compileTest(root.resolve("tests").toFile(), "QualifiedTest.java", 42, cut, 101);

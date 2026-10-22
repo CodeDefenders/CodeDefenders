@@ -269,6 +269,8 @@ public abstract class AbstractGame {
         return whitelist;
     }
 
+    public abstract boolean isUserAuthorized(int userId);
+
     @Override
     public boolean equals(Object other) {
         if (other instanceof AbstractGame otherGame) {

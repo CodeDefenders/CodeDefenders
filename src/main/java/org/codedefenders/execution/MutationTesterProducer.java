@@ -23,9 +23,12 @@ import jakarta.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 
 public class MutationTesterProducer {
@@ -35,12 +38,18 @@ public class MutationTesterProducer {
     public IMutationTester getMutationTester(Configuration config,
                                              BackendExecutorService backend, EventDAO eventDAO, UserRepository userRepo,
                                              ExecutorServiceProvider executorServiceProvider,
-                                             TestRepository testRepo, MutantRepository mutantRepo) {
+                                             TestRepository testRepo, MutantRepository mutantRepo,
+                                             INotificationService notificationService,
+                                             GameManagingUtils gameManagingUtils,
+                                             LiveFeedback liveFeedback) {
         if (config.isParallelize()) {
-            return new ParallelMutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo, config.isMutantCoverage(),
-                    executorServiceProvider.createExecutorService("test-executor-parallel", config.getNumberOfParallelAntExecutions()));
+            return new ParallelMutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo,
+                    notificationService, config.isMutantCoverage(), gameManagingUtils,
+                    executorServiceProvider.createExecutorService("test-executor-parallel",
+                            config.getNumberOfParallelAntExecutions()), liveFeedback);
         } else {
-            return new MutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo, config.isMutantCoverage());
+            return new MutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo,
+                    notificationService, config.isMutantCoverage(), gameManagingUtils, liveFeedback);
         }
     }
 }

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 /**
@@ -41,7 +42,7 @@ public class SizeScorer extends Scorer {
      * @return the calculated score for the test.
      */
     @Override
-    protected int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
+    protected int scoreTest(AbstractMultiplayerGame game, Test test, List<Mutant> killedMutants) {
         return killedMutants.size() + killedMutants.stream().mapToInt(Mutant::getScore).sum();
     }
 
@@ -55,7 +56,7 @@ public class SizeScorer extends Scorer {
      * @return the calculated score for the mutant.
      */
     @Override
-    protected int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+    protected int scoreMutant(AbstractMultiplayerGame game, Mutant mutant, List<Test> passedTests) {
         return passedTests.size();
     }
 }

@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
@@ -58,42 +59,14 @@
         </div>
     </div>
 
-    <div class="accordion loading loading-border-card loading-bg-gray" id="mutants-accordion">
-        <c:forEach items="${mutantAccordion.categories}" var="category">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="ma-heading-${category.id}">
-                        <%-- ${empty …} doesn't work with Set --%>
-                    <button class="${category.mutantIds.size() == 0 ? "" : 'ma-covered'} accordion-button collapsed"
-                            type="button" data-bs-toggle="collapse"
-                            data-bs-target="#ma-collapse-${category.id}"
-                            aria-controls="ma-collapse-${category.id}">
-                            <%-- ${empty …} doesn't work with Set --%>
-                        <span class="badge bg-attacker me-2 ma-count"
-                              id="ma-count-${category.id}"
-                              <c:if test="${category.mutantIds.size() == 0}">hidden</c:if>>
-                            ${category.mutantIds.size()}
-                        </span>
-                        ${i18n.tr(category.description)}
-                    </button>
-                </h2>
-                <div class="accordion-collapse collapse"
-                     id="ma-collapse-${category.id}"
-                     data-bs-parent="#mutants-accordion"
-                     aria-expanded="false" aria-labelledby="ma-heading-${category.id}">
-                    <div class="accordion-body p-0">
-                        <table id="ma-table-${category.id}" class="table table-sm"></table>
-                    </div>
-                </div>
-            </div>
-        </c:forEach>
-    </div>
+    <div class="accordion loading loading-border-card loading-bg-gray" id="mutants-accordion"></div>
 
     <script type="module">
         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import {MutantAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
-        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
-        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+        const categories = JSON.parse('${fn:escapeJS(mutantAccordion.jsonFromCategories())}');
+        const mutants = new Map(JSON.parse('${fn:escapeJS(mutantAccordion.jsonMutants())}'));
         const gameId = ${mutantAccordion.gameId};
 
         const mutantAccordion = new MutantAccordion(categories, mutants, gameId);

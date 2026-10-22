@@ -250,6 +250,9 @@ public class ClassroomAPI extends HttpServlet {
         private final GameMode mode;
 
         @Expose
+        private final ClassroomGameClassDTO cut;
+
+        @Expose
         private final GameState state;
 
         @Expose
@@ -261,22 +264,41 @@ public class ClassroomAPI extends HttpServlet {
         @Expose
         private final Integer duration;
 
+        @Expose
+        private final List<ClassroomPlayerDTO> players;
+
         public ClassroomGameDTO(AbstractGame game, Role role) {
             this.gameId = game.getId();
             this.mode = game.getMode();
+            var cut = game.getCUT();
+            this.cut = new ClassroomGameClassDTO(cut.getId(), cut.getAlias());
             this.state = game.getState();
             this.role = role;
 
-            if (game instanceof MeleeGame) {
-                this.startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
-                this.duration = ((MeleeGame) game).getGameDurationMinutes();
-            } else if (game instanceof MultiplayerGame) {
-                this.startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
-                this.duration = ((MultiplayerGame) game).getGameDurationMinutes();
+            if (game instanceof MeleeGame meleeGame) {
+                this.startTime = meleeGame.getStartTimeUnixSeconds();
+                this.duration = meleeGame.getGameDurationMinutes();
+                this.players = meleeGame.getPlayers().stream()
+                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                    .toList();
+            } else if (game instanceof MultiplayerGame multiplayerGame) {
+                this.startTime = multiplayerGame.getStartTimeUnixSeconds();
+                this.duration = multiplayerGame.getGameDurationMinutes();
+                this.players = new ArrayList<>();
+                multiplayerGame.getAttackerPlayers().stream()
+                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                    .forEach(players::add);
+                multiplayerGame.getDefenderPlayers().stream()
+                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                    .forEach(players::add);
             } else {
                 this.startTime = null;
                 this.duration = null;
+                this.players = List.of();
             }
         }
     }
+
+    private record ClassroomPlayerDTO(@Expose String name, @Expose Role role) {}
+    private record ClassroomGameClassDTO(@Expose int classId, @Expose String alias) {}
 }

@@ -28,9 +28,12 @@ import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -44,6 +47,9 @@ class MutationExecutionRejectionTest {
     private final EventDAO events = mock(EventDAO.class);
     private final TestRepository tests = mock(TestRepository.class);
     private final MutantRepository mutants = mock(MutantRepository.class);
+    private final INotificationService notifications = mock(INotificationService.class);
+    private final GameManagingUtils gameManagingUtils = mock(GameManagingUtils.class);
+    private final LiveFeedback liveFeedback = mock(LiveFeedback.class);
     private final org.codedefenders.game.Test test = mock(org.codedefenders.game.Test.class);
     private final Mutant mutant = mock(Mutant.class);
     private final AntRunner.ExecutionLimitException rejection = new AntRunner.ExecutionLimitException();
@@ -52,13 +58,14 @@ class MutationExecutionRejectionTest {
     @ValueSource(booleans = {false, true})
     void rejectedExecutionsCannotKillMutantsOrResolveEquivalence(boolean equivalence) {
         when(backend.testMutant(mutant, test)).thenThrow(rejection);
-        MutationTester tester = new MutationTester(backend, users, events, tests, mutants, false);
+        MutationTester tester = new MutationTester(backend, users, events, tests, mutants, notifications,
+                false, gameManagingUtils, liveFeedback);
         try (var database = mockStatic(TargetExecutionDAO.class)) {
             assertSame(rejection, assertThrows(AntRunner.ExecutionLimitException.class, () -> {
                 if (equivalence) tester.runEquivalenceTest(test, mutant);
                 else tester.testVsMutant(test, mutant);
             }));
-            verifyNoInteractions(events, tests, mutants);
+            verifyNoInteractions(events, tests, mutants, notifications, gameManagingUtils, liveFeedback);
         }
     }
 
@@ -77,13 +84,14 @@ class MutationExecutionRejectionTest {
         ExecutorService executor = mock(ExecutorService.class);
         doAnswer(call -> { ((Runnable) call.getArgument(0)).run(); return null; })
                 .when(executor).execute(any(Runnable.class));
-        ParallelMutationTester tester = new ParallelMutationTester(backend, users, events, tests, mutants, false, executor);
+        ParallelMutationTester tester = new ParallelMutationTester(backend, users, events, tests, mutants, notifications,
+                false, gameManagingUtils, executor, liveFeedback);
         try (var database = mockStatic(TargetExecutionDAO.class)) {
             assertSame(rejection, assertThrows(AntRunner.ExecutionLimitException.class, () -> {
                 if (submittingTest) tester.runTestOnAllMultiplayerMutants(game, test);
-                else tester.runAllTestsOnMutant(game, mutant, ignored -> List.of(test));
+                else tester.runAllTestsOnMutant(game, mutant, ignored -> new ArrayList<>(List.of(test)));
             }));
-            verifyNoInteractions(events, tests, mutants);
+            verifyNoInteractions(events, tests, mutants, notifications, gameManagingUtils, liveFeedback);
         }
     }
 }

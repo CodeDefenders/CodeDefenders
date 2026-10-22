@@ -21,7 +21,6 @@ package org.codedefenders.beans.game;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -32,7 +31,6 @@ import jakarta.inject.Named;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameProducer;
@@ -58,23 +56,39 @@ public class MeleeScoreboardBean {
     private final List<ScoreItem> currentScore;
 
     @Inject
-    public MeleeScoreboardBean(UserService userService, GameProducer gameProducer, ScoreCalculator scoreCalculator) {
+    public MeleeScoreboardBean(UserService userService, GameProducer gameProducer) {
         MeleeGame meleeGame = gameProducer.getMeleeGame();
 
-        final Map<Integer, PlayerScore> mutantsScores = scoreCalculator.getMutantScores(meleeGame.getId());
-        final Map<Integer, PlayerScore> testsScores = scoreCalculator.getTestScores(meleeGame.getId());
-        final Map<Integer, PlayerScore> duelsScores = scoreCalculator.getDuelScores(meleeGame.getId());
+        if (meleeGame == null) {
+            throw new RuntimeException("No melee game exists in this request.");
+        }
+
+
+        final Map<Integer, PlayerScore> mutantsScores = meleeGame.getMutantScores();
+        final Map<Integer, PlayerScore> testsScores = meleeGame.getTestScores();
 
         currentScore = meleeGame.getPlayers().stream()
                 .map(Player::getId)
                 .map(playerId -> {
                     SimpleUser user = userService.getSimpleUserByPlayerId(playerId).get();
 
+                    PlayerScore mutantScore = mutantsScores.getOrDefault(playerId, new PlayerScore(playerId));
+                    PlayerScore testScore = testsScores.getOrDefault(playerId, new PlayerScore(playerId));
+
+                    int mutantDuelScore = mutantScore.getDuelsWon();
+                    mutantScore.increaseTotalScore(-mutantDuelScore);
+
+                    int testDuelScore = testScore.getDuelsWon();
+                    testScore.increaseTotalScore(-testDuelScore);
+
+                    PlayerScore duelScore = new PlayerScore(playerId);
+                    duelScore.setDuelsWon(testDuelScore + mutantDuelScore);
+                    duelScore.increaseTotalScore(testDuelScore + mutantDuelScore);
+
+
                     return new ScoreItem(
                             user,
-                            Optional.ofNullable(mutantsScores.get(playerId)).orElse(new PlayerScore(playerId)),
-                            Optional.ofNullable(testsScores.get(playerId)).orElse(new PlayerScore(playerId)),
-                            Optional.ofNullable(duelsScores.get(playerId)).orElse(new PlayerScore(playerId))
+                            mutantScore, testScore, duelScore
                     );
                 })
                 .sorted().collect(Collectors.toList());

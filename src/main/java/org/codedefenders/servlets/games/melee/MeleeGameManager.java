@@ -62,11 +62,9 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -209,6 +207,8 @@ public class MeleeGameManager extends HttpServlet {
     private I18nService i18nService;
     @Inject
     private ValidationRepository validationRepository;
+    @Inject
+    private LiveFeedback liveFeedback;
 
 
     @Override
@@ -450,6 +450,7 @@ public class MeleeGameManager extends HttpServlet {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
 
+                liveFeedback.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
     }
@@ -601,7 +602,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
+        messages.add(mutationTester.runTestOnAllMultiplayerMutants(game, newTest));
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }
@@ -613,6 +614,8 @@ public class MeleeGameManager extends HttpServlet {
         ttme.setUserId(login.getUserId());
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
+
+        liveFeedback.notifyPlayersOnTestAdded(newTest, game.getId());
 
         // Clean up the session
         previousSubmission.clear();
@@ -792,6 +795,9 @@ public class MeleeGameManager extends HttpServlet {
         }
         // Clean the mutated code only if mutant is accepted
         previousSubmission.clear();
+
+        gameManagingUtils.notifyPlayersOnMutantAdded(newMutant, game);
+
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
@@ -896,6 +902,8 @@ public class MeleeGameManager extends HttpServlet {
             ede.setMutantId(equivMutant.getId());
             ede.setDefenderWon();
             notificationService.post(ede);
+
+            liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
 
             // We need this to pass the mutation information along
             Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
@@ -1072,6 +1080,8 @@ public class MeleeGameManager extends HttpServlet {
                                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(scoreEvent);
 
+                        liveFeedback.notifyPlayersOnMutantUpdated(game, mPending);
+
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                             newTest.getId(), mPending.getId());
@@ -1114,8 +1124,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
-                                 int gameId, MeleeGame game,
-                                 int playerId) throws IOException {
+                                 int gameId, MeleeGame game, int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add(I18n.marktr("You cannot claim mutants as equivalent in this game anymore."));
@@ -1149,9 +1158,7 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 mutantRepo.updateMutant(m);
 
-                                Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
-
-                                Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
+                                Event event = new Event(-1, gameId, m.getCreatorId(),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
@@ -1167,10 +1174,19 @@ public class MeleeGameManager extends HttpServlet {
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
 
+                                liveFeedback.notifyPlayersOnMutantUpdated(game, m);
+
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
                                 mutantRepo.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
+
+                                var edte = new EquivalenceDuelTriggeredEvent();
+                                edte.setGameId(gameId);
+                                edte.setMutantId(m.getId());
+                                edte.setAttackerId(m.getCreatorId());
+                                userRepo.getUserIdForPlayerId(playerId).ifPresent(edte::setDefenderId);
+                                notificationService.post(edte);
                             });
                 });
 

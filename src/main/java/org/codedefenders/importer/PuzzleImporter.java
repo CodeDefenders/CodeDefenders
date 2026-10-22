@@ -20,6 +20,10 @@ package org.codedefenders.importer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -177,6 +181,42 @@ public class PuzzleImporter {
         for (PuzzleData puzzleData : data.puzzles) {
             importPuzzle(puzzleData, chapter.getId());
         }
+    }
+
+    private void importPuzzleChapter(Path path) throws IOException, CoverageGenerator.CoverageGeneratorException,
+            CompileException, BackendExecutorService.ExecutionException {
+        importPuzzleChapter(walkDirectory(path));
+    }
+
+    public void importDefaultPuzzles() throws IOException, CoverageGenerator.CoverageGeneratorException,
+            CompileException, BackendExecutorService.ExecutionException {
+        var chapterPaths = listDefaultPuzzleChapters();
+        for (var path : chapterPaths) {
+            importPuzzleChapter(path);
+        }
+    }
+
+    private List<Path> listDefaultPuzzleChapters() throws IOException {
+        URI uri;
+        try {
+            uri = Thread.currentThread().getContextClassLoader().getResource("puzzles/").toURI();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try (var files = Files.list(Path.of(uri))) {
+            return files.toList();
+        }
+    }
+
+    private List<SimpleFile> walkDirectory(Path dir) throws IOException {
+        var files = new ArrayList<SimpleFile>();
+        try (var stream = Files.walk(dir)) {
+            var paths = stream.filter(Files::isRegularFile).toList();
+            for (var path : paths) {
+                files.add(new SimpleFile(dir.relativize(path), Files.readAllBytes(path)));
+            }
+        }
+        return files;
     }
 
     public record PuzzleChapterProperties(String title, String description) { }

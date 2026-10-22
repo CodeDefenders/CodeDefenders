@@ -27,6 +27,7 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.registration.AchievementRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.EquivalenceDuelRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
+import org.codedefenders.notification.events.client.registration.GameHighlightingRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.InviteRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
@@ -35,6 +36,7 @@ import org.codedefenders.notification.events.client.registration.TestProgressBar
 import org.codedefenders.notification.handling.server.AchievementEventHandler;
 import org.codedefenders.notification.handling.server.EquivalenceDuelEventHandler;
 import org.codedefenders.notification.handling.server.GameChatEventHandler;
+import org.codedefenders.notification.handling.server.GameHighlightingEventHandler;
 import org.codedefenders.notification.handling.server.GameLifecycleEventHandler;
 import org.codedefenders.notification.handling.server.InviteEventHandler;
 import org.codedefenders.notification.handling.server.MutantProgressBarEventHandler;
@@ -183,6 +185,15 @@ public class ServerEventHandlerContainer {
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
             removeHandler(new InviteEventHandler(socket, user.getId()));
+        }
+    }
+
+    public void handleRegistrationEvent(GameHighlightingRegistrationEvent event) {
+        if (event.getAction() == RegistrationEvent.Action.REGISTER) {
+            addHandler(new GameHighlightingEventHandler(socket, event.getGameId(), user.getId()));
+
+        } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
+            removeHandler(new GameHighlightingEventHandler(socket, event.getGameId(), user.getId()));
         }
     }
 

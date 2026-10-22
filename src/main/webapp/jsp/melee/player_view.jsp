@@ -359,3 +359,9 @@
         <t:test_accordion/>
     </div>
 </div>
+
+<% if (openEquivalenceDuel) {
+    previousSubmission.clearButKeepMutant();
+} else {
+    previousSubmission.clear();
+} %>

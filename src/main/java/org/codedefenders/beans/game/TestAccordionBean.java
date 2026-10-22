@@ -69,17 +69,21 @@ public class TestAccordionBean {
      */
     private Map<Integer, TestDTO> tests;
 
+    private Integer gameId;
+
     @Inject
     public TestAccordionBean(CodeDefendersAuth login, GameService gameService, GameProducer gameProducer) {
         var game = gameProducer.getGame();
         if (game != null) {
             GameClass cut = game.getCUT();
             List<TestDTO> testsList = gameService.getTests(login.getUserId(), game.getId());
-            init(cut, testsList);
+            init(cut, testsList, game.getId());
         }
     }
 
-    public void init(GameClass cut, List<TestDTO> testsList) {
+    public void init(GameClass cut, List<TestDTO> testsList, Integer gameId) {
+        this.gameId = gameId;
+
         List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
         GameAccordionMapping mapping = GameAccordionMapping.computeForTests(methodDescriptions, testsList);
 
@@ -121,11 +125,29 @@ public class TestAccordionBean {
         return tests;
     }
 
+    public Integer getGameId() {
+        return gameId;
+    }
+
     public String getCategoriesAsJSON() {
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(categories);
+    }
+
+    public String jsonFromCategories() {
+        return getCategoriesAsJSON();
+    }
+
+    public String jsonCategoriesContainingTest(int testId) {
+        List<TestAccordionCategory> categoriesContainingTest = categories.stream()
+                .filter(category -> category.getTestIds().contains(testId))
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(categoriesContainingTest);
     }
 
     public String getTestsAsJSON() {
@@ -134,6 +156,18 @@ public class TestAccordionBean {
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
         return gson.toJson(tests);
+    }
+
+    public String jsonTests() {
+        return getTestsAsJSON();
+    }
+
+    public String jsonTest(int testId) {
+        TestDTO test = this.tests.get(testId);
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(test);
     }
 
 

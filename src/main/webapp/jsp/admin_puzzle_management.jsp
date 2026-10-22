@@ -50,6 +50,10 @@
                             ${i18n.tr('Upload puzzles')}
                             <i class="fa fa-upload ms-1"></i>
                         </button>
+                        <button type="submit" id="button-install-default-puzzles" class="btn btn-sm btn-outline-secondary">
+                                ${i18n.tr('Install default puzzles')}
+                            <i class="fa fa-download ms-1"></i>
+                        </button>
                         <button type="button" id="button-add-chapter" class="btn btn-sm btn-outline-secondary">
                             ${i18n.tr('Add empty chapter')}
                             <i class="fa fa-plus ms-1"></i>
@@ -281,6 +285,25 @@
                                 onclick="this.form.submit(); this.disabled = true; this.innerText='${i18n.tr('Uploading...')}';">
                                 ${i18n.tr('Upload')}
                         </button>
+                </jsp:attribute>
+            </t:modal>
+        </form>
+
+        <form id="installDefaultPuzzles" name="installDefaultPuzzles" method="post" action="${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}">
+            <input type="hidden" name="action" value="importDefaultPuzzles">
+
+            <t:modal title="${i18n.tr('Install Default Puzzles')}" id="install-default-puzzles-modal"
+                     modalDialogClasses="modal-dialog-responsive">
+                <jsp:attribute name="content">
+                    <p>
+                            ${i18n.tr('Are you sure you want to install the default puzzle chapers? This will take a few minutes.')}
+                    </p>
+                </jsp:attribute>
+                <jsp:attribute name="footer">
+                    <button class="btn btn-primary" type="submit" id="installDefaultPuzzlesButton"
+                            onclick="this.form.submit(); this.disabled = true; this.innerText='${i18n.tr('Installing...')}';">
+                            ${i18n.tr('Install')}
+                    </button>
                 </jsp:attribute>
             </t:modal>
         </form>
@@ -1329,6 +1352,15 @@
                     uploadPuzzleTitle.innerHTML = `Upload Puzzles to \${i(uploadText.title, uploadText.isFallback)}`;
                     uploadPuzzleChapterId.value = String(chapter.id);
                     uploadPuzzleModal.show();
+                });
+
+                const installDefaultPuzzlesModal = new BootstrapModal(document.getElementById("install-default-puzzles-modal"));
+                document.getElementById('button-install-default-puzzles').addEventListener('click', function(event) {
+                    if (isUnsavedChanges) {
+                        unsavedChangesModal.show();
+                    } else {
+                        installDefaultPuzzlesModal.show();
+                    }
                 });
             }
 

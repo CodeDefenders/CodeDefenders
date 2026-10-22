@@ -44,7 +44,7 @@ public class AchievementEventHandler implements ServerEventHandler {
 
     @Subscribe
     public void sendAchievementUnlockedEvent(AchievementUnlockedEvent event) {
-        logger.info("Received achievementUnlockedEvent: {}", event);
+        logger.info("Send achievementUnlockedEvent: {}", event);
         if (event.getUserId() == this.userId) {
             socket.sendEvent(event);
         }

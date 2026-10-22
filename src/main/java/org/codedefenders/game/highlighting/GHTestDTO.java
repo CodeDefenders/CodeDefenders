@@ -16,35 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game.scoring;
+package org.codedefenders.game.highlighting;
 
-import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.PlayerScore;
+
+import com.google.gson.annotations.Expose;
 
 /**
- * This should replace {@link Scorer} and we will use it for dependency injection.
- *
- * @author gambi
- *
+ * Represents a test for the game highlighting.
  */
-public interface IScoringPolicy {
+public class GHTestDTO {
+    @Expose
+    public int id;
 
-    /**
-     * Associate this test with a score.
-     * TODO Consider returning or updating PlayerScore instead of test
-     */
-    void scoreTest(Test test);
-
-    /**
-     * Associate this mutant with a score.
-     * TODO Consider returning or updating PlayerScore instead of mutant
-     */
-    void scoreMutant(Mutant mutant);
-
-    /**
-     * Associate this PlayerScore with points gained by winning equivalence duels.
-     */
-    void scoreDuels(PlayerScore duelScore);
-
+    public GHTestDTO(Test test) {
+        this.id = test.getId();
+    }
 }

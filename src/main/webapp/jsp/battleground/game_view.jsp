@@ -95,4 +95,8 @@
 </p:game_page>
 
 
-<% previousSubmission.clear(); %>
+<% if (openEquivalenceDuel) {
+    previousSubmission.clearButKeepMutant();
+} else {
+    previousSubmission.clear();
+} %>
