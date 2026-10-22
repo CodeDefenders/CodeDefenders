@@ -110,6 +110,11 @@ public class MutantRule extends ValidationRule {
         return insertionNodeRules.stream().anyMatch(p -> p.test(node));
     }
 
+    @Override
+    public String toString() {
+        return "[" + getGeneralDescription() + "|" + getDetailedDescription() + "]";
+    }
+
     static class Builder {
         private final List<TriFunction<CompilationUnit, CompilationUnit, I18n, Optional<String>>>
                 compilationUnitRules = new ArrayList<>();
@@ -170,7 +175,9 @@ public class MutantRule extends ValidationRule {
          *             return a list of lines from the mutant that violate this rule.
          *             If the rule is not violated, an empty {@link Optional} is returned.
          *             See {@link ValidationUtils#checkLineDiff(List, Predicate)} and its uses for examples.
+         *             @deprecated Don't use this, as this will also disallow the terms in Strings etc
          */
+        @Deprecated
         Builder withLineDiff(LineDiffRule rule) {
             lineDiffRules.add(rule);
             return this;
@@ -201,7 +208,9 @@ public class MutantRule extends ValidationRule {
          * Diffs are checked against the insertion of these items. This is used as a shorthand to avoid having to
          * write complicated lambdas in the line diff rules.
          * @param terms The terms that are forbidden from being inserted.
+         * @deprecated Don't use this, as this will also disallow the terms in Strings etc
          */
+        @Deprecated
         Builder withInsertion(String... terms) {
             insertionRules.add(terms);
             return this.withLineDiff(diff -> ValidationUtils.anyHasBeenAdded(diff, terms));

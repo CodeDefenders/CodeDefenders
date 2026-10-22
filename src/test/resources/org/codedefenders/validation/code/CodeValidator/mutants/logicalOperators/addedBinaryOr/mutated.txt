@@ -1,0 +1,6 @@
+public class Test {
+    public void test() {
+        if (a | b) {
+        }
+    }
+}
