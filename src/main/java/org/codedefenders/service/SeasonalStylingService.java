@@ -20,11 +20,14 @@ package org.codedefenders.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.URLUtils;
 
 @ApplicationScoped
@@ -32,10 +35,14 @@ import org.codedefenders.util.URLUtils;
 public class SeasonalStylingService {
     private final Map<String, Map<String, String>> mappings;
 
-    @Inject
-    URLUtils url;
+    final URLUtils url;
+    final PuzzleRepository puzzleRepository;
 
-    public SeasonalStylingService() {
+    @Inject
+    public SeasonalStylingService(URLUtils url, PuzzleRepository puzzleRepository) {
+        this.url = url;
+        this.puzzleRepository = puzzleRepository;
+
         mappings = new HashMap<>();
 
         HashMap<String, String> christmas = new HashMap<>();
@@ -59,5 +66,19 @@ public class SeasonalStylingService {
         } else {
             return originalPath;
         }
+    }
+
+    /**
+     * Returns an Optional with a single seasonal chapter that is currently active,
+     * or an empty Optional
+     * if no such chapter exists.
+     */
+    public Optional<PuzzleChapter> getCurrentSeasonalChapter() {
+        for (PuzzleChapter chapter : puzzleRepository.getPuzzleChapters()) {
+            if (chapter.getCalendarDate() != null && chapter.isVisible()) {
+                return Optional.of(chapter);
+            }
+        }
+        return Optional.empty();
     }
 }

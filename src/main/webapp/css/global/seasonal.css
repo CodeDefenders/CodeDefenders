@@ -35,5 +35,9 @@ button.christmas-season {
 }
 
 a.chapter__level.christmas-season.season-blocked {
-    background-color: darkred;
+    background-color: #ff00ff;
+}
+
+.nav-item.christmas-season {
+    background-color: #ff00ff;
 }
