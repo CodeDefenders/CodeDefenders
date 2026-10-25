@@ -92,6 +92,10 @@ public class PuzzleChapter {
         }
     }
 
+    /**
+     * Returns the seasonal style for this chapter. Returns an empty String for a regular puzzle chapter.
+     * The style String should be identical to the css-class used for that season.
+     */
     public String getSeasonalStyle() {
         if (calendarDate != null) {
             return "christmas-season";

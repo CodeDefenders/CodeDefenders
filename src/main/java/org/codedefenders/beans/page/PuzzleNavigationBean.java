@@ -93,7 +93,7 @@ public class PuzzleNavigationBean {
 
         for (PuzzleEntry puzzleEntry : unsolvedPuzzles) {
             if (puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE) {
-                if (!puzzleEntry.getPuzzle().isSeasonablyAvailable()
+                if (puzzleEntry.getPuzzle().isBlockedBySeason()
                         || !nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
                     puzzleEntry.lock();
                 }

@@ -245,7 +245,7 @@ public class PuzzleGameManager extends HttpServlet {
             request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
         }
 
-        if (!game.getPuzzle().isSeasonablyAvailable()) {
+        if (game.getPuzzle().isBlockedBySeason()) {
             logger.error("Trying to enter a seasonal puzzle that is not yet unlocked");
             response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
             return;
@@ -1000,7 +1000,7 @@ public class PuzzleGameManager extends HttpServlet {
                  * an empty, not-null list if there are no puzzles
                  */
                 for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
-                    if (!puzzle.isSeasonablyAvailable()) {
+                    if (puzzle.isBlockedBySeason()) {
                         //If this puzzle is an invisible seasonal puzzle, all other puzzles in this chapter
                         //will be too.
                         break;

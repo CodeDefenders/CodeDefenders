@@ -251,14 +251,18 @@ public class Puzzle {
         this.isEquivalent = equivalent;
     }
 
-    public boolean isSeasonablyAvailable() {
+    /**
+     * Returns true if this puzzle is part of a seasonal chapter and not available yet today, otherwise
+     * returns false.
+     */
+    public boolean isBlockedBySeason() {
         PuzzleChapter chapter = getChapter();
         if (chapter == null) {
-            return true;
+            return false;
         } else if (chapter.getCalendarDate() == null) {
-            return true;
+            return false;
         } else {
-            return chapter.getCalendarDate()
+            return !chapter.getCalendarDate()
                     .withYear(2000)
                     .plusDays(position - 2)
                     .isBefore(LocalDate.now().withYear(2000));

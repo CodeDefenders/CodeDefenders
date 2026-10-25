@@ -33,3 +33,7 @@ button.christmas-season {
 .mutantImageAlive.christmas-season {
     background-image: url('../../images/seasonal/christmasEquivalence.png');
 }
+
+a.chapter__level.christmas-season.season-blocked {
+    background-color: darkred;
+}
