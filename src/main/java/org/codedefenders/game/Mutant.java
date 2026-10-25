@@ -208,10 +208,17 @@ public class Mutant implements Serializable {
         this.creatorName = creatorName;
     }
 
+    /**
+     * @return the user id of the mutant's creator.
+     */
     public int getCreatorId() {
         return creatorId;
     }
 
+    /**
+     * Set the user id of the mutant's creator.
+     * @param creatorId the user id of the mutant's creator.
+     */
     public void setCreatorId(int creatorId) {
         this.creatorId = creatorId;
     }
@@ -286,6 +293,9 @@ public class Mutant implements Serializable {
         return alive;
     }
 
+    /**
+     * @return the player id of the mutant's creator.
+     */
     public int getPlayerId() {
         return playerId;
     }

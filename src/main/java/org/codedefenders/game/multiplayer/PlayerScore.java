@@ -22,6 +22,7 @@ public class PlayerScore {
     private int playerId;
     private int totalScore;
     private int quantity;
+    private int duelsWon;
     private String mutantKillInformation;
 
     private String duelInformation;
@@ -79,5 +80,13 @@ public class PlayerScore {
     // Answer: Quantity of mutants (if attacker) or tests (if defender).
     public void increaseQuantity() {
         quantity++;
+    }
+
+    public int getDuelsWon() {
+        return duelsWon;
+    }
+
+    public void setDuelsWon(int duelsWon) {
+        this.duelsWon = duelsWon;
     }
 }

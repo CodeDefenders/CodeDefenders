@@ -25,7 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +58,9 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.highlighting.GHMutantDTO;
+import org.codedefenders.game.highlighting.GHTestDTO;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -68,7 +73,12 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
+import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
+import org.codedefenders.notification.events.server.highlighting.MutantUpdatedEvent;
+import org.codedefenders.notification.events.server.highlighting.TestAddedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -213,6 +223,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     private I18nService i18nService;
     @Inject
     private ValidationRepository validationRepository;
+    @Inject
+    private LiveFeedback liveFeedback;
 
     /**
      * {@inheritDoc}
@@ -460,6 +472,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
+        liveFeedback.notifyPlayersOnMutantAdded(newMutant, game);
+
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
 
@@ -560,7 +574,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        final PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }
@@ -572,8 +586,27 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
+        liveFeedback.notifyPlayersOnMutantAdded(newMutant, game);
+
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
+
+    public static List<Player> getAllPlayersInGame(AbstractGame game) {
+        var allPlayers = new LinkedList<Player>();
+        if (game instanceof MultiplayerGame multiplayerGame) {
+            allPlayers.addAll(multiplayerGame.getAttackerPlayers());
+            allPlayers.addAll(multiplayerGame.getDefenderPlayers());
+            allPlayers.addAll(multiplayerGame.getObserverPlayers());
+        } else if (game instanceof MeleeGame meleeGame) {
+            allPlayers.addAll(meleeGame.getPlayers());
+            allPlayers.addAll(meleeGame.getObserverPlayers());
+        }
+        return allPlayers;
+    }
+
+
+
+
 
     /**
      * {@inheritDoc}
@@ -756,10 +789,8 @@ public class GameManagingUtils implements IGameManagingUtils {
 
 
         PreparedMessage mutationTesterMessage;// = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
-        if (game instanceof MultiplayerGame multiplayerGame) {
+        if (game instanceof AbstractMultiplayerGame multiplayerGame) {
             mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
-        } else if (game instanceof MeleeGame meleeGame) {
-            mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
         } else {
             throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
         }
@@ -775,8 +806,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
+        liveFeedback.notifyPlayersOnTestAdded(newTest, game.getId());
+
         return CreateBattlegroundTestResult.success(newTest, mutationTesterMessage);
     }
+
+
+
 
     public enum CanUserResolveEquivalenceResult {
         USER_NOT_PART_OF_THE_GAME,
@@ -877,6 +913,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                     new Timestamp(System.currentTimeMillis()));
             eventDAO.insert(notifDefenderEquiv);
         }
+
+        liveFeedback.notifyPlayersOnMutantUpdated(game, equivMutant);
 
         return new AcceptBattlegroundEquivalenceResult(isMutantKillable);
     }
@@ -1042,6 +1080,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
+
+                    liveFeedback.notifyPlayersOnMutantUpdated(game, mutPending);
                 }
                 logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                         newTest.getId(), mutPending.getId());
@@ -1132,7 +1172,16 @@ public class GameManagingUtils implements IGameManagingUtils {
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(event);
 
+                        liveFeedback.notifyPlayersOnMutantUpdated(game, m);
+
                         mutantRepo.insertEquivalence(m, playerId);
+
+                        var edte = new EquivalenceDuelTriggeredEvent();
+                        edte.setGameId(game.getId());
+                        edte.setMutantId(m.getId());
+                        edte.setAttackerId(m.getCreatorId());
+                        edte.setDefenderId(userId);
+                        notificationService.post(edte);
                     })
                     .forEach(claimedMutants::add);
         }

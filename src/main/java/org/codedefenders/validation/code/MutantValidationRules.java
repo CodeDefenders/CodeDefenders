@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.util.JavaParserUtils;
 import org.xnap.commons.i18n.I18n;
 
 import com.github.difflib.patch.AbstractDelta;
@@ -44,9 +45,14 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
@@ -143,7 +149,7 @@ public class MutantValidationRules {
             I18n.marktr("No changes to comments"),
             ValidationMessage.MUTANT_COMMENT)
             .withCompilation(MutantValidationRules::containsModifiedComments)
-            .withInsertion("//", "/*")
+            //.withInsertion("//", "/*")
             .build();
 
     public static MutantRule prohibitedModifier = new MutantRule.Builder(
@@ -157,27 +163,33 @@ public class MutantValidationRules {
             CONTROL,
             I18n.marktr("No new logical operators like '&&' or '||'"),
             ValidationMessage.MUTANT_LOGIC)
-            .withInsertion("&&", "||")
+            //.withInsertion("&&", "||")
+            .withInsertionNode(n -> n instanceof BinaryExpr b
+                    && List.of(BinaryExpr.Operator.AND,
+                    BinaryExpr.Operator.OR,
+                    BinaryExpr.Operator.BINARY_AND,
+                    BinaryExpr.Operator.BINARY_OR).contains(b.getOperator()))
             .build();
 
     public static MutantRule prohibitedConditionals = new MutantRule.Builder(
             CONTROL,
             I18n.marktr("No new conditional statements like if, switch etc."),
             ValidationMessage.MUTANT_CONDITIONALS)
-            .withInsertion("if", "switch")
-            .withLineDiff(MutantValidationRules::ternaryAdded)
+            //.withInsertion("if", "switch")
+            //.withLineDiff(MutantValidationRules::ternaryAdded)
             .withInsertionNode(n -> n instanceof ForEachStmt
                     || n instanceof IfStmt
                     || n instanceof SwitchStmt
                     || n instanceof SwitchExpr
             )
+            .withInsertionNode(n -> n instanceof ConditionalExpr)
             .build();
 
     public static MutantRule prohibitedLoops = new MutantRule.Builder(
             CONTROL,
             I18n.marktr("No new loops."),
             ValidationMessage.MUTANT_LOOPS)
-            .withInsertion("while", "for")
+            //.withInsertion("while", "for")
             .withInsertionNode(n -> n instanceof ForEachStmt
                     || n instanceof ForStmt
                     || n instanceof WhileStmt
@@ -193,23 +205,25 @@ public class MutantValidationRules {
 
             //The following checks were present in the original validator. The original tests passed without them,
             // and I haven't found a mutant that they trigger that wouldn't be triggered anyway.
-
-            //.withInsertionNode(n -> n instanceof NameExpr nameExpr
-            //        && nameExpr.getNameAsString().equals("System"))
-            //.withInsertionNode(n -> n instanceof MethodCallExpr methodCallExpr
-            //        && methodCallExpr.getNameAsString().startsWith("System."))
-            //.withInsertionNode(n -> n instanceof VariableDeclarator variableDeclarator
-            //        && variableDeclarator.getInitializer().isPresent()
-            //        && JavaParserUtils.unparse(variableDeclarator.getInitializer().get()).startsWith("System."))
+            .withInsertionNode(n -> n instanceof NameExpr nameExpr
+                    && nameExpr.getNameAsString().equals("System"))
+            .withInsertionNode(n -> n instanceof SimpleName name
+                    && name.asString().equals("System"))
+            .withInsertionNode(n -> n instanceof MethodCallExpr methodCallExpr
+                    && methodCallExpr.getNameAsString().startsWith("System."))
+            .withInsertionNode(n -> n instanceof VariableDeclarator variableDeclarator
+                    && variableDeclarator.getInitializer().isPresent()
+                    && JavaParserUtils.unparse(variableDeclarator.getInitializer().get()).startsWith("System."))
             .build();
 
     public static MutantRule noRandom = new MutantRule.Builder(
             METHOD_CALLS,
             I18n.marktr("No use of random number generators"),
             ValidationMessage.MUTANT_CALL_RANDOM)
-            .withInsertion("Random.", "Random(", "random(", "randomUUID(")
-            .withInsertionNode(n -> n instanceof NameExpr nameExpr
-                    && nameExpr.getNameAsString().equals("Random"))
+            .withInsertion("Random.", "Random(", "random(", "getMethod(\"random\")", "randomUUID(")
+            .withInsertionNode(n -> n instanceof SimpleName name
+                    && List.of("Random", "random", "randomUUID").contains(
+                    name.asString()))
             .build();
 
     public static MutantRule noDate = new MutantRule.Builder(
@@ -217,8 +231,8 @@ public class MutantValidationRules {
             I18n.marktr("No calls to Date classes"),
             ValidationMessage.MUTANT_CALL_DATE)
             .withInsertion("Date(")
-            .withInsertionNode(n -> n instanceof NameExpr nameExpr
-                    && nameExpr.getNameAsString().equals("Date"))
+            .withInsertionNode(n -> n instanceof SimpleName name
+                    && name.asString().equals("Date"))
             .build();
 
     public static MutantRule noThreading = new MutantRule.Builder(
@@ -226,14 +240,19 @@ public class MutantValidationRules {
             I18n.marktr("No calls to multithreading classes"),
             ValidationMessage.MUTANT_CALL_THREAD)
             .withInsertion("Thread.")
-            .withInsertionNode(n -> n instanceof NameExpr nameExpr
-                    && nameExpr.getNameAsString().equals("Thread"))
+            .withInsertionNode(n -> n instanceof SimpleName name
+                    && name.asString().equals("Thread"))
             .build();
 
     public static MutantRule noIO = new MutantRule.Builder(
             METHOD_CALLS,
             I18n.marktr("No new IO calls"),
             ValidationMessage.MUTANT_CALL_IO)
+            //TODO It might be better to use `Name`s instead of this
+            .withInsertionNode(node -> node instanceof SimpleName n
+                    && List.of("io", "nio", "net", "sql").contains(n.asString())
+                    && n.getParentNode().isPresent()
+                    && n.getParentNode().get().findFirst(SimpleName.class, j -> j.asString().equals("java")).isPresent())
             .withInsertion("java.io", "java.nio", "java.net", "java.sql")
             .build();
 
@@ -242,7 +261,14 @@ public class MutantValidationRules {
             CONTROL,
             I18n.marktr("No new bitwise operators"),
             ValidationMessage.MUTANT_BITWISE)
-            .withInsertion("<<", ">>", ">>>", "|", "&")
+            .withInsertionNode(n -> n instanceof BinaryExpr b
+                    && List.of(BinaryExpr.Operator.BINARY_AND,
+                            BinaryExpr.Operator.BINARY_OR,
+                            BinaryExpr.Operator.LEFT_SHIFT,
+                            BinaryExpr.Operator.UNSIGNED_RIGHT_SHIFT,
+                            BinaryExpr.Operator.SIGNED_RIGHT_SHIFT)
+                    .contains(b.getOperator()))
+            //.withInsertion("<<", ">>", ">>>", "|", "&")
             .build();
 
     /**
@@ -335,7 +361,7 @@ public class MutantValidationRules {
                 String cleanedMutated = mutatedComments.get(i).getContent().replaceAll("\\r", "");
 
                 if (!cleanedOriginal.equals(cleanedMutated)) {
-                    return Optional.of(i18n.tr("Changed comment {0} to {1}", cleanedOriginal,cleanedMutated));
+                    return Optional.of(i18n.tr("Changed comment {0} to {1}", cleanedOriginal, cleanedMutated));
                 }
             }
             return Optional.empty();

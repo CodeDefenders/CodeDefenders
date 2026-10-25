@@ -59,11 +59,15 @@ public class Paths {
     public static final String BATTLEGROUND_HISTORY = "/multiplayer/history";
     public static final String BATTLEGROUND_SELECTION = "/multiplayer/games";
     public static final String BATTLEGROUND_CREATE = "/multiplayer/create";
+    public static final String BATTLEGROUND_GAME_SCOREBOARD = "/multiplayer/scoreboard";
+    public static final String BATTLEGROUND_GAME_SCORE = "/multiplayer/score";
 
     public static final String MELEE_GAME = "/meleegame";
     public static final String MELEE_HISTORY = "/meleegame/history";
     public static final String MELEE_SELECTION = "/melee/games";
     public static final String MELEE_CREATE = "/melee/create";
+    public static final String MELEE_GAME_SCOREBOARD = "/melee/scoreboard";
+    public static final String MELEE_GAME_SCORE = "/melee/score";
 
     public static final String PUZZLE_OVERVIEW = "/puzzles";
     public static final String PUZZLE_GAME = "/puzzlegame";
@@ -99,6 +103,8 @@ public class Paths {
     public static final String API_CLASS = "/api/class";
     public static final String API_TEST = "/api/test";
     public static final String API_MUTANT = "/api/mutant";
+    public static final String API_MUTANT_ACCORDION = "/api/mutant-accordion";
+    public static final String API_TEST_ACCORDION = "/api/test-accordion";
     public static final String API_GAME_CHAT = "/api/game-chat";
     public static final String API_CLASSROOM = "/api/classroom";
     public static final String API_MESSAGES = "/api/messages";

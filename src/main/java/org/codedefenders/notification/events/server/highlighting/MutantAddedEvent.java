@@ -16,22 +16,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game.scoring;
+package org.codedefenders.notification.events.server.highlighting;
 
-import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Named;
+import org.codedefenders.game.highlighting.GHMutantDTO;
 
-import org.codedefenders.database.EventDAO;
-import org.codedefenders.persistence.database.GameRepository;
-import org.codedefenders.persistence.database.MutantRepository;
-import org.codedefenders.persistence.database.PlayerRepository;
+import com.google.gson.annotations.Expose;
 
-public class ScoringPolicyProducer {
+/**
+ * Event sent when a mutant is added to the game highlighting.
+ * Contains the mutant information and the user id of the player for which the canClaim info is relevant.
+ */
+public class MutantAddedEvent extends GameHighlightingEvent {
 
-    @Produces
-    @Named("basic")
-    public IScoringPolicy getTheBasicPolicy(EventDAO eventDAO, MutantRepository mutantRepo, GameRepository gameRepo,
-                                            PlayerRepository playerRepo) {
-        return new DefaultScoringPolicy(eventDAO, mutantRepo, gameRepo, playerRepo);
+    @Expose
+    GHMutantDTO mutant;
+
+    @Expose
+    int userId;
+
+    public GHMutantDTO getMutant() {
+        return mutant;
+    }
+
+    public void setMutant(GHMutantDTO mutant) {
+        this.mutant = mutant;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

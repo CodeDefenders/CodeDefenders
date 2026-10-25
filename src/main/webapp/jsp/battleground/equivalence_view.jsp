@@ -24,7 +24,6 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
@@ -44,7 +43,6 @@
     SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    final GameClass cut = game.getCUT();
     final int mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
 
     final String mutantClaimedKey = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID

@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game;
+package org.codedefenders.game.highlighting;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
-import org.codedefenders.util.Constants;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 
 import com.google.gson.annotations.Expose;
 
@@ -83,7 +83,7 @@ public class GameHighlightingDTO {
                     .getLinesCovered()
                     .stream()
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             for (Integer line : linesCovered) {
                 List<Integer> list = testIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
                 list.add(test.getId());
@@ -113,7 +113,7 @@ public class GameHighlightingDTO {
                     .getLinesCovered()
                     .stream()
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             for (Integer line : linesCovered) {
                 List<Integer> list = alternativeTestIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
                 list.add(test.getId());
@@ -121,39 +121,4 @@ public class GameHighlightingDTO {
         }
     }
 
-    /**
-     * Represents a mutant for the game highlighting.
-     */
-    public static class GHMutantDTO {
-        @Expose public int id;
-        @Expose public int score;
-        @Expose public String lines;
-        @Expose public String creatorName;
-        @Expose public Mutant.State status;
-        @Expose public boolean canClaim;
-
-        public GHMutantDTO(Mutant mutant, Integer userId) {
-            this.id = mutant.getId();
-            this.score = mutant.getScore();
-            this.creatorName = mutant.getCreatorName();
-            this.lines = mutant.getSummaryString();
-            this.status = mutant.getState();
-            this.canClaim = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                    && mutant.isAlive()
-                    && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                    && (userId == null || mutant.getCreatorId() != userId)
-                    && mutant.getLines().size() >= 1;
-        }
-    }
-
-    /**
-     * Represents a test for the game highlighting.
-     */
-    public static class GHTestDTO {
-        @Expose public int id;
-
-        public GHTestDTO(Test test) {
-            this.id = test.getId();
-        }
-    }
 }

@@ -42,6 +42,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -220,8 +221,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                     dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
             String classFile = matchingFiles.get(0).getAbsolutePath();
-            int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, gameRepo.getCurrentRound(gameId));
+            Player player = playerRepo.getPlayerForUserAndGame(ownerId, gameId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, player.getId(), gameRepo.getCurrentRound(gameId));
+
+            newMutant.setCreatorId(ownerId);
+            newMutant.setCreatorName(player.getUser().getUsername());
 
             int mutantId = mutantRepo.storeMutant(newMutant);
             newMutant.setId(mutantId);
@@ -234,8 +238,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
             logger.error("Failed to compile mutant {}: {}", javaFile, message);
-            int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, gameRepo.getCurrentRound(gameId));
+            Player player = playerRepo.getPlayerForUserAndGame(ownerId, gameId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, player.getId(), gameRepo.getCurrentRound(gameId));
+
+            newMutant.setCreatorId(ownerId);
+            newMutant.setCreatorName(player.getUser().getUsername());
 
             int mutantId = mutantRepo.storeMutant(newMutant);
             newMutant.setId(mutantId);

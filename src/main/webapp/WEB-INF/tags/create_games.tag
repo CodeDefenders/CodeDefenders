@@ -1310,7 +1310,7 @@
             {
                 data: null,
                 orderable: false,
-                defaultContent: '<span class="btn btn-xs btn-secondary show-settings">${i18n.tr("Show")}</span>',
+                defaultContent: '<span class="badge bg-secondary show-settings">${i18n.tr("Show")}</span>',
                 type: 'html',
                 title: '${i18n.tr("Settings")}'
             },

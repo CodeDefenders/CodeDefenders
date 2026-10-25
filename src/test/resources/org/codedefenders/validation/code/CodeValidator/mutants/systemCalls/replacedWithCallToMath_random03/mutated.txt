@@ -1,0 +1,6 @@
+public class Test {
+    public boolean test() {
+        int ando = 4;
+        return Math.random() > 0.5;
+    }
+}

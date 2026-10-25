@@ -89,5 +89,3 @@
     </c:if>
 </p:game_page>
 
-
-<% previousSubmission.clear(); %>

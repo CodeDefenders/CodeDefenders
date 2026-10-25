@@ -31,7 +31,6 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
@@ -157,6 +156,16 @@ public class MutantAccordionBean {
         return gson.toJson(categories);
     }
 
+    public String jsonCategoriesContainingMutant(int mutantId) {
+        List<MutantAccordionCategory> categoriesContainingMutant = categories.stream()
+                .filter(category -> category.getMutantIds().contains(mutantId))
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(categoriesContainingMutant);
+    }
+
     public String jsonMutants() {
         Map<Integer, MutantDTO> mutants = this.mutantList.stream()
                 .collect(Collectors.toMap(MutantDTO::getId, Function.identity()));
@@ -166,9 +175,19 @@ public class MutantAccordionBean {
                 .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
-        // We need to do the JavaScript escaping in the end, since otherwise {@code '} character don't get escaped
-        // properly
-        return StringEscapeUtils.escapeEcmaScript(gson.toJson(mutants));
+
+        return gson.toJson(mutants);
+    }
+
+    public String jsonMutant(int mutantId) {
+        MutantDTO mutant = this.mutantList.stream()
+                .filter(m -> m.getId() == mutantId)
+                .findFirst()
+                .orElse(null);
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(mutant);
     }
 
     public static class MutantAccordionCategory {

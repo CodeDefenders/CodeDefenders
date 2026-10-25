@@ -1,13 +1,24 @@
 FROM docker.io/library/maven:3.9-eclipse-temurin-17 AS build-webapp
 
+# gettext provides msgfmt, which compiles the translations in po/ during the build
+RUN apt-get update && \
+    DEBIAN_FRONTEND='noninteractive' apt-get install -y --no-install-recommends gettext && \
+    rm -rf /var/lib/apt/lists/*
+
+# Build in a directory of its own: with the repository root at / the license plugin scans the whole filesystem
+WORKDIR /build
+
 COPY ./local-repo ./local-repo/
 COPY pom.xml .
 COPY package.json .
 COPY package-lock.json .
 COPY rolldown.config.js .
+COPY rolldown.i18n.js .
+COPY i18n.sh .
+COPY ./po ./po/
 COPY ./.git ./.git/
 COPY ./src ./src/
-RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
+RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle && mv target /
 
 
 FROM docker.io/library/debian:12-slim AS debian-java-layer

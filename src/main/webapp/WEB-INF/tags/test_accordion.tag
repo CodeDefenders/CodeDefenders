@@ -42,10 +42,10 @@
                         type="button" data-bs-toggle="collapse"
                         data-bs-target="#ta-collapse-${category.id}"
                         aria-controls="ta-collapse-${category.id}">
-                    <%-- ${empty …} doesn't work with Set --%>
-                    <c:if test="${!(category.testIds.size() == 0)}">
-                        <span class="badge bg-defender me-2 ta-count">${category.testIds.size()}</span>
-                    </c:if>
+                    <span class="badge bg-defender me-2 ta-count"
+                          id="ta-count-${category.id}" ${category.testIds.size() == 0 ? 'hidden' : ''}>
+                            ${category.testIds.size()}
+                    </span>
                     ${i18n.tr(category.description)}
                 </button>
             </h2>
@@ -67,9 +67,10 @@
 
     const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
     const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
+    const gameId = ${testAccordion.gameId};
     const testEditor = document.getElementById('test-code') ? await objects.await('testEditor') : false;
 
-    const testAccordion = new TestAccordion(categories, tests, testEditor);
+    const testAccordion = new TestAccordion(categories, tests, testEditor, gameId);
 
 
     objects.register('testAccordion', testAccordion);

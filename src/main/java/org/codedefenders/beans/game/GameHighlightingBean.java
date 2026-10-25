@@ -22,10 +22,10 @@ import java.util.List;
 
 import jakarta.enterprise.context.RequestScoped;
 
-import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.highlighting.GameHighlightingDTO;
 import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;

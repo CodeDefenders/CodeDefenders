@@ -53,6 +53,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -159,6 +160,8 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameService gameService;
+    @Inject
+    private LiveFeedback liveFeedback;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -366,6 +369,8 @@ public class MultiplayerGameManager extends HttpServlet {
                         EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
+
+                liveFeedback.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
 
@@ -528,13 +533,12 @@ public class MultiplayerGameManager extends HttpServlet {
         GameManagingUtils.CreateBattlegroundMutantResult result;
         //noinspection DuplicatedCode
         try {
-            result = gameManagingUtils.createBattlegroundMutant(
-                    game, login.getUserId(), mutantText.get());
+            result = gameManagingUtils.createBattlegroundMutant(game, login.getUserId(), mutantText.get());
         } catch (GameManagingUtils.MutantCreationException e) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
                     game.getId(), game.getClassId(), login.getUserId(), mutantText);
-            response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
@@ -543,8 +547,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add(I18n.marktr("Database error while saving the mutant."));
                 logger.error("Database error while saving the mutant: {}", e.getMessage());
             }
-            response.sendRedirect(
-                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -578,7 +581,7 @@ public class MultiplayerGameManager extends HttpServlet {
             }
         }
 
-        response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
     }
 
     @SuppressWarnings("Duplicates")
