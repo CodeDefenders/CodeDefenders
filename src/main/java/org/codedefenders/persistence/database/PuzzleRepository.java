@@ -144,30 +144,14 @@ public class PuzzleRepository {
     }
 
     /**
-     * Returns a {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
-     *
-     * @return A {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
-     */
-    public List<Puzzle> getPuzzles() {
-        @Language("SQL") String query = """
-                SELECT *
-                FROM view_active_puzzles as puzzles
-                ORDER BY Chapter_ID, Position;
-        """;
-
-        return queryRunner.query(query,
-                listFromRS(PuzzleRepository::puzzleFromRS)
-        );
-    }
-
-    /**
      * Returns all unassigned {@link Puzzle Puzzles}, sorted by position.
      */
     public List<Puzzle> getUnassignedPuzzles() {
         @Language("SQL") String query = """
                 SELECT *
                 FROM puzzles
-                WHERE Chapter_ID IS NULL
+                WHERE IsDummy = 0
+                  AND Chapter_ID IS NULL
                 ORDER BY Position;
         """;
 
@@ -183,7 +167,8 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 SELECT *
                 FROM puzzles
-                WHERE Active = 0
+                WHERE IsDummy = 0
+                  AND Active = 0
                 ORDER BY Position;
         """;
 
@@ -204,7 +189,8 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_active_puzzles as puzzles
-                WHERE Chapter_ID = ?
+                WHERE IsDummy = 0
+                  AND Chapter_ID = ?
                 ORDER BY Position;
         """;
 
@@ -245,9 +231,11 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
-                WHERE Puzzle_ID = ?
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
+                JOIN puzzles ON puzzles.Puzzle_ID = games.Puzzle_ID
+                WHERE games.Puzzle_ID = ?
+                  AND games.Creator_ID = ?
+                  AND puzzles.IsDummy = 0
+                ORDER BY games.Timestamp DESC;
         """;
 
         var game = queryRunner.query(query,
@@ -256,31 +244,6 @@ public class PuzzleRepository {
                 userId
         );
         return game.orElse(null);
-    }
-
-    /**
-     * Returns a {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     * given user. The list is sorted by the timestamp of the games.
-     *
-     * @param puzzleId The puzzle ID.
-     * @param userId   The user ID.
-     * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     *     given user. The list is sorted by the timestamp of the games.
-     */
-    public List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
-        @Language("SQL") String query = """
-                SELECT *
-                FROM view_puzzle_games games
-                WHERE Puzzle_ID = ?
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
-        """;
-
-        return queryRunner.query(query,
-                listFromRS(PuzzleRepository::puzzleGameFromRS),
-                puzzleId,
-                userId
-        );
     }
 
     /**
@@ -295,9 +258,11 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
-                WHERE State = 'ACTIVE'
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
+                JOIN puzzles ON puzzles.Puzzle_ID = games.Puzzle_ID
+                WHERE games.State = 'ACTIVE'
+                  AND games.Creator_ID = ?
+                  AND puzzles.IsDummy = 0
+                ORDER BY games.Timestamp DESC;
         """;
 
         return queryRunner.query(query,
@@ -325,9 +290,10 @@ public class PuzzleRepository {
                 Editable_Lines_End,
                 Chapter_ID,
                 Position,
-                IsEquivalent)
+                IsEquivalent,
+                IsDummy)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner.insert(query,
@@ -341,7 +307,8 @@ public class PuzzleRepository {
                 puzzle.getEditableLinesEnd(),
                 puzzle.getChapterId(),
                 puzzle.getPosition(),
-                puzzle.isEquivalent()
+                puzzle.isEquivalent(),
+                puzzle.isDummy()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
 
@@ -426,7 +393,8 @@ public class PuzzleRepository {
                     Editable_Lines_Start = ?,
                     Editable_Lines_End   = ?,
                     Level                = ?,
-                    IsEquivalent         = ?
+                    IsEquivalent         = ?,
+                    IsDummy              = ?
                 WHERE Puzzle_ID = ?;
         """;
 
@@ -438,7 +406,8 @@ public class PuzzleRepository {
                 puzzle.getEditableLinesEnd(),
                 puzzle.getLevel().toString(),
                 puzzle.isEquivalent(),
-                puzzle.getPuzzleId()
+                puzzle.getPuzzleId(),
+                puzzle.isDummy()
         );
         return updatedRows > 0;
     }
@@ -614,6 +583,7 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_active_puzzles as puzzles
+                WHERE puzzles.IsDummy = 0
                 LIMIT 1;
         """;
 
@@ -626,6 +596,7 @@ public class PuzzleRepository {
                 SELECT puzzles.*, COUNT(games.ID) AS game_count
                 FROM puzzles
                 LEFT JOIN view_puzzle_games games ON puzzles.Puzzle_ID = games.Puzzle_ID
+                WHERE puzzles.IsDummy = 0
                 GROUP BY puzzles.Puzzle_ID;
         """;
 
@@ -927,8 +898,9 @@ public class PuzzleRepository {
         }
 
         boolean isEquivalent = rs.getBoolean("puzzles.IsEquivalent");
+        boolean isDummy = rs.getBoolean("puzzles.IsDummy");
         return new Puzzle(puzzleId, classId, type, isEquivalent, level, maxAssertions,
-                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position);
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, isDummy);
     }
 
     /**
