@@ -163,5 +163,10 @@ or are locked for the logged in user.
                 </div>
             </c:forEach>
         </div>
+
+        <script type="module">
+            import {Snow} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            Snow.init(".chapter.christmas-season");
+        </script>
     </jsp:body>
 </p:main_page>
