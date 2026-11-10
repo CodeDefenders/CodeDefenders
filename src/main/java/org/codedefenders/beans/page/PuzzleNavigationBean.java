@@ -67,7 +67,8 @@ public class PuzzleNavigationBean {
 
         // maps the puzzle id to the puzzle game
         activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
-                .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity()));
+                .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity(),
+                        (a,b)-> a));
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()

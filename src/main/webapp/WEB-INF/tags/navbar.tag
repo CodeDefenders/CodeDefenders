@@ -79,11 +79,11 @@
 
                         <c:set var="season" value="${seasonStyle.currentSeasonalChapter}"/>
                         <c:if test="${season.present}">
-                            <li class="nav-item nav-item-highlight me-3 ${season.present ? season.get().seasonalStyle : ""}">
+                            <li class="nav-item nav-item-highlight me-3 ${season.get().seasonalStyle}">
                                 <a class="nav-link" id="header-season"
-                                   href="${url.forPath("/puzzles")}">${season.present
-                                   ? puzzleRepo.getPuzzleChapterTextWithFallback(season.get().id, auth.user.locale.language, i18nService.defaultLocale.language).title()
-                                   : ""}</a>
+                                   href="${url.forPath("/puzzles")}">
+                                       ${puzzleRepo.getPuzzleChapterTextWithFallback(season.get().id, auth.user.locale.language, i18nService.defaultLocale.language).title()}
+                                </a>
                             </li>
                         </c:if>
 

@@ -18,8 +18,6 @@
  */
 package org.codedefenders.service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -28,44 +26,15 @@ import jakarta.inject.Named;
 
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.persistence.database.PuzzleRepository;
-import org.codedefenders.util.URLUtils;
 
 @ApplicationScoped
 @Named("seasonStyle")
 public class SeasonalStylingService {
-    private final Map<String, Map<String, String>> mappings;
-
-    final URLUtils url;
     final PuzzleRepository puzzleRepository;
 
     @Inject
-    public SeasonalStylingService(URLUtils url, PuzzleRepository puzzleRepository) {
-        this.url = url;
+    public SeasonalStylingService(PuzzleRepository puzzleRepository) {
         this.puzzleRepository = puzzleRepository;
-
-        mappings = new HashMap<>();
-
-        HashMap<String, String> christmas = new HashMap<>();
-        christmas.put("/images/ingameicons/equivalence.png", "/images/seasonal/christmasEquivalence.png");
-
-        mappings.put("christmas-season", christmas);
-    }
-
-    /**
-     * Returns the path of a season-specific version of an image, or the original image if no such path exists.
-     * @param originalPath The path to the normal version of the image. Must start with a "/".
-     * @param season The style string for a season. This is also the name of the associated CSS class.
-     */
-    public String getPath(String originalPath, String season) {
-        if (season.isBlank()) {
-            return url.forPath(originalPath);
-        }
-        Map<String, String> seasonMap = mappings.get(season);
-        if (seasonMap != null) {
-            return url.forPath(seasonMap.getOrDefault(originalPath, originalPath));
-        } else {
-            return originalPath;
-        }
     }
 
     /**

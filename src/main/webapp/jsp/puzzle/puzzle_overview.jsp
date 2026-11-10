@@ -40,6 +40,9 @@ or are locked for the logged in user.
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/puzzle_overview.css")}" rel="stylesheet">
+        <c:if test="${seasonStyle.currentSeasonalChapter.present}">
+            <link href="${url.forPath("/css/specific/advent_calendar.css")}" rel="stylesheet">
+        </c:if>
     </jsp:attribute>
 
     <jsp:body>
@@ -85,19 +88,16 @@ or are locked for the logged in user.
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
                 <c:set var="chapter" value="${ChapterEntry.chapter}"/>
-                <div class="chapter">
+                <c:set var="season" value="${chapter.seasonalStyle}"/>
+                <div class="chapter ${season}">
                     <div class="chapter__title">
                         <h2>${ChapterEntry.title}</h2>
                     </div>
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
-                            <c:set var="season" value="${puzzle.chapter.seasonalStyle}"/>
-                            <c:set var="seasonalBlock"
-                                   value = "${puzzle.blockedBySeason ? 'season-blocked' : ''}"/>
-                            <c:set var="status"
-                                   value="${ seasonalBlock ? 'locked' : puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
-                            <a class="chapter__level puzzle-${status} ${season} ${seasonalBlock}"
+                            <c:set var="status" value="${puzzle.blockedBySeason ? 'locked season-blocked' : puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
+                            <a class="chapter__level puzzle-${status}"
                                     <c:choose>
                                         <c:when test="${(puzzleEntry.type == 'GAME' || !puzzleEntry.locked) && !puzzle.blockedBySeason}">
                                             href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${puzzle.puzzleId}"
@@ -106,20 +106,33 @@ or are locked for the logged in user.
                                             disabled="disabled"
                                             data-bs-toggle="tooltip"
                                             title="${i18n.tr('This puzzle is locked.')}"
+                                            role="link"
+                                            aria-disabled="true"
+                                            tabindex="0"
                                         </c:otherwise>
                                     </c:choose>
                             >
-                                <img class="chapter__level__watermark ${season} ${seasonalBlock}"  alt="${puzzle.type}"
+                                <c:if test="${season == 'christmas-season'}">
+                                    <span class="advent-gift" aria-hidden="true">
+                                        <span class="advent-gift__box"></span>
+                                        <span class="advent-gift__top">
+                                            <span class="advent-gift__bow"></span>
+                                            <span class="advent-gift__lid"></span>
+                                        </span>
+                                        <span class="advent-gift__number"></span>
+                                    </span>
+                                </c:if>
+                                <img class="chapter__level__watermark"  alt="${puzzle.type}"
                                         <c:choose>
                                             <c:when test="${puzzle.type == 'EQUIVALENCE'}">
-                                                src="${seasonStyle.getPath("/images/ingameicons/equivalence.png", season)}"
+                                                src="${url.forPath("/images/ingameicons/equivalence.png")}"
                                             </c:when>
                                             <c:otherwise>
-                                                src="${seasonStyle.getPath("/images/achievements/codedefenders_achievements_".concat( puzzle.type == 'ATTACKER' ? "1" : "2").concat("_lvl_0.png"), season)}"
+                                                src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
                                             </c:otherwise>
                                         </c:choose>
                                 />
-                                <div class="chapter__level__image ${season} ${seasonalBlock}">
+                                <div class="chapter__level__image">
                                     <c:if test="${status == 'next'}">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                                             <path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"></path>
@@ -140,7 +153,7 @@ or are locked for the logged in user.
                                         </svg>
                                     </c:if>
                                 </div>
-                                <div class="chapter__level__title ${season} ${seasonalBlock}">
+                                <div class="chapter__level__title">
                                     <h3>${puzzleEntry.title}</h3>
                                     <p>${puzzleEntry.description}</p>
                                 </div>
