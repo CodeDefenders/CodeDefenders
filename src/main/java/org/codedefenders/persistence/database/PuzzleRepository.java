@@ -206,6 +206,26 @@ public class PuzzleRepository {
     }
 
     /**
+     * Returns all puzzles in the given chapter, including inactive puzzles, sorted by position.
+     *
+     * @param chapterId The chapter ID.
+     * @return A list of all puzzles in the chapter.
+     */
+    public List<Puzzle> getAllPuzzlesForChapterId(int chapterId) {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM puzzles
+                WHERE Chapter_ID = ?
+                ORDER BY Position;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS),
+                chapterId
+        );
+    }
+
+    /**
      * Returns the {@link PuzzleGame} for the given game ID.
      *
      * @param gameId The game ID.

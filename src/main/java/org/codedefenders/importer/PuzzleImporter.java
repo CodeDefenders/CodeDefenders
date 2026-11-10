@@ -192,8 +192,55 @@ public class PuzzleImporter {
             CompileException, BackendExecutorService.ExecutionException {
         var chapterPaths = listDefaultPuzzleChapters();
         for (var path : chapterPaths) {
-            importPuzzleChapter(path);
+            ChapterData data = readChapterData(walkDirectory(path));
+            PuzzleChapter chapter = findChapter(data.properties);
+            if (chapter == null) {
+                chapter = storePuzzleChapterToDB(data.properties);
+            } else {
+                logger.info("Skipping existing default puzzle chapter '{}'.",
+                        readPuzzleChapterProperties(data.properties).title());
+            }
+
+            for (PuzzleData puzzleData : data.puzzles) {
+                if (findPuzzle(chapter.getId(), puzzleData) == null) {
+                    importPuzzle(puzzleData, chapter.getId());
+                } else {
+                    logger.info("Skipping existing default puzzle '{}'.", readPuzzleTitle(puzzleData));
+                }
+            }
         }
+    }
+
+    private PuzzleChapter findChapter(SimpleFile propertiesFile) throws IOException {
+        String title = readPuzzleChapterProperties(propertiesFile).title();
+        String defaultLanguage = i18nService.getDefaultLocale().getLanguage();
+
+        return puzzleRepo.getPuzzleChapters().stream()
+                .filter(chapter -> {
+                    var text = puzzleRepo.getPuzzleChapterText(chapter.getId(), defaultLanguage);
+                    return text != null && Objects.equals(text.title(), title);
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Puzzle findPuzzle(int chapterId, PuzzleData puzzleData) throws IOException {
+        String title = readPuzzleTitle(puzzleData);
+        String defaultLanguage = i18nService.getDefaultLocale().getLanguage();
+
+        return puzzleRepo.getAllPuzzlesForChapterId(chapterId).stream()
+                .filter(puzzle -> {
+                    var text = puzzleRepo.getPuzzleText(puzzle.getPuzzleId(), defaultLanguage);
+                    return text != null && Objects.equals(text.title(), title);
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String readPuzzleTitle(PuzzleData puzzleData) throws IOException {
+        Properties cfg = new Properties();
+        cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
+        return cfg.getProperty("title");
     }
 
     private List<Path> listDefaultPuzzleChapters() throws IOException {
@@ -458,9 +505,13 @@ public class PuzzleImporter {
                                        String description, Integer editableLinesStart, Integer editableLinesEnd) { }
 
         public void readPuzzleProperties() throws IOException {
+            this.properties = readPuzzleProperties(puzzleData);
+        }
+
+        private PuzzleProperties readPuzzleProperties(PuzzleData data) throws IOException {
             // Load config.
             Properties cfg = new Properties();
-            cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
+            cfg.load(new ByteArrayInputStream(data.properties.getContent()));
 
             // Read values from specification file
             PuzzleType type = PuzzleType.valueOf(cfg.getProperty("type"));
@@ -477,7 +528,7 @@ public class PuzzleImporter {
                     .map(Integer::parseInt)
                     .orElse(null);
 
-            this.properties = new PuzzleProperties(type, isEquivalent, level, title, description, editableLinesStart,
+            return new PuzzleProperties(type, isEquivalent, level, title, description, editableLinesStart,
                     editableLinesEnd);
         }
 
