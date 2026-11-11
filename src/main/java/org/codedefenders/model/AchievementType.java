@@ -72,6 +72,10 @@ public enum AchievementType {
     MAX_MUTANTS_IN_SHORT_TIME(18, 1800),
     @SerializedName("19")
     PUZZLES_SOLVED_ON_FIRST_TRY(19, 750),
+    @SerializedName("20")
+    SOLVE_MUTLES(20, 1900),
+    @SerializedName("21")
+    MUTLE_SOLVE_IN_TWO(21, 1950),
     ; // format for better git diffs
 
     private final int id;
@@ -564,5 +568,44 @@ public enum AchievementType {
                         I18n.marktr("{0} Birds with {0} Stones"),
                         I18n.marktr("Solve {0} puzzles on the first try"),
                         I18n.marktr("{0} puzzles solved on the first try, max level reached"), 10);
+
+        SOLVE_MUTLES
+                .setLevel(0,
+                        I18n.marktr("No Mutle cases solved"),
+                        I18n.marktr("Solve a Mutle case"),
+                        I18n.marktr("{0} of {1} Mutle cases solved"), 0)
+                .setLevel(1,
+                        I18n.marktr("Mutle Solver"),
+                        I18n.marktr("Solve your first Mutle case"),
+                        I18n.marktr("{0} of {1} Mutle cases solved to reach the next level"), 1)
+                .setLevel(2,
+                        I18n.marktr("Mutle Master"),
+                        I18n.marktr("Solve {0} Mutle cases"),
+                        I18n.marktr("{0} of {1} Mutle cases solved to reach the next level"), 5)
+                .setLevel(3,
+                        I18n.marktr("Mutle Genius"),
+                        I18n.marktr("Solve {0} Mutle cases"),
+                        I18n.marktr("{0} of {1} Mutle cases solved to reach the next level"), 10)
+                .setLevel(4,
+                        I18n.marktr("Mutle Legend"),
+                        I18n.marktr("Solve {0} Mutle cases"),
+                        I18n.marktr("{0} Mutle cases solved, max level reached"), 15);
+
+        MUTLE_SOLVE_IN_TWO
+                .setLevel(0, I18n.marktr("No Mutle case solved in two tests or fewer"),
+                        I18n.marktr("Solve a Mutle case in two tests or fewer"),
+                        I18n.marktr("{0} of {1} Mutle cases solved in two tests or fewer"), 0)
+                .setLevel(1, I18n.marktr("Swift Mutle Solver"),
+                        I18n.marktr("Solve a Mutle case in two tests or fewer"),
+                        I18n.marktr("Mutle case solved in two tests or fewer"), 1)
+                .setLevel(2, I18n.marktr("Mutle Speedrunner"),
+                        I18n.marktr("Solve {0} Mutle cases in two tests or fewer"),
+                        I18n.marktr("{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"), 2)
+                .setLevel(3, I18n.marktr("Mutle Flash"),
+                        I18n.marktr("Solve {0} Mutle cases in two tests or fewer"),
+                        I18n.marktr("{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"), 5)
+                .setLevel(4, I18n.marktr("Mutle Lightning"),
+                        I18n.marktr("Solve {0} Mutle cases in two tests or fewer"),
+                        I18n.marktr("{0} Mutle cases solved in two tests or fewer, max level reached"), 10);
     }
 }

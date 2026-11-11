@@ -1,0 +1,31 @@
+{
+  "id": "library-loan",
+  "title": "Library Loan",
+  "specification": "A library loan checks out one titled book for a fixed number of days and permits only a bounded number of renewals before it must be returned.",
+  "concepts": ["state", "boundaries", "order", "boolean-results"],
+  "sourcePath": "LibraryLoan.java",
+  "tests": [
+    {"key":"rejects-blank-title","title":"Rejects a blank title","sourcePath":"tests/LibraryLoanRejectsBlankTitleTest.java"},
+    {"key":"rejects-nonpositive-loan-days","title":"Rejects non-positive loan days","sourcePath":"tests/LibraryLoanRejectsNonPositiveLoanDaysTest.java"},
+    {"key":"rejects-negative-renewals","title":"Rejects negative renewal allowance","sourcePath":"tests/LibraryLoanRejectsNegativeRenewalsTest.java"},
+    {"key":"allows-zero-renewals","title":"Allows zero renewals","sourcePath":"tests/LibraryLoanAllowsZeroRenewalsTest.java"},
+    {"key":"retains-title","title":"Retains the book title","sourcePath":"tests/LibraryLoanRetainsTitleTest.java"},
+    {"key":"checkout-success","title":"Checkout reports success","sourcePath":"tests/LibraryLoanCheckoutSuccessTest.java"},
+    {"key":"checkout-state","title":"Checkout marks the loan active","sourcePath":"tests/LibraryLoanCheckoutStateTest.java"},
+    {"key":"checkout-due-days","title":"Checkout sets the due period","sourcePath":"tests/LibraryLoanCheckoutDueDaysTest.java"},
+    {"key":"duplicate-checkout","title":"An active loan cannot be checked out twice","sourcePath":"tests/LibraryLoanDuplicateCheckoutTest.java"},
+    {"key":"renew-requires-checkout","title":"Renewal requires checkout","sourcePath":"tests/LibraryLoanRenewRequiresCheckoutTest.java"},
+    {"key":"renew-adds-days","title":"Renewal adds a loan period","sourcePath":"tests/LibraryLoanRenewAddsDaysTest.java"},
+    {"key":"renew-consumes-allowance","title":"Renewal consumes one allowance","sourcePath":"tests/LibraryLoanRenewConsumesAllowanceTest.java"},
+    {"key":"renewal-limit","title":"Renewal limit is enforced","sourcePath":"tests/LibraryLoanRenewalLimitTest.java"},
+    {"key":"return-success","title":"Return reports success","sourcePath":"tests/LibraryLoanReturnSuccessTest.java"},
+    {"key":"return-clears-state","title":"Return clears the active state","sourcePath":"tests/LibraryLoanReturnClearsStateTest.java"},
+    {"key":"return-resets-renewals","title":"Return restores renewal allowance","sourcePath":"tests/LibraryLoanReturnResetsRenewalsTest.java"},
+    {"key":"return-when-idle","title":"An idle loan cannot be returned","sourcePath":"tests/LibraryLoanReturnWhenIdleTest.java"}
+  ],
+  "mutants": [
+    {"key":"renewal-not-extended","sourcePath":"mutants/renewal-not-extended/LibraryLoan.java","method":"renew","mutatedLines":[33],"operator":"STATEMENT_DELETION","proofTestKey":"renew-adds-days","revealExplanation":"A successful renewal does not extend the due date."},
+    {"key":"returned-loan-keeps-due-date","sourcePath":"mutants/returned-loan-keeps-due-date/LibraryLoan.java","method":"returnBook","mutatedLines":[42],"operator":"STATEMENT_DELETION","proofTestKey":"return-clears-state","revealExplanation":"Returning a loan leaves its due date in place."},
+    {"key":"return-keeps-used-renewals","sourcePath":"mutants/return-keeps-used-renewals/LibraryLoan.java","method":"returnBook","mutatedLines":[43],"operator":"STATEMENT_DELETION","proofTestKey":"return-resets-renewals","revealExplanation":"Returning a loan does not reset the used renewal count."}
+  ]
+}

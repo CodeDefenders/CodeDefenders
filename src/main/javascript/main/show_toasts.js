@@ -61,7 +61,10 @@ class ShowToasts {
             }
 
             const iconElement = document.createElement("img");
-            iconElement.classList.add("me-2", "w-75");
+            iconElement.classList.add('me-2');
+            iconElement.width = 64;
+            iconElement.height = 64;
+            iconElement.style.objectFit = 'contain';
             iconElement.src = icon;
 
             iconAnchor.appendChild(iconElement);

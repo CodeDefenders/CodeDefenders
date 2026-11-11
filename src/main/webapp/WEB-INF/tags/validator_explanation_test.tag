@@ -20,6 +20,7 @@
 --%>
 
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ attribute name="maxAssertions" required="false" type="java.lang.Integer" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
@@ -36,7 +37,14 @@
     game = Objects.nonNull(game) ? game : (AbstractGame) request.getAttribute(Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     String maxAssertionsText;
-    if (Objects.nonNull(game)) {
+    if (Objects.nonNull(maxAssertions)) {
+        maxAssertionsText = i18n.trn(
+                "Only {0} assertion per test",
+                "Only {0} assertions per test",
+                maxAssertions,
+                maxAssertions
+        );
+    } else if (Objects.nonNull(game)) {
         maxAssertionsText = i18n.trn(
                 "Only {0} assertion per test",
                 "Only {0} assertions per test",
@@ -87,4 +95,3 @@
         </ul>
     </div>
 </div>
-

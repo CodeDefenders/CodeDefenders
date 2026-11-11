@@ -36,8 +36,6 @@ import org.intellij.lang.annotations.Language;
  * @see TargetExecution
  */
 public class TargetExecutionDAO {
-    private static final int MESSAGE_LIMIT = 2000;
-
     /**
      * Constructs a test from a {@link ResultSet} entry.
      *
@@ -74,8 +72,8 @@ public class TargetExecutionDAO {
         final DatabaseValue<?>[] values;
 
         final String insertedMessage = targetExecution.message == null ? ""
-                : targetExecution.message.length() <= MESSAGE_LIMIT ? targetExecution.message
-                        : targetExecution.message.substring(0, MESSAGE_LIMIT);
+                : targetExecution.message.length() <= TargetExecution.MESSAGE_LIMIT ? targetExecution.message
+                        : targetExecution.message.substring(0, TargetExecution.MESSAGE_LIMIT);
 
         if (targetExecution.hasTest() && targetExecution.hasMutant()) {
             query = "INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message)"

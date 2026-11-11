@@ -18,10 +18,14 @@
  */
 package org.codedefenders.dependencies;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -92,6 +96,11 @@ public class DependencyProvider {
     public void installDependencies() throws MavenDependencyResolverException {
         try (var resolver = new MavenDependencyResolver(getLocalRepoPath(), "16")) {
             JACOCO_CLASSPATH = resolver.resolveDependencies(parseSpecs(JACOCO_SPECS)).getClasspath();
+            try {
+                securityManagerJar(config.getLibraryDir().toPath().resolve("test-security.jar"));
+            } catch (IOException e) {
+                throw resolver.new MavenDependencyResolverException(e);
+            }
             logger.info("Resolved JaCoCo Classpath: " + JACOCO_CLASSPATH);
 
             COMMON_CLASSPATH = resolver.resolveDependencies(parseSpecs(COMMON_SPECS)).getClasspath();
@@ -102,6 +111,19 @@ public class DependencyProvider {
             testSpecs.addAll(COMMON_SPECS);
             TEST_CLASSPATH = resolver.resolveDependencies(parseSpecs(testSpecs)).getClasspath();
             logger.info("Resolved Test Classpath: " + TEST_CLASSPATH);
+        }
+    }
+
+    public static void securityManagerJar(Path destination) throws IOException {
+        String name = "org/codedefenders/execution/TestSecurityManager.class";
+        try (var output = new JarOutputStream(Files.newOutputStream(destination));
+             var input = DependencyProvider.class.getResourceAsStream("/" + name)) {
+            if (input == null) {
+                throw new IOException("Test security manager is missing");
+            }
+            output.putNextEntry(new JarEntry(name));
+            input.transferTo(output);
+            output.closeEntry();
         }
     }
 

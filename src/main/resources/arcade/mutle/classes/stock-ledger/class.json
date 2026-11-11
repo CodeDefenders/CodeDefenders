@@ -1,0 +1,24 @@
+{
+  "id": "stock-ledger",
+  "title": "Stock Ledger",
+  "specification": "A stock ledger maintains nonnegative inventory by nonempty SKU, accepts positive receipts, prevents over-shipment, and treats missing stock as zero.",
+  "concepts": ["state", "boundaries", "validation"],
+  "sourcePath": "StockLedger.java",
+  "tests": [
+    {"key":"receives-new-sku","title":"Receives new SKU","sourcePath":"tests/StockLedgerReceivesNewSkuTest.java"},
+    {"key":"receive-reports-success","title":"Receipt reports success","sourcePath":"tests/StockLedgerReceiveReportsSuccessTest.java"},
+    {"key":"accumulates-receipts","title":"Accumulates receipts","sourcePath":"tests/StockLedgerAccumulatesReceiptsTest.java"},
+    {"key":"rejects-zero-receipt","title":"Rejects zero receipt","sourcePath":"tests/StockLedgerRejectsZeroReceiptTest.java"},
+    {"key":"rejects-negative-receipt","title":"Rejects negative receipt","sourcePath":"tests/StockLedgerRejectsNegativeReceiptTest.java"},
+    {"key":"rejects-missing-shipment","title":"Rejects missing shipment","sourcePath":"tests/StockLedgerRejectsMissingShipmentTest.java"},
+    {"key":"ships-all-stock","title":"Ships all stock","sourcePath":"tests/StockLedgerShipsAllStockTest.java"},
+    {"key":"shipment-reduces-quantity","title":"Shipment reduces quantity","sourcePath":"tests/StockLedgerShipmentReducesQuantityTest.java"},
+    {"key":"removes-depleted-sku","title":"Removes depleted SKU","sourcePath":"tests/StockLedgerRemovesDepletedSkuTest.java"},
+    {"key":"rejects-over-shipment","title":"Rejects over shipment","sourcePath":"tests/StockLedgerRejectsOverShipmentTest.java"},
+    {"key":"uses-strict-reorder-threshold","title":"Uses strict reorder threshold","sourcePath":"tests/StockLedgerUsesStrictReorderThresholdTest.java"},
+    {"key":"reads-missing-sku-as-zero","title":"Reads missing SKU as zero","sourcePath":"tests/StockLedgerReadsMissingSkuAsZeroTest.java"}
+  ],
+  "mutants": [
+    {"key":"depleted-sku-retained","sourcePath":"mutants/depleted-sku-retained/StockLedger.java","method":"ship","mutatedLines":[24],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"removes-depleted-sku","revealExplanation":"A depleted SKU remains stored after its quantity reaches zero."}
+  ]
+}

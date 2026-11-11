@@ -505,7 +505,7 @@ public class PuzzleImporter {
             var props = this.properties;
 
             // Store puzzle to DB.
-            Puzzle puzzle = new Puzzle(-1, cut.getId(), props.type, props.isEquivalent, props.level,
+            Puzzle puzzle = Puzzle.regularPuzzle(-1, cut.getId(), props.type, props.isEquivalent, props.level,
                     maxAssertionsPerTest, mutantValidatorLevel, props.editableLinesStart, props.editableLinesEnd,
                     chapterId, position);
             int puzzleId = puzzleRepo.storePuzzle(puzzle);

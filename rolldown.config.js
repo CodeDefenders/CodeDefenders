@@ -85,6 +85,7 @@ export default defineConfig({
     input: [
         `${SRC_DIR}/game/index.js`,
         `${SRC_DIR}/main/index.js`,
+        `${SRC_DIR}/main/mutle.js`,
         `${SRC_DIR}/init/index.js`,
         ...fs.readdirSync(`${SRC_DIR}/thirdparty`)
                 .map(name => `${SRC_DIR}/thirdparty/${name}`)

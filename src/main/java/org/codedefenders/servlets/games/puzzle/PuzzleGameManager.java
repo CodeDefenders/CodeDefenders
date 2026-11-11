@@ -32,11 +32,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.arcade.mutle.persistence.MutleRepository;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.AntRunner.ExecutionLimitException;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -163,6 +165,9 @@ public class PuzzleGameManager extends HttpServlet {
     private PuzzleRepository puzzleRepo;
 
     @Inject
+    private MutleRepository mutleRepository;
+
+    @Inject
     private MutantRepository mutantRepo;
 
     @Inject
@@ -180,8 +185,22 @@ public class PuzzleGameManager extends HttpServlet {
     private ValidationRepository validationRepository;
 
     @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            super.service(request, response);
+        } catch (ExecutionLimitException e) {
+            logger.warn("Game execution rejected", e);
+            ServletUtils.executionRejected(request, response, previousSubmission, messages);
+        }
+    }
+
+    @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
+        if (redirectMutleGame(request, response)) {
+            return;
+        }
         if (!puzzleRepo.checkPuzzlesEnabled() || !puzzleRepo.checkActivePuzzlesExist()) {
             // Send users to the home page
             response.sendRedirect(url.forPath("/"));
@@ -362,6 +381,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
+        if (redirectMutleGame(request, response)) {
+            return;
+        }
         final HttpSession session = request.getSession();
         final String action = ServletUtils.formType(request);
         switch (action) {
@@ -383,6 +405,15 @@ public class PuzzleGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 break;
         }
+    }
+
+    private boolean redirectMutleGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Optional<Integer> gameId = gameId(request);
+        if (gameId.isPresent() && mutleRepository.isMutleGame(gameId.get(), login.getUserId())) {
+            response.sendRedirect(url.forPath(Paths.MUTLE_PLAY) + "?gameId=" + gameId.get());
+            return true;
+        }
+        return false;
     }
 
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, HttpSession session)

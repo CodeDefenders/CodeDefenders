@@ -137,6 +137,10 @@ public class ParallelMutationTester extends MutationTester {
                     liveFeedback.notifyPlayersOnMutantUpdated(game.getId(), mutant);
                 }
             } catch (InterruptedException | ExecutionException | CancellationException e) {
+                if (e.getCause() instanceof AntRunner.ExecutionLimitException rejected) {
+                    tasks.values().forEach(task -> task.cancel(true));
+                    throw rejected;
+                }
                 logger.error("While waiting results for mutant " + mutant, e);
             }
         }
@@ -267,6 +271,10 @@ public class ParallelMutationTester extends MutationTester {
                     return new PreparedMessage(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
                 }
             } catch (InterruptedException | ExecutionException e) {
+                if (e.getCause() instanceof AntRunner.ExecutionLimitException rejected) {
+                    tasks.values().forEach(pending -> pending.cancel(true));
+                    throw rejected;
+                }
                 logger.warn(
                         "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + e.getMessage());
                 // e.printStackTrace();

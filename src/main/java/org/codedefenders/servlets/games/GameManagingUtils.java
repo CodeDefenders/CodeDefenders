@@ -1325,6 +1325,25 @@ public class GameManagingUtils implements IGameManagingUtils {
         */
     }
 
+    public Mutant copyUploadedTemplateMutant(AbstractGame game, int templateMutantId) {
+        Mutant template = mutantRepo.getMutantById(templateMutantId);
+        if (template == null) {
+            throw new IllegalArgumentException("Unknown Mutle template mutant " + templateMutantId);
+        }
+        if (template.getClassId() != game.getClassId()) {
+            throw new IllegalArgumentException("Mutle template mutant has another class");
+        }
+        int attackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        if (attackerPlayerId == -1) {
+            throw new IllegalStateException("System attacker was not added to game " + game.getId());
+        }
+        Mutant copy = new Mutant(game.getId(), game.getClassId(), template.getJavaFile(), template.getClassFile(),
+                true, attackerPlayerId, gameRepo.getCurrentRound(game.getId()));
+        copy.setLines(template.getLines());
+        copy.setId(mutantRepo.storeMutant(copy));
+        return copy;
+    }
+
     public boolean hasPredefinedMutants(AbstractGame game) {
         int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         return game.getMutants().stream()

@@ -1,0 +1,29 @@
+{
+  "id": "shipping-manifest",
+  "title": "Shipping Manifest",
+  "specification": "A shipping manifest accepts unique positive-weight packages up to a positive fixed capacity and restores capacity when a package is removed.",
+  "concepts": ["state", "boundaries", "validation"],
+  "sourcePath": "ShippingManifest.java",
+  "tests": [
+    {"key": "rejects-zero-capacity", "title": "Rejects zero capacity", "sourcePath": "tests/ShippingManifestRejectsZeroCapacityTest.java"},
+    {"key": "accepts-exact-capacity", "title": "Accepts exact capacity", "sourcePath": "tests/ShippingManifestAcceptsExactCapacityTest.java"},
+    {"key": "rejects-excess-weight", "title": "Rejects excess weight", "sourcePath": "tests/ShippingManifestRejectsExcessWeightTest.java"},
+    {"key": "rejects-duplicate-identifier", "title": "Rejects duplicate identifier", "sourcePath": "tests/ShippingManifestRejectsDuplicateIdentifierTest.java"},
+    {"key": "rejects-null-identifier", "title": "Rejects null identifier", "sourcePath": "tests/ShippingManifestRejectsNullIdentifierTest.java"},
+    {"key": "rejects-empty-identifier", "title": "Rejects empty identifier", "sourcePath": "tests/ShippingManifestRejectsEmptyIdentifierTest.java"},
+    {"key": "rejects-zero-weight", "title": "Rejects zero weight", "sourcePath": "tests/ShippingManifestRejectsZeroWeightTest.java"},
+    {"key": "reports-missing-package", "title": "Reports missing package", "sourcePath": "tests/ShippingManifestReportsMissingPackageTest.java"},
+    {"key": "remove-missing-package", "title": "Cannot remove missing package", "sourcePath": "tests/ShippingManifestRemoveMissingPackageTest.java"},
+    {"key": "counts-added-package", "title": "Counts added package", "sourcePath": "tests/ShippingManifestCountsAddedPackageTest.java"},
+    {"key": "contains-added-package", "title": "Finds added package", "sourcePath": "tests/ShippingManifestContainsAddedPackageTest.java"},
+    {"key": "remaining-capacity", "title": "Tracks remaining capacity", "sourcePath": "tests/ShippingManifestRemainingCapacityTest.java"},
+    {"key": "removal-reports-success", "title": "Removal reports success", "sourcePath": "tests/ShippingManifestRemovalReportsSuccessTest.java"},
+    {"key": "removal-frees-capacity", "title": "Removal frees capacity", "sourcePath": "tests/ShippingManifestRemovalFreesCapacityTest.java"}
+  ],
+  "mutants": [
+    {"key": "total-weight-not-updated", "sourcePath": "mutants/total-weight-not-updated/ShippingManifest.java", "method": "addPackage", "mutatedLines": [28], "operator": "constant-replacement", "proofTestKey": "remaining-capacity", "revealExplanation": "Adding a package does not consume capacity."},
+    {"key": "exact-capacity-rejected", "sourcePath": "mutants/exact-capacity-rejected/ShippingManifest.java", "method": "addPackage", "mutatedLines": [24], "operator": "RELATIONAL_OPERATOR_REPLACEMENT", "proofTestKey": "accepts-exact-capacity", "revealExplanation": "A package that exactly fills capacity must be accepted."},
+    {"key": "excess-weight-allowed", "sourcePath": "mutants/excess-weight-allowed/ShippingManifest.java", "method": "addPackage", "mutatedLines": [24], "operator": "CONDITIONAL_OPERATOR_REPLACEMENT", "proofTestKey": "rejects-excess-weight", "revealExplanation": "A package may exceed the manifest capacity."},
+    {"key": "duplicate-identifier-allowed", "sourcePath": "mutants/duplicate-identifier-allowed/ShippingManifest.java", "method": "addPackage", "mutatedLines": [24], "operator": "CONDITIONAL_OPERATOR_REPLACEMENT", "proofTestKey": "rejects-duplicate-identifier", "revealExplanation": "A package identifier may be added more than once."}
+  ]
+}

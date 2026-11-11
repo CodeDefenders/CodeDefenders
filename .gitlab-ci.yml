@@ -83,8 +83,12 @@ metrics:
 
 
 build:
+  image: maven:3.9-eclipse-temurin-17
   stage: build
   needs: [ ]
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends gettext
   cache:
     - *cache-maven-repo
     # TODO(Alex): Add caching for node/npm/js stuff
@@ -130,6 +134,40 @@ unit-tests:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
+
+# Exercise the deployed WAR, browser UI and restricted runner on an isolated database.
+integration-tests_public-mutle:
+  image: debian:12-slim
+  stage: test
+  needs:
+    - build
+  services:
+    - name: mariadb:10.5
+      alias: database
+  variables:
+    MYSQL_DATABASE: codedefenders
+    MYSQL_USER: codedefenders
+    MYSQL_PASSWORD: public-mutle-ci
+    MYSQL_ROOT_PASSWORD: public-mutle-ci-root
+    CODEDEFENDERS_DB_HOST: database
+    CODEDEFENDERS_DB_NAME: codedefenders
+    CODEDEFENDERS_DB_USERNAME: codedefenders
+    CODEDEFENDERS_DB_PASSWORD: public-mutle-ci
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends maven openjdk-17-jdk-headless ant ant-optional tomcat10 chromium chromium-driver curl unzip
+  script:
+    - bash scripts/ci/test-public-mutle
+  artifacts:
+    when: always
+    paths:
+      - target/public-mutle-tomcat.log
+      - target/public-mutle-screenshots/
+      - target/jacoco-it.exec
+    reports:
+      junit: target/failsafe-reports/TEST-*.xml
+  rules:
+    - if: '$CI_MERGE_REQUEST_TITLE !~ /^Draft:/'
 
 # Template for database integration tests, we repeat those for the three supported database versions
 .integration-tests_database:
@@ -212,7 +250,7 @@ spotbugs-sast:
     MAVEN_REPO_PATH: '.m2/repository'
   before_script:
     # Remove unrelated project files
-    - rm {src/main/resources,target/classes,target/codedefenders/WEB-INF/classes}/data/build.xml {src/test/resources,target/test-classes}/itests/build.xml {src/main/webapp,target/codedefenders}/project-exporter/{build.gradle,gradlew}
+    - rm {src/main/resources,target/classes,target/codedefenders/WEB-INF/classes}/data/build.xml {src/main/webapp,target/codedefenders}/project-exporter/{build.gradle,gradlew}
   artifacts:
     reports:
       sast: gl-sast-report.json

@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +35,6 @@ public class AntProcessResult {
     private static final Logger logger = LoggerFactory.getLogger(AntProcessResult.class);
 
     private String inputStreamText = "";
-    private String errorStreamText = "";
-    private String exceptionText = "";
     private String compilerOutput = "";
     private String testOutput = "";
     private boolean compiled;
@@ -52,10 +48,8 @@ public class AntProcessResult {
 
         StringBuilder testOutputBuilder = new StringBuilder();
         final String TEST_PREFIX = "[junit] ";
-        final String JUNIT_RESULT_REGEX = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ((\\d+)(([.,])\\d+)?) sec";
         String line;
         try {
-            Pattern pattern = Pattern.compile(JUNIT_RESULT_REGEX, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 isLog.append(line).append(System.lineSeparator());
@@ -64,11 +58,6 @@ public class AntProcessResult {
                     compilerOutputBuilder.append(line).append(System.lineSeparator());
                 } else if (line.startsWith(TEST_PREFIX)) {
                     testOutputBuilder.append(line).append(System.lineSeparator());
-                    Matcher m = pattern.matcher(line);
-                    if (m.find()) {
-                        hasFailure = Integer.parseInt(m.group(2)) > 0;
-                        hasError = Integer.parseInt(m.group(3)) > 0;
-                    }
                 } else if (line.equalsIgnoreCase("BUILD SUCCESSFUL")) {
                     compiled = true;
                 }
@@ -136,14 +125,6 @@ public class AntProcessResult {
         return sanitized.toString();
     }
 
-    void setErrorStreamText(String errorStreamText) {
-        this.errorStreamText = errorStreamText;
-    }
-
-    void setExceptionText(String exceptionText) {
-        this.exceptionText = exceptionText;
-    }
-
     boolean compiled() {
         return compiled;
     }
@@ -156,6 +137,12 @@ public class AntProcessResult {
         return hasError;
     }
 
+    /** Test execution takes the outcome from a protected report rather than submitted-code stdout. */
+    void setTestOutcome(boolean failure, boolean error) {
+        hasFailure = failure;
+        hasError = error;
+    }
+
     String getCompilerOutput() {
         return compilerOutput;
     }
@@ -165,15 +152,13 @@ public class AntProcessResult {
     }
 
     String getErrorMessage() {
-        return inputStreamText + " " + errorStreamText + " " + exceptionText;
+        return inputStreamText;
     }
 
     @Override
     public String toString() {
         return "AntProcessResult{"
                 + "inputStreamText='" + inputStreamText + '\''
-                + ", errorStreamText='" + errorStreamText + '\''
-                + ", exceptionText='" + exceptionText + '\''
                 + '}';
     }
 

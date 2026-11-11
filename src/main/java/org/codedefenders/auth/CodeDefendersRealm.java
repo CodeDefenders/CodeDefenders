@@ -69,6 +69,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;
 
+import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
+
 /**
  * Implements a Realm that uses the {@link UserRepository} for authenticating users. The logic
  * to record the start of a session and the like has been moved inside the
@@ -212,6 +214,10 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
             if (activeUser.isPresent()) {
                 UserEntity user = activeUser.get();
+
+                if (user.getId() == MUTLE_GUEST_USER_ID) {
+                    throw new LockedAccountException("The guest account cannot log in.");
+                }
 
                 if (settingsRepo.isMailValidationRequired() && !user.isValidated()) {
                     throw new LockedAccountException("Account email is not validated.");
