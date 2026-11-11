@@ -88,7 +88,12 @@
     filter: drop-shadow(0 5px 0 #103c5714);
     transition: transform 220ms ease, filter 220ms ease;
 }
-.chapter.christmas-season .chapter__level:nth-child(6n + 2) .advent-gift {
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 2),
+    :nth-child(24n + 9),
+    :nth-child(24n + 13),
+    :nth-child(24n + 24)
+) .advent-gift {
     --paper: #51b996;
     --pattern: #8ed8b7;
     --ribbon: #ff8581;
@@ -98,14 +103,24 @@
     transparent 0 12px, var(--pattern) 12px 22px);
     --pattern-size: auto;
 }
-.chapter.christmas-season .chapter__level:nth-child(6n + 3) .advent-gift {
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 4),
+    :nth-child(24n + 12),
+    :nth-child(24n + 15),
+    :nth-child(24n + 22)
+) .advent-gift {
     --paper: #f5c450;
     --pattern: #ffecaa;
     --ribbon: #64bce9;
     --gift-width: 9rem;
     --gift-height: 5.75rem;
 }
-.chapter.christmas-season .chapter__level:nth-child(6n + 4) .advent-gift {
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 3),
+    :nth-child(24n + 7),
+    :nth-child(24n + 17),
+    :nth-child(24n + 20)
+) .advent-gift {
     --paper: #71c5e0;
     --pattern: #b9e9f1;
     --ribbon: #ffce64;
@@ -115,7 +130,12 @@
     transparent 0 13px, var(--pattern) 13px 18px);
     --pattern-size: auto;
 }
-.chapter.christmas-season .chapter__level:nth-child(6n + 5) .advent-gift {
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 6),
+    :nth-child(24n + 10),
+    :nth-child(24n + 14),
+    :nth-child(24n + 23)
+) .advent-gift {
     --paper: #f09e87;
     --pattern: #ffdac2;
     --ribbon: #87cbb2;
@@ -123,7 +143,12 @@
     --gift-height: 6.25rem;
     --pattern-size: 22px 22px;
 }
-.chapter.christmas-season .chapter__level:nth-child(6n) .advent-gift {
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 5),
+    :nth-child(24n + 8),
+    :nth-child(24n + 16),
+    :nth-child(24n + 19)
+) .advent-gift {
     --paper: #65afa4;
     --pattern: #a1dbca;
     --ribbon: #ffe18a;
