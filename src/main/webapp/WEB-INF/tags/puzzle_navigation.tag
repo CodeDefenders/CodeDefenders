@@ -46,6 +46,7 @@
                    href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">${i18n.tr('Overview')}</a></li>
             <c:if test="${puzzleNavigation.hasNextPuzzle()}">
                 <%--@elvariable id="nextPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
+                <%--@elvariable id="nextSeasonalPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
                 <c:set var="nextPuzzleObj" value="${puzzleNavigation.nextPuzzle.get()}"/>
                 <li><a class="dropdown-item" id="header-puzzle-next"
                        href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}"
@@ -58,6 +59,7 @@
                 <%-- shouldn't happen --%>
                 <li class="dropdown-item">${i18n.tr('There are currently no puzzles available.')}</li>
             </c:if>
+            <c:set var="nextSeasonalPuzzleObj" value="${puzzleNavigation.nextSeasonalPuzzle.orElse(null)}"/>
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="chapterEntry">
                 <%--@elvariable id="chapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
                 <c:set var="chapter" value="${chapterEntry.chapter}"/>
@@ -71,9 +73,9 @@
                         <c:forEach var="puzzleEntry" items="${chapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
                             <c:set var="status"
-                                   value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
+                                   value="${puzzleEntry.equals(nextPuzzleObj) || puzzleEntry.equals(nextSeasonalPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
                             <c:set var="icon"
-                                   value="${puzzleEntry.equals(nextPuzzleObj) ? 'fa-chevron-right' : (puzzleEntry.solved ? 'fa-check' : 'fa-lock')}"/>
+                                   value="${puzzleEntry.equals(nextPuzzleObj) || puzzleEntry.equals(nextSeasonalPuzzleObj) ? 'fa-chevron-right' : (puzzleEntry.solved ? 'fa-check' : 'fa-lock')}"/>
                             <li><a class="dropdown-item header-puzzle-${status}"
                                    id="header-puzzle-chapter-${chapter.position}-${puzzle.position}"
                                     <c:choose>

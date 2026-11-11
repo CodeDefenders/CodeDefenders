@@ -58,6 +58,7 @@ public class PuzzleNavigationBean {
 
     SortedSet<PuzzleChapterEntry> puzzleChapters;
     Optional<PuzzleEntry> nextPuzzle;
+    Optional<PuzzleEntry> nextSeasonalPuzzle;
 
     @Inject
     public PuzzleNavigationBean(PuzzleRepository puzzleRepo, CodeDefendersAuth login, I18nService i18nService) {
@@ -68,7 +69,7 @@ public class PuzzleNavigationBean {
         // maps the puzzle id to the puzzle game
         activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
                 .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity(),
-                        (a,b)-> a));
+                        (a, b) -> a));
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
@@ -84,18 +85,22 @@ public class PuzzleNavigationBean {
                 .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
                 .filter(Predicate.not(PuzzleEntry::isSolved))
                 .toList();
-        nextPuzzle = unsolvedPuzzles.stream().findFirst();
 
-        // lock puzzles if the user has not solved the previous puzzle
-//        unsolvedPuzzles.stream()
-//                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
-//                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
-//                .forEach(PuzzleEntry::lock);
+        nextPuzzle = unsolvedPuzzles.stream()
+                .filter(p -> !p.getPuzzle().getChapter().isSeasonalChapter())
+                .findFirst();
+
+        nextSeasonalPuzzle = unsolvedPuzzles.stream()
+                .filter(p -> p.getPuzzle().getChapter().isSeasonalChapter())
+                .findFirst();
 
         for (PuzzleEntry puzzleEntry : unsolvedPuzzles) {
             if (puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE) {
-                if (puzzleEntry.getPuzzle().isBlockedBySeason()
-                        || !nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
+                if (puzzleEntry.getPuzzle().getChapter().getCalendarDate() == null) {
+                    if (!nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
+                        puzzleEntry.lock();
+                    }
+                } else if (puzzleEntry.getPuzzle().isBlockedBySeason() || !nextSeasonalPuzzle.map(puzzleEntry::equals).orElse(true)) {
                     puzzleEntry.lock();
                 }
             }
@@ -131,6 +136,10 @@ public class PuzzleNavigationBean {
      */
     public Optional<PuzzleEntry> getNextPuzzle() {
         return nextPuzzle;
+    }
+
+    public Optional<PuzzleEntry> getNextSeasonalPuzzle() {
+        return nextSeasonalPuzzle;
     }
 
     /**

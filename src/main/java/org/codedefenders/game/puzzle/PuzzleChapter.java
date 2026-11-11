@@ -79,6 +79,10 @@ public class PuzzleChapter {
         return calendarDate;
     }
 
+    public boolean isSeasonalChapter() {
+        return calendarDate != null;
+    }
+
     public void setCalendarDate(LocalDate calendarDate) {
         this.calendarDate = calendarDate;
     }

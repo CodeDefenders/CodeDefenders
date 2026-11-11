@@ -297,8 +297,10 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         // check if puzzle is locked
-        Optional<Puzzle> nextPuzzle = getNextPuzzleForUser(userId);
-        if (nextPuzzle.isPresent() && nextPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()) {
+        Optional<Puzzle> nextNormalPuzzle = getNextPuzzleForUser(false);
+        Optional<Puzzle> nextSeasonalPuzzle = getNextPuzzleForUser(true);
+        if (nextNormalPuzzle.isPresent() && nextNormalPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()
+                && (nextSeasonalPuzzle.isEmpty() || nextSeasonalPuzzle.get().getPuzzleId() != puzzle.getPuzzleId())) {
             logger.error("Cannot create puzzle game for puzzleId: {}. Puzzle is locked.", puzzleId);
             response.setStatus(SC_FORBIDDEN);
             Redirect.redirectBack(request, response);
@@ -956,26 +958,29 @@ public class PuzzleGameManager extends HttpServlet {
     }
 
     /**
-     * Retrieves the first puzzle that has not been solved yet by the given user.
+     * Retrieves the first puzzle that has not been solved yet by the logged-in user.
      *
-     * @param userId The user to retrieve the next puzzle for.
+     * @param seasonal If true, check the first available seasonal puzzle. If false, check the first available
+     *                 non-seasonal puzzle.
      * @return The next puzzle for the given user, or an empty Optional if no puzzle is available / all puzzles were
      * solved.
      */
-    private Optional<Puzzle> getNextPuzzleForUser(int userId) {
+    private Optional<Puzzle> getNextPuzzleForUser(boolean seasonal) {
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
-                // TODO Should he make PuzzleDAO inject dependencies instead
-                PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
-                        puzzle.getPuzzleId(),
-                        login.getUserId()
-                );
+            if (puzzleChapter.isSeasonalChapter() == seasonal) {
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    // TODO Should he make PuzzleDAO inject dependencies instead
+                    PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
+                            puzzle.getPuzzleId(),
+                            login.getUserId()
+                    );
 
-                if (playedGame == null // Not yet played this puzzle
-                        || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
-                ) {
-                    // first not solved puzzle
-                    return Optional.of(puzzle);
+                    if (playedGame == null // Not yet played this puzzle
+                            || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
+                    ) {
+                        // first not solved puzzle
+                        return Optional.of(puzzle);
+                    }
                 }
             }
         }
