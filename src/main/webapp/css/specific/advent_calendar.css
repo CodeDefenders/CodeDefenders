@@ -339,14 +339,17 @@
     background: var(--christmas-scene-background);
     color: var(--christmas-scene-foreground);
 }
+#content {
+    overflow-x: clip;
+}
 
 /* full width */
 .chapter.christmas-season::before,
 .chapter.christmas-season > .christmas-scene__snow {
     position: absolute;
     top: 0;
-    left: var(--christmas-scene-left, 0px);
-    width: var(--christmas-scene-width, 100%);
+    left: var(--christmas-scene-left, -50vw);
+    width: var(--christmas-scene-width, 150vw);
     height: 100%;
     pointer-events: none;
 }
