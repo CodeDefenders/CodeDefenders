@@ -41,7 +41,7 @@ class PuzzleNavigationBeanTest {
     }
 
     private static PuzzleGame game(int puzzleId, int gameId) {
-        Puzzle puzzle = new Puzzle(puzzleId, 1, PuzzleType.DEFENDER, false, GameLevel.EASY, 1,
+        Puzzle puzzle = Puzzle.regularPuzzle(puzzleId, 1, PuzzleType.DEFENDER, false, GameLevel.EASY, 1,
                 null, null, null, null, null);
         PuzzleGame game = new PuzzleGame(puzzle, 7);
         game.setId(gameId);

@@ -217,7 +217,7 @@ public class MutleFixtureInstaller {
     }
 
     private int createPuzzle(GameClass cut) {
-        Puzzle puzzle = new Puzzle(-1, cut.getId(), PuzzleType.DEFENDER, false, GameLevel.EASY,
+        Puzzle puzzle = Puzzle.dummyPuzzle(-1, cut.getId(), PuzzleType.DEFENDER, false, GameLevel.EASY,
                 DEFAULT_NB_ASSERTIONS, DefaultRuleSets.MODERATE, null, null, null, null);
         int puzzleId = puzzleRepository.storePuzzle(puzzle);
         puzzle.setPuzzleId(puzzleId);

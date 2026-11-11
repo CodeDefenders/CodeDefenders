@@ -92,6 +92,12 @@ public class Puzzle {
     private PuzzleChapter chapter;
 
     /**
+     * Whether the puzzle is a dummy puzzle used to implement another mode
+     * or a regular puzzle for the standard puzzle mode.
+     */
+    private boolean isDummy;
+
+    /**
      * Constructs a new Puzzle instance.
      *
      * @param puzzleId             ID of the chapter.
@@ -106,6 +112,7 @@ public class Puzzle {
      * @param editableLinesEnd     Last editable line of the class or test. Can be null.
      * @param chapterId            ID of the chapter the puzzle belongs to. Can be null.
      * @param position             Position of the puzzle inside the chapter. Can be null.
+     * @param isDummy              Whether the puzzle is a dummy puzzle.
      */
     public Puzzle(int puzzleId,
                   int classId,
@@ -117,7 +124,8 @@ public class Puzzle {
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
                   Integer chapterId,
-                  Integer position) {
+                  Integer position,
+                  boolean isDummy) {
         this.puzzleId = puzzleId;
         this.classId = classId;
         this.type = type;
@@ -130,6 +138,7 @@ public class Puzzle {
         this.chapterId = chapterId;
         this.position = position;
         this.chapter = null;
+        this.isDummy = isDummy;
     }
 
     public static Puzzle forPuzzleInfo(int puzzleId,
@@ -139,7 +148,37 @@ public class Puzzle {
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
         return new Puzzle(puzzleId, -1, null, false, null, maxAssertionsPerTest,
-            null, editableLinesStart, editableLinesEnd, chapterId, position);
+            null, editableLinesStart, editableLinesEnd, chapterId, position, false);
+    }
+
+    public static Puzzle dummyPuzzle(int puzzleId,
+                                     int classId,
+                                     PuzzleType type,
+                                     boolean isEquivalent,
+                                     GameLevel level,
+                                     int maxAssertionsPerTest,
+                                     MutantValidationRuleSet mutantValidatorLevel,
+                                     Integer editableLinesStart,
+                                     Integer editableLinesEnd,
+                                     Integer chapterId,
+                                     Integer position) {
+        return new Puzzle(puzzleId, classId, type, isEquivalent, level, maxAssertionsPerTest,
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, true);
+    }
+
+    public static Puzzle regularPuzzle(int puzzleId,
+                                       int classId,
+                                       PuzzleType type,
+                                       boolean isEquivalent,
+                                       GameLevel level,
+                                       int maxAssertionsPerTest,
+                                       MutantValidationRuleSet mutantValidatorLevel,
+                                       Integer editableLinesStart,
+                                       Integer editableLinesEnd,
+                                       Integer chapterId,
+                                       Integer position) {
+        return new Puzzle(puzzleId, classId, type, isEquivalent, level, maxAssertionsPerTest,
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, false);
     }
 
     public int getPuzzleId() {
@@ -247,5 +286,13 @@ public class Puzzle {
 
     public void setEquivalent(boolean equivalent) {
         this.isEquivalent = equivalent;
+    }
+
+    public boolean isDummy() {
+        return isDummy;
+    }
+
+    public void setDummy(boolean isDummy) {
+        this.isDummy = isDummy;
     }
 }
