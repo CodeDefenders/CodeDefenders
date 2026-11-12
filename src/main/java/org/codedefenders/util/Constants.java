@@ -36,6 +36,7 @@ public class Constants {
     public static final int DUMMY_CREATOR_USER_ID = -1;
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
+    public static final int MUTLE_GUEST_USER_ID = 8;
     public static final int AI_ATTACKER_USER_ID = 5;
     public static final int AI_DEFENDER_USER_ID = 6;
     public static final int AI_PLAYER_USER_ID = 7;

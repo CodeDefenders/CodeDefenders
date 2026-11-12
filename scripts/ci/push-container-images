@@ -9,6 +9,9 @@ export LC_ALL=C.UTF-8
 GIT_COMMIT_REV_SHORT="${CI_COMMIT_SHORT_SHA:-$(git rev-parse --short HEAD)}"
 readonly GIT_COMMIT_REV_SHORT
 
+GIT_TAG="${CI_COMMIT_TAG:-$(git tag --points-at HEAD | head -n1)}"
+readonly GIT_TAG
+
 SOURCE_CONTAINER_TAG="$1"
 shift
 
@@ -16,7 +19,9 @@ TARGET_CONTAINER_NAME="$1"
 shift
 
 for registry in "$@"; do
-    buildah push "${SOURCE_CONTAINER_TAG}" "${registry}/${TARGET_CONTAINER_NAME}:git-${GIT_COMMIT_REV_SHORT}"
+    if [ -n "${GIT_TAG}" ]; then
+        buildah push "${SOURCE_CONTAINER_TAG}" "${registry}/${TARGET_CONTAINER_NAME}:${GIT_TAG}"
+    else
+        buildah push "${SOURCE_CONTAINER_TAG}" "${registry}/${TARGET_CONTAINER_NAME}:git-${GIT_COMMIT_REV_SHORT}"
+    fi
 done
-
-# TODO(Alex): Add additional handling for git tags

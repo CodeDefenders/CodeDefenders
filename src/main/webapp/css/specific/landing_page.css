@@ -22,6 +22,16 @@
     --color-error: #dc2626;
 }
 
+.page > .mutle-hero {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+}
+
+.mutle-hero + .anim .status {
+    margin-top: 0;
+}
+
 .title {
     font-size: 48px;
     font-weight: 500;

@@ -1,0 +1,25 @@
+{
+  "id":"discount-basket",
+  "title":"Discount Basket",
+  "specification":"A basket keeps distinct priced items and applies a bounded percentage discount.",
+  "concepts":["boundaries","collections","arithmetic"],
+  "sourcePath":"DiscountBasket.java",
+  "tests":[
+    {"key":"add","title":"Named item is accepted","sourcePath":"tests/DiscountBasketAddTest.java"},
+    {"key":"zero-price","title":"Zero price is valid","sourcePath":"tests/DiscountBasketZeroPriceTest.java"},
+    {"key":"empty-total","title":"Empty basket totals zero","sourcePath":"tests/DiscountBasketEmptyTotalTest.java"},
+    {"key":"duplicate","title":"Repeated name is rejected","sourcePath":"tests/DiscountBasketDuplicateTest.java"},
+    {"key":"capacity","title":"Eighth item fits","sourcePath":"tests/DiscountBasketCapacityTest.java"},
+    {"key":"remove","title":"Removal updates basket","sourcePath":"tests/DiscountBasketRemoveTest.java"},
+    {"key":"missing-remove","title":"Missing item stays absent","sourcePath":"tests/DiscountBasketMissingRemovalTest.java"},
+    {"key":"same-discount","title":"Same discount is unchanged","sourcePath":"tests/DiscountBasketSameDiscountTest.java"},
+    {"key":"discount-reports-change","title":"Changed discount is reported","sourcePath":"tests/DiscountBasketDiscountReportsChangeTest.java"},
+    {"key":"discount","title":"Discount reduces total","sourcePath":"tests/DiscountBasketDiscountTest.java"},
+    {"key":"rounding","title":"Discount total rounds down","sourcePath":"tests/DiscountBasketRoundingTest.java"},
+    {"key":"price-range","title":"Negative price is invalid","sourcePath":"tests/DiscountBasketPriceRangeTest.java"}
+  ],
+  "mutants":[
+    {"key":"eighth-item","sourcePath":"mutants/eighth-item/DiscountBasket.java","method":"addItem","mutatedLines":[17],"operator":"constant-replacement","proofTestKey":"capacity","revealExplanation":"The eighth item is rejected."},
+    {"key":"duplicate-name-allowed","sourcePath":"mutants/duplicate-name-allowed/DiscountBasket.java","method":"addItem","mutatedLines":[17],"operator":"CONDITIONAL_OPERATOR_REPLACEMENT","proofTestKey":"duplicate","revealExplanation":"An item name can be added more than once."}
+  ]
+}

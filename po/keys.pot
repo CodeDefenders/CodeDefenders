@@ -267,45 +267,33 @@ msgstr "Observer"
 msgid "Player"
 msgstr "Player"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:130
+#: src/main/java/org/codedefenders/model/AchievementType.java:134
 msgid "No games played yet"
 msgstr "No games played yet"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:131
+#: src/main/java/org/codedefenders/model/AchievementType.java:135
 msgid "Play your first game to unlock this achievement"
 msgstr "Play your first game to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:132
+#: src/main/java/org/codedefenders/model/AchievementType.java:136
 msgid "{0} of {1} games played"
 msgstr "{0} of {1} games played"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:134
+#: src/main/java/org/codedefenders/model/AchievementType.java:138
 msgid "Newbie"
 msgstr "Newbie"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:135
+#: src/main/java/org/codedefenders/model/AchievementType.java:139
 msgid "Play your first game!"
 msgstr "Play your first game!"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:136
-msgid "{0} of {1} games played to reach the next level"
-msgstr "{0} of {1} games played to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:138
-msgid "Bronze Player"
-msgstr "Bronze Player"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:139
-msgid "Play {0} games"
-msgstr "Play {0} games"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:140
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:142
-msgid "Silver Player"
-msgstr "Silver Player"
+msgid "Bronze Player"
+msgstr "Bronze Player"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:143
 msgid "Play {0} games"
@@ -316,56 +304,56 @@ msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:146
-msgid "Gold Player"
-msgstr "Gold Player"
+msgid "Silver Player"
+msgstr "Silver Player"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:147
 msgid "Play {0} games"
 msgstr "Play {0} games"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:148
-msgid "{0} games played, max level reached"
-msgstr "{0} games played, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:152
-msgid "No game played as attacker yet"
-msgstr "No game played as attacker yet"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:153
-msgid "Play as attacker to unlock this achievement"
-msgstr "Play as attacker to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:154
-msgid "{0} of {1} games played"
-msgstr "{0} of {1} games played"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:156
-msgid "Prepare to Attack"
-msgstr "Prepare to Attack"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:157
-msgid "Play your first multiplayer game as attacker"
-msgstr "Play your first multiplayer game as attacker"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:158
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:150
+msgid "Gold Player"
+msgstr "Gold Player"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:151
+msgid "Play {0} games"
+msgstr "Play {0} games"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:152
+msgid "{0} games played, max level reached"
+msgstr "{0} games played, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:156
+msgid "No game played as attacker yet"
+msgstr "No game played as attacker yet"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:157
+msgid "Play as attacker to unlock this achievement"
+msgstr "Play as attacker to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:158
+msgid "{0} of {1} games played"
+msgstr "{0} of {1} games played"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:160
-msgid "Bronze Attacker"
-msgstr "Bronze Attacker"
+msgid "Prepare to Attack"
+msgstr "Prepare to Attack"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:161
-msgid "Play {0} games as attacker"
-msgstr "Play {0} games as attacker"
+msgid "Play your first multiplayer game as attacker"
+msgstr "Play your first multiplayer game as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:162
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:164
-msgid "Silver Attacker"
-msgstr "Silver Attacker"
+msgid "Bronze Attacker"
+msgstr "Bronze Attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:165
 msgid "Play {0} games as attacker"
@@ -376,56 +364,56 @@ msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:168
-msgid "Gold Attacker"
-msgstr "Gold Attacker"
+msgid "Silver Attacker"
+msgstr "Silver Attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:169
 msgid "Play {0} games as attacker"
 msgstr "Play {0} games as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:170
-msgid "{0} games played, max level reached"
-msgstr "{0} games played, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:174
-msgid "No game played as defender yet"
-msgstr "No game played as defender yet"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:175
-msgid "Play as defender to unlock this achievement"
-msgstr "Play as defender to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:176
-msgid "{0} of {1} games played"
-msgstr "{0} of {1} games played"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:178
-msgid "Prepare Your Defenses"
-msgstr "Prepare Your Defenses"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:179
-msgid "Play your first multiplayer game as defender"
-msgstr "Play your first multiplayer game as defender"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:180
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:172
+msgid "Gold Attacker"
+msgstr "Gold Attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:173
+msgid "Play {0} games as attacker"
+msgstr "Play {0} games as attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:174
+msgid "{0} games played, max level reached"
+msgstr "{0} games played, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:178
+msgid "No game played as defender yet"
+msgstr "No game played as defender yet"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:179
+msgid "Play as defender to unlock this achievement"
+msgstr "Play as defender to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:180
+msgid "{0} of {1} games played"
+msgstr "{0} of {1} games played"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:182
-msgid "Bronze Defender"
-msgstr "Bronze Defender"
+msgid "Prepare Your Defenses"
+msgstr "Prepare Your Defenses"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:183
-msgid "Play {0} games as defender"
-msgstr "Play {0} games as defender"
+msgid "Play your first multiplayer game as defender"
+msgstr "Play your first multiplayer game as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:184
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:186
-msgid "Silver Defender"
-msgstr "Silver Defender"
+msgid "Bronze Defender"
+msgstr "Bronze Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:187
 msgid "Play {0} games as defender"
@@ -436,56 +424,56 @@ msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:190
-msgid "Gold Defender"
-msgstr "Gold Defender"
+msgid "Silver Defender"
+msgstr "Silver Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:191
 msgid "Play {0} games as defender"
 msgstr "Play {0} games as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:192
-msgid "{0} games played, max level reached"
-msgstr "{0} games played, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:196
-msgid "No melee game played yet"
-msgstr "No melee game played yet"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:197
-msgid "Try the melee mode to unlock this achievement"
-msgstr "Try the melee mode to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:198
-msgid "{0} of {1} games played"
-msgstr "{0} of {1} games played"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:200
-msgid "Melee Starter"
-msgstr "Melee Starter"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:201
-msgid "Play your first melee game"
-msgstr "Play your first melee game"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:202
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:194
+msgid "Gold Defender"
+msgstr "Gold Defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:195
+msgid "Play {0} games as defender"
+msgstr "Play {0} games as defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:196
+msgid "{0} games played, max level reached"
+msgstr "{0} games played, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:200
+msgid "No melee game played yet"
+msgstr "No melee game played yet"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:201
+msgid "Try the melee mode to unlock this achievement"
+msgstr "Try the melee mode to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:202
+msgid "{0} of {1} games played"
+msgstr "{0} of {1} games played"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:204
-msgid "Melee Bronze"
-msgstr "Melee Bronze"
+msgid "Melee Starter"
+msgstr "Melee Starter"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:205
-msgid "Play {0} melee games"
-msgstr "Play {0} melee games"
+msgid "Play your first melee game"
+msgstr "Play your first melee game"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:206
 msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:208
-msgid "Melee Silver"
-msgstr "Melee Silver"
+msgid "Melee Bronze"
+msgstr "Melee Bronze"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:209
 msgid "Play {0} melee games"
@@ -496,56 +484,56 @@ msgid "{0} of {1} games played to reach the next level"
 msgstr "{0} of {1} games played to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:212
-msgid "Melee Gold"
-msgstr "Melee Gold"
+msgid "Melee Silver"
+msgstr "Melee Silver"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:213
 msgid "Play {0} melee games"
 msgstr "Play {0} melee games"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:214
+msgid "{0} of {1} games played to reach the next level"
+msgstr "{0} of {1} games played to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:216
+msgid "Melee Gold"
+msgstr "Melee Gold"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:217
+msgid "Play {0} melee games"
+msgstr "Play {0} melee games"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:218
 msgid "{0} games played, max level reached"
 msgstr "{0} games played, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:218
+#: src/main/java/org/codedefenders/model/AchievementType.java:222
 msgid "No tests written yet"
 msgstr "No tests written yet"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:219
+#: src/main/java/org/codedefenders/model/AchievementType.java:223
 msgid "Write tests to unlock this achievement"
 msgstr "Write tests to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:220
+#: src/main/java/org/codedefenders/model/AchievementType.java:224
 msgid "{0} of {1} test written"
 msgstr "{0} of {1} test written"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:222
+#: src/main/java/org/codedefenders/model/AchievementType.java:226
 msgid "The First Test"
 msgstr "The First Test"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:223
+#: src/main/java/org/codedefenders/model/AchievementType.java:227
 msgid "Write your first test"
 msgstr "Write your first test"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:224
-msgid "{0} of {1} tests written to reach the next level"
-msgstr "{0} of {1} tests written to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:226
-msgid "Bronze Test Writer"
-msgstr "Bronze Test Writer"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:227
-msgid "Write {0} tests"
-msgstr "Write {0} tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:228
 msgid "{0} of {1} tests written to reach the next level"
 msgstr "{0} of {1} tests written to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:230
-msgid "Silver Test Writer"
-msgstr "Silver Test Writer"
+msgid "Bronze Test Writer"
+msgstr "Bronze Test Writer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:231
 msgid "Write {0} tests"
@@ -556,56 +544,56 @@ msgid "{0} of {1} tests written to reach the next level"
 msgstr "{0} of {1} tests written to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:234
-msgid "Gold Test Writer"
-msgstr "Gold Test Writer"
+msgid "Silver Test Writer"
+msgstr "Silver Test Writer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:235
 msgid "Write {0} tests"
 msgstr "Write {0} tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:236
+msgid "{0} of {1} tests written to reach the next level"
+msgstr "{0} of {1} tests written to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:238
+msgid "Gold Test Writer"
+msgstr "Gold Test Writer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:239
+msgid "Write {0} tests"
+msgstr "Write {0} tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:240
 msgid "{0} tests written, max level reached"
 msgstr "{0} tests written, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:240
+#: src/main/java/org/codedefenders/model/AchievementType.java:244
 msgid "No mutants created yet"
 msgstr "No mutants created yet"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:241
+#: src/main/java/org/codedefenders/model/AchievementType.java:245
 msgid "Create mutants to unlock this achievement"
 msgstr "Create mutants to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:242
+#: src/main/java/org/codedefenders/model/AchievementType.java:246
 msgid "{0} of {1} mutant created"
 msgstr "{0} of {1} mutant created"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:244
+#: src/main/java/org/codedefenders/model/AchievementType.java:248
 msgid "The First Mutant"
 msgstr "The First Mutant"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:245
+#: src/main/java/org/codedefenders/model/AchievementType.java:249
 msgid "Create your first mutant"
 msgstr "Create your first mutant"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:246
-msgid "{0} of {1} mutants created to reach the next level"
-msgstr "{0} of {1} mutants created to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:248
-msgid "Bronze Mutant Creator"
-msgstr "Bronze Mutant Creator"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:249
-msgid "Create {0} mutants"
-msgstr "Create {0} mutants"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:250
 msgid "{0} of {1} mutants created to reach the next level"
 msgstr "{0} of {1} mutants created to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:252
-msgid "Silver Mutant Creator"
-msgstr "Silver Mutant Creator"
+msgid "Bronze Mutant Creator"
+msgstr "Bronze Mutant Creator"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:253
 msgid "Create {0} mutants"
@@ -616,56 +604,56 @@ msgid "{0} of {1} mutants created to reach the next level"
 msgstr "{0} of {1} mutants created to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:256
-msgid "Gold Mutant Creator"
-msgstr "Gold Mutant Creator"
+msgid "Silver Mutant Creator"
+msgstr "Silver Mutant Creator"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:257
 msgid "Create {0} mutants"
 msgstr "Create {0} mutants"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:258
+msgid "{0} of {1} mutants created to reach the next level"
+msgstr "{0} of {1} mutants created to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:260
+msgid "Gold Mutant Creator"
+msgstr "Gold Mutant Creator"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:261
+msgid "Create {0} mutants"
+msgstr "Create {0} mutants"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:262
 msgid "{0} mutants created, max level reached"
 msgstr "{0} mutants created, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:262
+#: src/main/java/org/codedefenders/model/AchievementType.java:266
 msgid "No games won"
 msgstr "No games won"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:263
+#: src/main/java/org/codedefenders/model/AchievementType.java:267
 msgid "Win games to unlock this achievement"
 msgstr "Win games to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:264
+#: src/main/java/org/codedefenders/model/AchievementType.java:268
 msgid "{0} of {1} games won"
 msgstr "{0} of {1} games won"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:266
+#: src/main/java/org/codedefenders/model/AchievementType.java:270
 msgid "First Victory"
 msgstr "First Victory"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:267
+#: src/main/java/org/codedefenders/model/AchievementType.java:271
 msgid "Win your first game"
 msgstr "Win your first game"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:268
-msgid "{0} of {1} games won to reach the next level"
-msgstr "{0} of {1} games won to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:270
-msgid "Bronze Winner"
-msgstr "Bronze Winner"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:271
-msgid "Win {0} games"
-msgstr "Win {0} games"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:272
 msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:274
-msgid "Silver Winner"
-msgstr "Silver Winner"
+msgid "Bronze Winner"
+msgstr "Bronze Winner"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:275
 msgid "Win {0} games"
@@ -676,56 +664,56 @@ msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:278
-msgid "Gold Winner"
-msgstr "Gold Winner"
+msgid "Silver Winner"
+msgstr "Silver Winner"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:279
 msgid "Win {0} games"
 msgstr "Win {0} games"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:280
-msgid "{0} games won, max level reached"
-msgstr "{0} games won, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:284
-msgid "No games won as attacker"
-msgstr "No games won as attacker"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:285
-msgid "Win games as attacker to unlock this achievement"
-msgstr "Win games as attacker to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:286
-msgid "{0} of {1} games won"
-msgstr "{0} of {1} games won"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:288
-msgid "First Attacker Victory"
-msgstr "First Attacker Victory"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:289
-msgid "Win your first game as attacker"
-msgstr "Win your first game as attacker"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:290
 msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:282
+msgid "Gold Winner"
+msgstr "Gold Winner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:283
+msgid "Win {0} games"
+msgstr "Win {0} games"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:284
+msgid "{0} games won, max level reached"
+msgstr "{0} games won, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:288
+msgid "No games won as attacker"
+msgstr "No games won as attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:289
+msgid "Win games as attacker to unlock this achievement"
+msgstr "Win games as attacker to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:290
+msgid "{0} of {1} games won"
+msgstr "{0} of {1} games won"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:292
-msgid "Good Attacker"
-msgstr "Good Attacker"
+msgid "First Attacker Victory"
+msgstr "First Attacker Victory"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:293
-msgid "Win {0} games as attacker"
-msgstr "Win {0} games as attacker"
+msgid "Win your first game as attacker"
+msgstr "Win your first game as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:294
 msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:296
-msgid "Advanced Attacker"
-msgstr "Advanced Attacker"
+msgid "Good Attacker"
+msgstr "Good Attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:297
 msgid "Win {0} games as attacker"
@@ -736,56 +724,56 @@ msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:300
-msgid "Master Attacker"
-msgstr "Master Attacker"
+msgid "Advanced Attacker"
+msgstr "Advanced Attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:301
 msgid "Win {0} games as attacker"
 msgstr "Win {0} games as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:302
-msgid "{0} games won, max level reached"
-msgstr "{0} games won, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:306
-msgid "No games won as defender"
-msgstr "No games won as defender"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:307
-msgid "Win games as defender to unlock this achievement"
-msgstr "Win games as defender to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:308
-msgid "{0} of {1} games won"
-msgstr "{0} of {1} games won"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:310
-msgid "First Defender Victory"
-msgstr "First Defender Victory"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:311
-msgid "Win your first game as defender"
-msgstr "Win your first game as defender"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:312
 msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:304
+msgid "Master Attacker"
+msgstr "Master Attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:305
+msgid "Win {0} games as attacker"
+msgstr "Win {0} games as attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:306
+msgid "{0} games won, max level reached"
+msgstr "{0} games won, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:310
+msgid "No games won as defender"
+msgstr "No games won as defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:311
+msgid "Win games as defender to unlock this achievement"
+msgstr "Win games as defender to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:312
+msgid "{0} of {1} games won"
+msgstr "{0} of {1} games won"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:314
-msgid "Good Defender"
-msgstr "Good Defender"
+msgid "First Defender Victory"
+msgstr "First Defender Victory"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:315
-msgid "Win {0} games as defender"
-msgstr "Win {0} games as defender"
+msgid "Win your first game as defender"
+msgstr "Win your first game as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:316
 msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:318
-msgid "Advanced Defender"
-msgstr "Advanced Defender"
+msgid "Good Defender"
+msgstr "Good Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:319
 msgid "Win {0} games as defender"
@@ -796,56 +784,56 @@ msgid "{0} of {1} games won to reach the next level"
 msgstr "{0} of {1} games won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:322
-msgid "Master Defender"
-msgstr "Master Defender"
+msgid "Advanced Defender"
+msgstr "Advanced Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:323
 msgid "Win {0} games as defender"
 msgstr "Win {0} games as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:324
+msgid "{0} of {1} games won to reach the next level"
+msgstr "{0} of {1} games won to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:326
+msgid "Master Defender"
+msgstr "Master Defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:327
+msgid "Win {0} games as defender"
+msgstr "Win {0} games as defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:328
 msgid "{0} games won, max level reached"
 msgstr "{0} games won, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:328
+#: src/main/java/org/codedefenders/model/AchievementType.java:332
 msgid "No puzzles solved yet"
 msgstr "No puzzles solved yet"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:329
+#: src/main/java/org/codedefenders/model/AchievementType.java:333
 msgid "Solve puzzles to unlock this achievement"
 msgstr "Solve puzzles to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:330
+#: src/main/java/org/codedefenders/model/AchievementType.java:334
 msgid "{0} of {1} puzzles solved"
 msgstr "{0} of {1} puzzles solved"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:332
+#: src/main/java/org/codedefenders/model/AchievementType.java:336
 msgid "The First Puzzle"
 msgstr "The First Puzzle"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:333
+#: src/main/java/org/codedefenders/model/AchievementType.java:337
 msgid "Solve your first puzzle"
 msgstr "Solve your first puzzle"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:334
-msgid "{0} of {1} puzzles solved to reach the next level"
-msgstr "{0} of {1} puzzles solved to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:336
-msgid "Bronze Puzzle Solver"
-msgstr "Bronze Puzzle Solver"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:337
-msgid "Solve {0} puzzles"
-msgstr "Solve {0} puzzles"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:338
 msgid "{0} of {1} puzzles solved to reach the next level"
 msgstr "{0} of {1} puzzles solved to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:340
-msgid "Silver Puzzle Solver"
-msgstr "Silver Puzzle Solver"
+msgid "Bronze Puzzle Solver"
+msgstr "Bronze Puzzle Solver"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:341
 msgid "Solve {0} puzzles"
@@ -856,56 +844,56 @@ msgid "{0} of {1} puzzles solved to reach the next level"
 msgstr "{0} of {1} puzzles solved to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:344
-msgid "Puzzle Expert"
-msgstr "Puzzle Expert"
+msgid "Silver Puzzle Solver"
+msgstr "Silver Puzzle Solver"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:345
 msgid "Solve {0} puzzles"
 msgstr "Solve {0} puzzles"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:346
+msgid "{0} of {1} puzzles solved to reach the next level"
+msgstr "{0} of {1} puzzles solved to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:348
+msgid "Puzzle Expert"
+msgstr "Puzzle Expert"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:349
+msgid "Solve {0} puzzles"
+msgstr "Solve {0} puzzles"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:350
 msgid "{0} puzzles solved, max level reached"
 msgstr "{0} puzzles solved, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:350
+#: src/main/java/org/codedefenders/model/AchievementType.java:354
 msgid "No smell free tests written"
 msgstr "No smell free tests written"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:351
+#: src/main/java/org/codedefenders/model/AchievementType.java:355
 msgid "Write a test without test smells to unlock this achievement"
 msgstr "Write a test without test smells to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:352
+#: src/main/java/org/codedefenders/model/AchievementType.java:356
 msgid "{0} of {1} smell free tests written"
 msgstr "{0} of {1} smell free tests written"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:354
+#: src/main/java/org/codedefenders/model/AchievementType.java:358
 msgid "This smells good"
 msgstr "This smells good"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:355
+#: src/main/java/org/codedefenders/model/AchievementType.java:359
 msgid "Write the first test without smells"
 msgstr "Write the first test without smells"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:356
-msgid "{0} of {1} smell free tests written to reach the next level"
-msgstr "{0} of {1} smell free tests written to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:358
-msgid "Bronze Perfumer"
-msgstr "Bronze Perfumer"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:359
-msgid "Write {0} smell free tests"
-msgstr "Write {0} smell free tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:360
 msgid "{0} of {1} smell free tests written to reach the next level"
 msgstr "{0} of {1} smell free tests written to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:362
-msgid "Silver Perfumer"
-msgstr "Silver Perfumer"
+msgid "Bronze Perfumer"
+msgstr "Bronze Perfumer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:363
 msgid "Write {0} smell free tests"
@@ -916,56 +904,56 @@ msgid "{0} of {1} smell free tests written to reach the next level"
 msgstr "{0} of {1} smell free tests written to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:366
-msgid "Perfume Expert"
-msgstr "Perfume Expert"
+msgid "Silver Perfumer"
+msgstr "Silver Perfumer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:367
 msgid "Write {0} smell free tests"
 msgstr "Write {0} smell free tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:368
+msgid "{0} of {1} smell free tests written to reach the next level"
+msgstr "{0} of {1} smell free tests written to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:370
+msgid "Perfume Expert"
+msgstr "Perfume Expert"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:371
+msgid "Write {0} smell free tests"
+msgstr "Write {0} smell free tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:372
 msgid "{0} smell free tests written, max level reached"
 msgstr "{0} smell free tests written, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:372
+#: src/main/java/org/codedefenders/model/AchievementType.java:376
 msgid "No mutants killed"
 msgstr "No mutants killed"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:373
+#: src/main/java/org/codedefenders/model/AchievementType.java:377
 msgid "Kill a mutant to unlock this achievement"
 msgstr "Kill a mutant to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:374
+#: src/main/java/org/codedefenders/model/AchievementType.java:378
 msgid "{0} of {1} mutant killed"
 msgstr "{0} of {1} mutant killed"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:376
+#: src/main/java/org/codedefenders/model/AchievementType.java:380
 msgid "Get the mutants!"
 msgstr "Get the mutants!"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:377
+#: src/main/java/org/codedefenders/model/AchievementType.java:381
 msgid "Kill the first mutant with a test"
 msgstr "Kill the first mutant with a test"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:378
-msgid "{0} of {1} mutants killed to reach the next level"
-msgstr "{0} of {1} mutants killed to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:380
-msgid "Bronze Mutant Killer"
-msgstr "Bronze Mutant Killer"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:381
-msgid "Kill {0} mutants with tests"
-msgstr "Kill {0} mutants with tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:382
 msgid "{0} of {1} mutants killed to reach the next level"
 msgstr "{0} of {1} mutants killed to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:384
-msgid "Silver Mutant Killer"
-msgstr "Silver Mutant Killer"
+msgid "Bronze Mutant Killer"
+msgstr "Bronze Mutant Killer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:385
 msgid "Kill {0} mutants with tests"
@@ -976,56 +964,56 @@ msgid "{0} of {1} mutants killed to reach the next level"
 msgstr "{0} of {1} mutants killed to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:388
-msgid "Mutant Executioner"
-msgstr "Mutant Executioner"
+msgid "Silver Mutant Killer"
+msgstr "Silver Mutant Killer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:389
 msgid "Kill {0} mutants with tests"
 msgstr "Kill {0} mutants with tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:390
+msgid "{0} of {1} mutants killed to reach the next level"
+msgstr "{0} of {1} mutants killed to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:392
+msgid "Mutant Executioner"
+msgstr "Mutant Executioner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:393
+msgid "Kill {0} mutants with tests"
+msgstr "Kill {0} mutants with tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:394
 msgid "{0} mutants killed, max level reached"
 msgstr "{0} mutants killed, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:394
+#: src/main/java/org/codedefenders/model/AchievementType.java:398
 msgid "No lines covered"
 msgstr "No lines covered"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:395
+#: src/main/java/org/codedefenders/model/AchievementType.java:399
 msgid "Cover at least one line of code using tests to unlock this achievement"
 msgstr "Cover at least one line of code using tests to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:396
+#: src/main/java/org/codedefenders/model/AchievementType.java:400
 msgid "{0} of {1} lines covered"
 msgstr "{0} of {1} lines covered"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:398
+#: src/main/java/org/codedefenders/model/AchievementType.java:402
 msgid "Cover the first line"
 msgstr "Cover the first line"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:399
+#: src/main/java/org/codedefenders/model/AchievementType.java:403
 msgid "Cover the first line of code with a test"
 msgstr "Cover the first line of code with a test"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:400
-msgid "{0} of {1} lines covered to reach the next level"
-msgstr "{0} of {1} lines covered to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:402
-msgid "Bronze Coverer"
-msgstr "Bronze Coverer"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:403
-msgid "Cover {0} lines of code with tests"
-msgstr "Cover {0} lines of code with tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:404
 msgid "{0} of {1} lines covered to reach the next level"
 msgstr "{0} of {1} lines covered to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:406
-msgid "Silver Coverer"
-msgstr "Silver Coverer"
+msgid "Bronze Coverer"
+msgstr "Bronze Coverer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:407
 msgid "Cover {0} lines of code with tests"
@@ -1036,56 +1024,56 @@ msgid "{0} of {1} lines covered to reach the next level"
 msgstr "{0} of {1} lines covered to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:410
-msgid "Line Coverage Expert"
-msgstr "Line Coverage Expert"
+msgid "Silver Coverer"
+msgstr "Silver Coverer"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:411
 msgid "Cover {0} lines of code with tests"
 msgstr "Cover {0} lines of code with tests"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:412
-msgid "{0} lines covered, max level reached"
-msgstr "{0} lines covered, max level reached"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:416
-msgid "No tests with coverage"
-msgstr "No tests with coverage"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:417
-msgid "Write a test that covers at least one line of code to unlock this achievement"
-msgstr "Write a test that covers at least one line of code to unlock this achievement"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:418
-msgid "{0} of {1} lines covered"
-msgstr "{0} of {1} lines covered"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:420
-msgid "Specific Tester"
-msgstr "Specific Tester"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:421
-msgid "Write a test that covers at least one line of code"
-msgstr "Write a test that covers at least one line of code"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:422
 msgid "{0} of {1} lines covered to reach the next level"
 msgstr "{0} of {1} lines covered to reach the next level"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:414
+msgid "Line Coverage Expert"
+msgstr "Line Coverage Expert"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:415
+msgid "Cover {0} lines of code with tests"
+msgstr "Cover {0} lines of code with tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:416
+msgid "{0} lines covered, max level reached"
+msgstr "{0} lines covered, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:420
+msgid "No tests with coverage"
+msgstr "No tests with coverage"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:421
+msgid "Write a test that covers at least one line of code to unlock this achievement"
+msgstr "Write a test that covers at least one line of code to unlock this achievement"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:422
+msgid "{0} of {1} lines covered"
+msgstr "{0} of {1} lines covered"
+
 #: src/main/java/org/codedefenders/model/AchievementType.java:424
-msgid "Small Tester"
-msgstr "Small Tester"
+msgid "Specific Tester"
+msgstr "Specific Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:425
-msgid "Cover {0} lines of code using a single test"
-msgstr "Cover {0} lines of code using a single test"
+msgid "Write a test that covers at least one line of code"
+msgstr "Write a test that covers at least one line of code"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:426
 msgid "{0} of {1} lines covered to reach the next level"
 msgstr "{0} of {1} lines covered to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:428
-msgid "Large-Scale Tester"
-msgstr "Large-Scale Tester"
+msgid "Small Tester"
+msgstr "Small Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:429
 msgid "Cover {0} lines of code using a single test"
@@ -1096,56 +1084,56 @@ msgid "{0} of {1} lines covered to reach the next level"
 msgstr "{0} of {1} lines covered to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:432
-msgid "All-Encompassing Tester"
-msgstr "All-Encompassing Tester"
+msgid "Large-Scale Tester"
+msgstr "Large-Scale Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:433
 msgid "Cover {0} lines of code using a single test"
 msgstr "Cover {0} lines of code using a single test"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:434
+msgid "{0} of {1} lines covered to reach the next level"
+msgstr "{0} of {1} lines covered to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:436
+msgid "All-Encompassing Tester"
+msgstr "All-Encompassing Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:437
+msgid "Cover {0} lines of code using a single test"
+msgstr "Cover {0} lines of code using a single test"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:438
 msgid "You wrote a test that covered {0} lines, this is crazy, please stop :o"
 msgstr "You wrote a test that covered {0} lines, this is crazy, please stop :o"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:438
+#: src/main/java/org/codedefenders/model/AchievementType.java:442
 msgid "No Duels won"
 msgstr "No Duels won"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:439
+#: src/main/java/org/codedefenders/model/AchievementType.java:443
 msgid "Win your first equivalence duel to unlock this achievement"
 msgstr "Win your first equivalence duel to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:440
+#: src/main/java/org/codedefenders/model/AchievementType.java:444
 msgid "{0} of {1} equivalence duels won"
 msgstr "{0} of {1} equivalence duels won"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:442
+#: src/main/java/org/codedefenders/model/AchievementType.java:446
 msgid "Beginner Duelist"
 msgstr "Beginner Duelist"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:443
+#: src/main/java/org/codedefenders/model/AchievementType.java:447
 msgid "Win your first equivalence duel"
 msgstr "Win your first equivalence duel"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:444
-msgid "{0} of {1} equivalence duels won to reach the next level"
-msgstr "{0} of {1} equivalence duels won to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:446
-msgid "Bronze Duelist"
-msgstr "Bronze Duelist"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:447
-msgid "Win {0} equivalence duels"
-msgstr "Win {0} equivalence duels"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:448
 msgid "{0} of {1} equivalence duels won to reach the next level"
 msgstr "{0} of {1} equivalence duels won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:450
-msgid "Silver Duelist"
-msgstr "Silver Duelist"
+msgid "Bronze Duelist"
+msgstr "Bronze Duelist"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:451
 msgid "Win {0} equivalence duels"
@@ -1156,56 +1144,56 @@ msgid "{0} of {1} equivalence duels won to reach the next level"
 msgstr "{0} of {1} equivalence duels won to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:454
-msgid "The Best Duelist"
-msgstr "The Best Duelist"
+msgid "Silver Duelist"
+msgstr "Silver Duelist"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:455
 msgid "Win {0} equivalence duels"
 msgstr "Win {0} equivalence duels"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:456
+msgid "{0} of {1} equivalence duels won to reach the next level"
+msgstr "{0} of {1} equivalence duels won to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:458
+msgid "The Best Duelist"
+msgstr "The Best Duelist"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:459
+msgid "Win {0} equivalence duels"
+msgstr "Win {0} equivalence duels"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:460
 msgid "{0} equivalence duels won, max level reached"
 msgstr "{0} equivalence duels won, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:460
+#: src/main/java/org/codedefenders/model/AchievementType.java:464
 msgid "No Duels won as attacker"
 msgstr "No Duels won as attacker"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:461
+#: src/main/java/org/codedefenders/model/AchievementType.java:465
 msgid "Win your first equivalence duel as attacker to unlock this achievement"
 msgstr "Win your first equivalence duel as attacker to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:462
+#: src/main/java/org/codedefenders/model/AchievementType.java:466
 msgid "{0} of {1} equivalence duels won as attacker"
 msgstr "{0} of {1} equivalence duels won as attacker"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:464
+#: src/main/java/org/codedefenders/model/AchievementType.java:468
 msgid "Prove them wrong!"
 msgstr "Prove them wrong!"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:465
+#: src/main/java/org/codedefenders/model/AchievementType.java:469
 msgid "Win your first equivalence duel as attacker"
 msgstr "Win your first equivalence duel as attacker"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:466
-msgid "{0} of {1} equivalence duels won as attacker to reach the next level"
-msgstr "{0} of {1} equivalence duels won as attacker to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:468
-msgid "Bronze Mutant Defender"
-msgstr "Bronze Mutant Defender"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:469
-msgid "Win {0} equivalence duels as attacker"
-msgstr "Win {0} equivalence duels as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:470
 msgid "{0} of {1} equivalence duels won as attacker to reach the next level"
 msgstr "{0} of {1} equivalence duels won as attacker to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:472
-msgid "Silver Mutant Defender"
-msgstr "Silver Mutant Defender"
+msgid "Bronze Mutant Defender"
+msgstr "Bronze Mutant Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:473
 msgid "Win {0} equivalence duels as attacker"
@@ -1216,56 +1204,56 @@ msgid "{0} of {1} equivalence duels won as attacker to reach the next level"
 msgstr "{0} of {1} equivalence duels won as attacker to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:476
-msgid "The Best Mutant Defender"
-msgstr "The Best Mutant Defender"
+msgid "Silver Mutant Defender"
+msgstr "Silver Mutant Defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:477
 msgid "Win {0} equivalence duels as attacker"
 msgstr "Win {0} equivalence duels as attacker"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:478
+msgid "{0} of {1} equivalence duels won as attacker to reach the next level"
+msgstr "{0} of {1} equivalence duels won as attacker to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:480
+msgid "The Best Mutant Defender"
+msgstr "The Best Mutant Defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:481
+msgid "Win {0} equivalence duels as attacker"
+msgstr "Win {0} equivalence duels as attacker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:482
 msgid "{0} equivalence duels won as attacker, max level reached"
 msgstr "{0} equivalence duels won as attacker, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:482
+#: src/main/java/org/codedefenders/model/AchievementType.java:486
 msgid "No Duels won as defender"
 msgstr "No Duels won as defender"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:483
+#: src/main/java/org/codedefenders/model/AchievementType.java:487
 msgid "Win your first equivalence duel as defender to unlock this achievement"
 msgstr "Win your first equivalence duel as defender to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:484
+#: src/main/java/org/codedefenders/model/AchievementType.java:488
 msgid "{0} of {1} equivalence duels won as defender"
 msgstr "{0} of {1} equivalence duels won as defender"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:486
+#: src/main/java/org/codedefenders/model/AchievementType.java:490
 msgid "Beginner Equivalence Detective"
 msgstr "Beginner Equivalence Detective"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:487
+#: src/main/java/org/codedefenders/model/AchievementType.java:491
 msgid "Win your first equivalence duel as defender"
 msgstr "Win your first equivalence duel as defender"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:488
-msgid "{0} of {1} equivalence duels won as defender to reach the next level"
-msgstr "{0} of {1} equivalence duels won as defender to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:490
-msgid "Bronze Equivalence Detective"
-msgstr "Bronze Equivalence Detective"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:491
-msgid "Win {0} equivalence duels as defender"
-msgstr "Win {0} equivalence duels as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:492
 msgid "{0} of {1} equivalence duels won as defender to reach the next level"
 msgstr "{0} of {1} equivalence duels won as defender to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:494
-msgid "Silver Equivalence Detective"
-msgstr "Silver Equivalence Detective"
+msgid "Bronze Equivalence Detective"
+msgstr "Bronze Equivalence Detective"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:495
 msgid "Win {0} equivalence duels as defender"
@@ -1276,44 +1264,44 @@ msgid "{0} of {1} equivalence duels won as defender to reach the next level"
 msgstr "{0} of {1} equivalence duels won as defender to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:498
-msgid "The Best Equivalence Detective"
-msgstr "The Best Equivalence Detective"
+msgid "Silver Equivalence Detective"
+msgstr "Silver Equivalence Detective"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:499
 msgid "Win {0} equivalence duels as defender"
 msgstr "Win {0} equivalence duels as defender"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:500
+msgid "{0} of {1} equivalence duels won as defender to reach the next level"
+msgstr "{0} of {1} equivalence duels won as defender to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:502
+msgid "The Best Equivalence Detective"
+msgstr "The Best Equivalence Detective"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:503
+msgid "Win {0} equivalence duels as defender"
+msgstr "Win {0} equivalence duels as defender"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:504
 msgid "{0} equivalence duels won as defender, max level reached"
 msgstr "{0} equivalence duels won as defender, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:504
+#: src/main/java/org/codedefenders/model/AchievementType.java:508
 msgid "Not enough tests written in 5 minutes"
 msgstr "Not enough tests written in 5 minutes"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:505
+#: src/main/java/org/codedefenders/model/AchievementType.java:509
 msgid "Write two tests in 5 minutes to unlock this achievement"
 msgstr "Write two tests in 5 minutes to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:506
+#: src/main/java/org/codedefenders/model/AchievementType.java:510
 msgid "{0} of {1} tests written in 5 minutes"
 msgstr "{0} of {1} tests written in 5 minutes"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:508
+#: src/main/java/org/codedefenders/model/AchievementType.java:512
 msgid "Speedy Tester"
 msgstr "Speedy Tester"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:509
-msgid "Write {0} tests in 5 minutes"
-msgstr "Write {0} tests in 5 minutes"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:510
-msgid "{0} of {1} tests written in 5 minutes to reach the next level"
-msgstr "{0} of {1} tests written in 5 minutes to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:512
-msgid "Bronze Speedy Tester"
-msgstr "Bronze Speedy Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:513
 msgid "Write {0} tests in 5 minutes"
@@ -1324,8 +1312,8 @@ msgid "{0} of {1} tests written in 5 minutes to reach the next level"
 msgstr "{0} of {1} tests written in 5 minutes to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:516
-msgid "Silver Speedy Tester"
-msgstr "Silver Speedy Tester"
+msgid "Bronze Speedy Tester"
+msgstr "Bronze Speedy Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:517
 msgid "Write {0} tests in 5 minutes"
@@ -1336,44 +1324,44 @@ msgid "{0} of {1} tests written in 5 minutes to reach the next level"
 msgstr "{0} of {1} tests written in 5 minutes to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:520
-msgid "The Fastest Tester"
-msgstr "The Fastest Tester"
+msgid "Silver Speedy Tester"
+msgstr "Silver Speedy Tester"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:521
 msgid "Write {0} tests in 5 minutes"
 msgstr "Write {0} tests in 5 minutes"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:522
+msgid "{0} of {1} tests written in 5 minutes to reach the next level"
+msgstr "{0} of {1} tests written in 5 minutes to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:524
+msgid "The Fastest Tester"
+msgstr "The Fastest Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:525
+msgid "Write {0} tests in 5 minutes"
+msgstr "Write {0} tests in 5 minutes"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:526
 msgid "{0} tests written in 5 minutes, max level reached"
 msgstr "{0} tests written in 5 minutes, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:526
+#: src/main/java/org/codedefenders/model/AchievementType.java:530
 msgid "Not enough mutants created in 5 minutes"
 msgstr "Not enough mutants created in 5 minutes"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:527
+#: src/main/java/org/codedefenders/model/AchievementType.java:531
 msgid "Create five mutants in 5 minutes to unlock this achievement"
 msgstr "Create five mutants in 5 minutes to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:528
+#: src/main/java/org/codedefenders/model/AchievementType.java:532
 msgid "{0} of {1} mutants created in 5 minutes"
 msgstr "{0} of {1} mutants created in 5 minutes"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:530
+#: src/main/java/org/codedefenders/model/AchievementType.java:534
 msgid "Speedy Mutant Creator"
 msgstr "Speedy Mutant Creator"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:531
-msgid "Create {0} mutants in 5 minutes"
-msgstr "Create {0} mutants in 5 minutes"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:532
-msgid "{0} of {1} mutants created in 5 minutes to reach the next level"
-msgstr "{0} of {1} mutants created in 5 minutes to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:534
-msgid "Bronze Speedy Mutator"
-msgstr "Bronze Speedy Mutator"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:535
 msgid "Create {0} mutants in 5 minutes"
@@ -1384,8 +1372,8 @@ msgid "{0} of {1} mutants created in 5 minutes to reach the next level"
 msgstr "{0} of {1} mutants created in 5 minutes to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:538
-msgid "Silver Speedy Mutator"
-msgstr "Silver Speedy Mutator"
+msgid "Bronze Speedy Mutator"
+msgstr "Bronze Speedy Mutator"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:539
 msgid "Create {0} mutants in 5 minutes"
@@ -1396,48 +1384,48 @@ msgid "{0} of {1} mutants created in 5 minutes to reach the next level"
 msgstr "{0} of {1} mutants created in 5 minutes to reach the next level"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:542
-msgid "The Fastest Mutator"
-msgstr "The Fastest Mutator"
+msgid "Silver Speedy Mutator"
+msgstr "Silver Speedy Mutator"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:543
 msgid "Create {0} mutants in 5 minutes"
 msgstr "Create {0} mutants in 5 minutes"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:544
+msgid "{0} of {1} mutants created in 5 minutes to reach the next level"
+msgstr "{0} of {1} mutants created in 5 minutes to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:546
+msgid "The Fastest Mutator"
+msgstr "The Fastest Mutator"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:547
+msgid "Create {0} mutants in 5 minutes"
+msgstr "Create {0} mutants in 5 minutes"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:548
 msgid "{0} mutants created in 5 minutes, max level reached"
 msgstr "{0} mutants created in 5 minutes, max level reached"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:548
+#: src/main/java/org/codedefenders/model/AchievementType.java:552
 msgid "No puzzles solved on the first try"
 msgstr "No puzzles solved on the first try"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:549
+#: src/main/java/org/codedefenders/model/AchievementType.java:553
 msgid "Solve a puzzle on the first try to unlock this achievement"
 msgstr "Solve a puzzle on the first try to unlock this achievement"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:550
+#: src/main/java/org/codedefenders/model/AchievementType.java:554
 msgid "{0} of {1} puzzles solved on the first try"
 msgstr "{0} of {1} puzzles solved on the first try"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:552
+#: src/main/java/org/codedefenders/model/AchievementType.java:556
 msgid "One and Done"
 msgstr "One and Done"
 
-#: src/main/java/org/codedefenders/model/AchievementType.java:553
+#: src/main/java/org/codedefenders/model/AchievementType.java:557
 msgid "Solve your first puzzle on the first try"
 msgstr "Solve your first puzzle on the first try"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:554
-msgid "{0} of {1} puzzles solved on the first try to reach the next level"
-msgstr "{0} of {1} puzzles solved on the first try to reach the next level"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:556
-msgid "{0} Birds with {0} Stones"
-msgstr "{0} Birds with {0} Stones"
-
-#: src/main/java/org/codedefenders/model/AchievementType.java:557
-msgid "Solve {0} puzzles on the first try"
-msgstr "Solve {0} puzzles on the first try"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:558
 msgid "{0} of {1} puzzles solved on the first try to reach the next level"
@@ -1464,8 +1452,140 @@ msgid "Solve {0} puzzles on the first try"
 msgstr "Solve {0} puzzles on the first try"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:566
+msgid "{0} of {1} puzzles solved on the first try to reach the next level"
+msgstr "{0} of {1} puzzles solved on the first try to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:568
+msgid "{0} Birds with {0} Stones"
+msgstr "{0} Birds with {0} Stones"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:569
+msgid "Solve {0} puzzles on the first try"
+msgstr "Solve {0} puzzles on the first try"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:570
 msgid "{0} puzzles solved on the first try, max level reached"
 msgstr "{0} puzzles solved on the first try, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:574
+msgid "No Mutle cases solved"
+msgstr "No Mutle cases solved"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:575
+msgid "Solve a Mutle case"
+msgstr "Solve a Mutle case"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:576
+msgid "{0} of {1} Mutle cases solved"
+msgstr "{0} of {1} Mutle cases solved"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:578
+msgid "Mutle Solver"
+msgstr "Mutle Solver"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:579
+msgid "Solve your first Mutle case"
+msgstr "Solve your first Mutle case"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:580
+msgid "{0} of {1} Mutle cases solved to reach the next level"
+msgstr "{0} of {1} Mutle cases solved to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:582
+msgid "Mutle Master"
+msgstr "Mutle Master"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:583
+msgid "Solve {0} Mutle cases"
+msgstr "Solve {0} Mutle cases"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:584
+msgid "{0} of {1} Mutle cases solved to reach the next level"
+msgstr "{0} of {1} Mutle cases solved to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:586
+msgid "Mutle Genius"
+msgstr "Mutle Genius"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:587
+msgid "Solve {0} Mutle cases"
+msgstr "Solve {0} Mutle cases"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:588
+msgid "{0} of {1} Mutle cases solved to reach the next level"
+msgstr "{0} of {1} Mutle cases solved to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:590
+msgid "Mutle Legend"
+msgstr "Mutle Legend"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:591
+msgid "Solve {0} Mutle cases"
+msgstr "Solve {0} Mutle cases"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:592
+msgid "{0} Mutle cases solved, max level reached"
+msgstr "{0} Mutle cases solved, max level reached"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:595
+msgid "No Mutle case solved in two tests or fewer"
+msgstr "No Mutle case solved in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:596
+msgid "Solve a Mutle case in two tests or fewer"
+msgstr "Solve a Mutle case in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:597
+msgid "{0} of {1} Mutle cases solved in two tests or fewer"
+msgstr "{0} of {1} Mutle cases solved in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:598
+msgid "Swift Mutle Solver"
+msgstr "Swift Mutle Solver"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:599
+msgid "Solve a Mutle case in two tests or fewer"
+msgstr "Solve a Mutle case in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:600
+msgid "Mutle case solved in two tests or fewer"
+msgstr "Mutle case solved in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:601
+msgid "Mutle Speedrunner"
+msgstr "Mutle Speedrunner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:602
+msgid "Solve {0} Mutle cases in two tests or fewer"
+msgstr "Solve {0} Mutle cases in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:603
+msgid "{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"
+msgstr "{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:604
+msgid "Mutle Flash"
+msgstr "Mutle Flash"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:605
+msgid "Solve {0} Mutle cases in two tests or fewer"
+msgstr "Solve {0} Mutle cases in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:606
+msgid "{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"
+msgstr "{0} of {1} Mutle cases solved in two tests or fewer to reach the next level"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:607
+msgid "Mutle Lightning"
+msgstr "Mutle Lightning"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:608
+msgid "Solve {0} Mutle cases in two tests or fewer"
+msgstr "Solve {0} Mutle cases in two tests or fewer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:609
+msgid "{0} Mutle cases solved in two tests or fewer, max level reached"
+msgstr "{0} Mutle cases solved in two tests or fewer, max level reached"
 
 #: src/main/java/org/codedefenders/model/Feedback.java:38
 msgid "Mutation Difficulty"
@@ -2040,90 +2160,98 @@ msgid "Let users play the puzzles in the puzzle section."
 msgstr "Let users play the puzzles in the puzzle section."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:182
+msgid "Allow Mutle Section"
+msgstr "Allow Mutle Section"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:183
+msgid "Let users play Mutle puzzles."
+msgstr "Let users play Mutle puzzles."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:186
 msgid "Failed Duel Validation Threshold"
 msgstr "Failed Duel Validation Threshold"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:183
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
 msgid "The maximum number of tests that will run to validate a lost equivalence duel."
 msgstr "The maximum number of tests that will run to validate a lost equivalence duel."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:186
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:190
 msgid "Game Duration Minutes Max"
 msgstr "Game Duration Minutes Max"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
 msgid "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 msgstr "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:190
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:194
 msgid "Game Duration Minutes Default"
 msgstr "Game Duration Minutes Default"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:195
 msgid "The default duration a multiplayer/melee game is open (in minutes)."
 msgstr "The default duration a multiplayer/melee game is open (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:194
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:198
 msgid "Teacher Applications Enabled"
 msgstr "Teacher Applications Enabled"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:200
 msgid "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 msgstr "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:207
 msgid "Teacher Applications Email"
 msgstr "Teacher Applications Email"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:208
 msgid "The email address to use for teacher account applications."
 msgstr "The email address to use for teacher account applications."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:207
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:211
 msgid "Log Level"
 msgstr "Log Level"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:208
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:212
 msgid "Controls the granularity of log messages."
 msgstr "Controls the granularity of log messages."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:211
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:215
 msgid "LLM action interval"
 msgstr "LLM action interval"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:212
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:216
 msgid "The default number of seconds between actions of an AI player."
 msgstr "The default number of seconds between actions of an AI player."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:215
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:219
 msgid "LLM normal prompt number of tries"
 msgstr "LLM normal prompt number of tries"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:216
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:220
 msgid "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
 msgstr "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:219
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:223
 msgid "LLM equivalence duel number of tries"
 msgstr "LLM equivalence duel number of tries"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:220
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:224
 msgid "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
 msgstr "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:223
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:227
 msgid "OpenAI key"
 msgstr "OpenAI key"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:224
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:228
 msgid "The API key for OpenAI to be used by LLM players"
 msgstr "The API key for OpenAI to be used by LLM players"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:364
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:368
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:365
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:369
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
@@ -2907,75 +3035,75 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1237
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1150
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1238
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1151
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "Flagged 1 mutant as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1239
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1152
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "Flagged {0} mutants as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1436
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1368
 msgid "Your test has the following smell: {0}"
 msgstr "Your test has the following smell: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1442
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1374
 msgid "Your test has the following smells: {0}"
 msgstr "Your test has the following smells: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:809
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:806
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:814
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:811
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Can only resolve equivalence duels if you are a Player!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:819
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:816
 msgid "Game {0} has finished."
 msgstr "Game {0} has finished."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:824
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:821
 msgid "Mutant does not exist."
 msgstr "Mutant does not exist."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:840
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:837
 msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
 msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1078
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1071
 msgid "...and it also killed another claimed mutant!"
 msgstr "...and it also killed another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1080
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1073
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr "...and it also killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1085
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1078
 msgid "...however, your test did kill another claimed mutant!"
 msgstr "...however, your test did kill another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1087
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1080
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr "...however, your test killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1115
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1109
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr "You cannot claim mutants as equivalent in this game anymore."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1195
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1182
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1197
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1184
 msgid "Flagged 1 mutant as equivalent"
 msgstr "Flagged 1 mutant as equivalent"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1199
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1186
 msgid "Flagged {0} mutants as equivalent"
 msgstr "Flagged {0} mutants as equivalent"
 
@@ -3019,31 +3147,31 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:438
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:457
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "No, this mutant is not equivalent to the class under test."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:556
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:575
 msgid "Your test did not kill the mutant. Try again."
 msgstr "Your test did not kill the mutant. Try again."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:734
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:753
 msgid "Your test did not solve the puzzle. Try another one..."
 msgstr "Your test did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:936
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:955
 msgid "Your mutant did not solve the puzzle. Try another one..."
 msgstr "Your mutant did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1015
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1034
 msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1028
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1047
 msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1049
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1068
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
@@ -5586,6 +5714,178 @@ msgstr "Are you sure you want to stop the selected Games?"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:536
 msgid "Stop Games"
 msgstr "Stop Games"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:31
+msgid "Mutle administration"
+msgstr "Mutle administration"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:41
+msgid "Mutle administration"
+msgstr "Mutle administration"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:43
+msgid "Import fixture classes and publish one case for each lecture."
+msgstr "Import fixture classes and publish one case for each lecture."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:50
+msgid "Fixture inventory"
+msgstr "Fixture inventory"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:51
+msgid "Mutants remain hidden from players."
+msgstr "Mutants remain hidden from players."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:56
+msgid "No Mutle fixtures are installed."
+msgstr "No Mutle fixtures are installed."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:63
+msgid "Fixture"
+msgstr "Fixture"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:64
+msgid "Class"
+msgstr "Class"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:65
+msgid "Mutants"
+msgstr "Mutants"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:66
+msgid "Status"
+msgstr "Status"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:78
+msgid "Scheduled"
+msgstr "Scheduled"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:81
+msgid "Available"
+msgstr "Available"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:97
+msgid "Add fixture class"
+msgstr "Add fixture class"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:101
+msgid "Upload one class and its mutants as a Mutle fixture ZIP. Validate puzzle quality offline before upload."
+msgstr "Upload one class and its mutants as a Mutle fixture ZIP. Validate puzzle quality offline before upload."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:104
+msgid "The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder."
+msgstr "The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:107
+msgid "In class.json, define id, title, specification, concepts, sourcePath, tests, and mutants. Each test needs a key and sourcePath; each mutant needs a key, sourcePath, method, mutatedLines, operator, proofTestKey, and revealExplanation. The proofTestKey must match a test key, and all source paths are relative to the class folder."
+msgstr "In class.json, define id, title, specification, concepts, sourcePath, tests, and mutants. Each test needs a key and sourcePath; each mutant needs a key, sourcePath, method, mutatedLines, operator, proofTestKey, and revealExplanation. The proofTestKey must match a test key, and all source paths are relative to the class folder."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:113
+msgid "Fixture ZIP"
+msgstr "Fixture ZIP"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:119
+msgid "Upload fixture"
+msgstr "Upload fixture"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:129
+msgid "Publication schedule"
+msgstr "Publication schedule"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:132
+msgid "Published cases stay locked; future dates and fixture assignments can be changed. Only the last unpublished case can be removed individually."
+msgstr "Published cases stay locked; future dates and fixture assignments can be changed. Only the last unpublished case can be removed individually."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:135
+msgid "No future case is scheduled. The current case remains available until you add one."
+msgstr "No future case is scheduled. The current case remains available until you add one."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:143
+msgid "First release (UTC)"
+msgstr "First release (UTC)"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:146
+msgid "Interpreted as UTC. This schedules 15 weekly cases."
+msgstr "Interpreted as UTC. This schedules 15 weekly cases."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:149
+msgid "Schedule 15 weekly cases"
+msgstr "Schedule 15 weekly cases"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:158
+msgid "Case"
+msgstr "Case"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:159
+msgid "Release (UTC)"
+msgstr "Release (UTC)"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:160
+msgid "Fixture"
+msgstr "Fixture"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:161
+msgid "Status"
+msgstr "Status"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:162
+msgid "Action"
+msgstr "Action"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:168
+msgid "No cases are scheduled yet."
+msgstr "No cases are scheduled yet."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:189
+msgid "Release (UTC)"
+msgstr "Release (UTC)"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:201
+msgid "Fixture"
+msgstr "Fixture"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:215
+msgid "Published"
+msgstr "Published"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:218
+msgid "Future"
+msgstr "Future"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:226
+msgid "Save"
+msgstr "Save"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:232
+msgid "Remove last case"
+msgstr "Remove last case"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:247
+msgid "Clear unpublished cases"
+msgstr "Clear unpublished cases"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:249
+msgid "This removes only unpublished cases. Published cases and player history remain unchanged."
+msgstr "This removes only unpublished cases. Published cases and player history remain unchanged."
+
+#: src/main/webapp/jsp/admin_mutle.jsp:254
+msgid "Clear future schedule"
+msgstr "Clear future schedule"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:265
+msgid "Next case"
+msgstr "Next case"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:269
+msgid "Release (UTC)"
+msgstr "Release (UTC)"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:274
+msgid "Fixture"
+msgstr "Fixture"
+
+#: src/main/webapp/jsp/admin_mutle.jsp:282
+msgid "Add case"
+msgstr "Add case"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:34
 msgid "Puzzle Management"
@@ -8895,6 +9195,314 @@ msgstr "Defend"
 msgid "JUnit Tests"
 msgstr "JUnit Tests"
 
+#: src/main/webapp/jsp/mutle/overview.jsp:34
+msgid "Mutle"
+msgstr "Mutle"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:38
+msgid "Mutle: weekly mutation puzzles"
+msgstr "Mutle: weekly mutation puzzles"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:39
+msgid "This game mode is similar to the concept known from Wordle or Mastermind; just with finding mutants in Java code."
+msgstr "This game mode is similar to the concept known from Wordle or Mastermind; just with finding mutants in Java code."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:40
+msgid "You have six attempts to write a test that detects/kills the mutant. The only problem: Initially you know nothing about the mutant. But after each test you write, you get feedback in form of a color that tells you if you covered the method or line where the mutation is located. Using this information you have to locate the mutated line and write a test that successfully detects it."
+msgstr "You have six attempts to write a test that detects/kills the mutant. The only problem: Initially you know nothing about the mutant. But after each test you write, you get feedback in form of a color that tells you if you covered the method or line where the mutation is located. Using this information you have to locate the mutated line and write a test that successfully detects it."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:44
+msgid "Mutle coming soon"
+msgstr "Mutle coming soon"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:44
+msgid "This week's mutle"
+msgstr "This week's mutle"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:48
+msgid "Series"
+msgstr "Series"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:51
+msgid "Series"
+msgstr "Series"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:53
+msgid "The first mutle has not been published yet."
+msgstr "The first mutle has not been published yet."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:57
+msgid "Check back when the semester begins."
+msgstr "Check back when the semester begins."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:58
+msgid "You have six tests to isolate the hidden change."
+msgstr "You have six tests to isolate the hidden change."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:63
+msgid "Solved"
+msgstr "Solved"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:63
+msgid "Failed in six"
+msgstr "Failed in six"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:63
+msgid "Expired"
+msgstr "Expired"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:63
+msgid "In progress"
+msgstr "In progress"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:65
+msgid "guesses"
+msgstr "guesses"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:74
+msgid "Solve current mutle"
+msgstr "Solve current mutle"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:79
+msgid "View current mutle"
+msgstr "View current mutle"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:84
+msgid "Continue current mutle"
+msgstr "Continue current mutle"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:93
+msgid "Fixture practice"
+msgstr "Fixture practice"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:95
+msgid "Start a fresh, non-scoring game for any fixture. Practice games do not award achievements."
+msgstr "Start a fresh, non-scoring game for any fixture. Practice games do not award achievements."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:99
+msgid "Fixture"
+msgstr "Fixture"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:104
+msgid "Series"
+msgstr "Series"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:105
+msgid "Unscheduled"
+msgstr "Unscheduled"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:114
+msgid "Start fresh practice game"
+msgstr "Start fresh practice game"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:123
+msgid "Case history"
+msgstr "Case history"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:126
+msgid "Cases you attempt will appear here. Practice games are not included."
+msgstr "Cases you attempt will appear here. Practice games are not included."
+
+#: src/main/webapp/jsp/mutle/overview.jsp:133
+msgid "Series"
+msgstr "Series"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:134
+msgid "guesses"
+msgstr "guesses"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:137
+msgid "Solved"
+msgstr "Solved"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:137
+msgid "Failed in six"
+msgstr "Failed in six"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:137
+msgid "Expired"
+msgstr "Expired"
+
+#: src/main/webapp/jsp/mutle/overview.jsp:137
+msgid "Active"
+msgstr "Active"
+
+#: src/main/webapp/jsp/mutle/play.jsp:26
+msgid "Mutle"
+msgstr "Mutle"
+
+#: src/main/webapp/jsp/mutle/play.jsp:32
+msgid "Series"
+msgstr "Series"
+
+#: src/main/webapp/jsp/mutle/play.jsp:33
+msgid "{0} guesses remaining"
+msgstr "{0} guesses remaining"
+
+#: src/main/webapp/jsp/mutle/play.jsp:34
+msgid "Solved"
+msgstr "Solved"
+
+#: src/main/webapp/jsp/mutle/play.jsp:35
+msgid "Failed in six"
+msgstr "Failed in six"
+
+#: src/main/webapp/jsp/mutle/play.jsp:36
+msgid "Expired"
+msgstr "Expired"
+
+#: src/main/webapp/jsp/mutle/play.jsp:37
+msgid "Guess {0}: {1}"
+msgstr "Guess {0}: {1}"
+
+#: src/main/webapp/jsp/mutle/play.jsp:38
+msgid "Guess {0}: empty"
+msgstr "Guess {0}: empty"
+
+#: src/main/webapp/jsp/mutle/play.jsp:39
+msgid "Test {0}: {1}"
+msgstr "Test {0}: {1}"
+
+#: src/main/webapp/jsp/mutle/play.jsp:40
+msgid "Reveal"
+msgstr "Reveal"
+
+#: src/main/webapp/jsp/mutle/play.jsp:41
+msgid "Mutant source"
+msgstr "Mutant source"
+
+#: src/main/webapp/jsp/mutle/play.jsp:42
+msgid "Mutant diff"
+msgstr "Mutant diff"
+
+#: src/main/webapp/jsp/mutle/play.jsp:43
+msgid "Reference proof test"
+msgstr "Reference proof test"
+
+#: src/main/webapp/jsp/mutle/play.jsp:44
+msgid "No relevant coverage"
+msgstr "No relevant coverage"
+
+#: src/main/webapp/jsp/mutle/play.jsp:45
+msgid "Mutated method covered"
+msgstr "Mutated method covered"
+
+#: src/main/webapp/jsp/mutle/play.jsp:46
+msgid "Mutated line covered"
+msgstr "Mutated line covered"
+
+#: src/main/webapp/jsp/mutle/play.jsp:47
+msgid "Mutant killed"
+msgstr "Mutant killed"
+
+#: src/main/webapp/jsp/mutle/play.jsp:48
+msgid "Reuse test"
+msgstr "Reuse test"
+
+#: src/main/webapp/jsp/mutle/play.jsp:49
+msgid "Test copied to the editor."
+msgstr "Test copied to the editor."
+
+#: src/main/webapp/jsp/mutle/play.jsp:50
+msgid "Result copied"
+msgstr "Result copied"
+
+#: src/main/webapp/jsp/mutle/play.jsp:51
+msgid "Could not copy result"
+msgstr "Could not copy result"
+
+#: src/main/webapp/jsp/mutle/play.jsp:52
+msgid "Evaluating test…"
+msgstr "Evaluating test…"
+
+#: src/main/webapp/jsp/mutle/play.jsp:53
+msgid "Test accepted: {0}"
+msgstr "Test accepted: {0}"
+
+#: src/main/webapp/jsp/mutle/play.jsp:54
+msgid "A test is already being evaluated. Please wait."
+msgstr "A test is already being evaluated. Please wait."
+
+#: src/main/webapp/jsp/mutle/play.jsp:55
+msgid "The test could not be evaluated. Please try again."
+msgstr "The test could not be evaluated. Please try again."
+
+#: src/main/webapp/jsp/mutle/play.jsp:56
+msgid "Submit test"
+msgstr "Submit test"
+
+#: src/main/webapp/jsp/mutle/play.jsp:57
+msgid "This case is unavailable."
+msgstr "This case is unavailable."
+
+#: src/main/webapp/jsp/mutle/play.jsp:58
+msgid "Unable to load the case."
+msgstr "Unable to load the case."
+
+#: src/main/webapp/jsp/mutle/play.jsp:59
+msgid "Loading case…"
+msgstr "Loading case…"
+
+#: src/main/webapp/jsp/mutle/play.jsp:77
+msgid "Show details"
+msgstr "Show details"
+
+#: src/main/webapp/jsp/mutle/play.jsp:85
+msgid "Original class"
+msgstr "Original class"
+
+#: src/main/webapp/jsp/mutle/play.jsp:88
+msgid "Original class source"
+msgstr "Original class source"
+
+#: src/main/webapp/jsp/mutle/play.jsp:92
+msgid "Select an attempt to show its coverage."
+msgstr "Select an attempt to show its coverage."
+
+#: src/main/webapp/jsp/mutle/play.jsp:99
+msgid "Your test"
+msgstr "Your test"
+
+#: src/main/webapp/jsp/mutle/play.jsp:102
+msgid "Test source"
+msgstr "Test source"
+
+#: src/main/webapp/jsp/mutle/play.jsp:108
+msgid "Submit test"
+msgstr "Submit test"
+
+#: src/main/webapp/jsp/mutle/play.jsp:122
+msgid "What tests are allowed?"
+msgstr "What tests are allowed?"
+
+#: src/main/webapp/jsp/mutle/play.jsp:136
+msgid "Your attempts"
+msgstr "Your attempts"
+
+#: src/main/webapp/jsp/mutle/play.jsp:137
+msgid "Six result cells"
+msgstr "Six result cells"
+
+#: src/main/webapp/jsp/mutle/play.jsp:139
+msgid "No relevant coverage"
+msgstr "No relevant coverage"
+
+#: src/main/webapp/jsp/mutle/play.jsp:140
+msgid "Mutated method covered"
+msgstr "Mutated method covered"
+
+#: src/main/webapp/jsp/mutle/play.jsp:141
+msgid "Changed line covered, mutant survived"
+msgstr "Changed line covered, mutant survived"
+
+#: src/main/webapp/jsp/mutle/play.jsp:142
+msgid "Mutant killed"
+msgstr "Mutant killed"
+
+#: src/main/webapp/jsp/mutle/play.jsp:147
+msgid "Copy result"
+msgstr "Copy result"
+
 #: src/main/webapp/jsp/player_feedback.jsp:41
 msgid "Feedback for Game {0}"
 msgstr "Feedback for Game {0}"
@@ -10168,34 +10776,38 @@ msgid "Puzzles"
 msgstr "Puzzles"
 
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:47
+msgid "Mutle"
+msgstr "Mutle"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:50
 msgid "Analysis"
 msgstr "Analysis"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:50
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:53
 msgid "Analytics"
 msgstr "Analytics"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:52
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:55
 msgid "Users"
 msgstr "Users"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:53
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:56
 msgid "Classes"
 msgstr "Classes"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:54
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:57
 msgid "KillMaps"
 msgstr "KillMaps"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
 msgid "LLM Settings"
 msgstr "LLM Settings"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:64
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:64
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:67
 msgid "Text Settings"
 msgstr "Text Settings"
 
@@ -11203,19 +11815,19 @@ msgstr "Feedback"
 msgid "Invitations"
 msgstr "Invitations"
 
-#: src/main/webapp/WEB-INF/tags/game_js_init.tag:77
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:75
 msgid "Equivalence duel won!"
 msgstr "Equivalence duel won!"
 
-#: src/main/webapp/WEB-INF/tags/game_js_init.tag:78
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:76
 msgid "Mutant {0} that you claimed was declared equivalent. The attacker lost all their points for the mutant and you gained an additional point."
 msgstr "Mutant {0} that you claimed was declared equivalent. The attacker lost all their points for the mutant and you gained an additional point."
 
-#: src/main/webapp/WEB-INF/tags/game_js_init.tag:82
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:80
 msgid "Equivalence duel lost!"
 msgstr "Equivalence duel lost!"
 
-#: src/main/webapp/WEB-INF/tags/game_js_init.tag:83
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:81
 msgid "Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point."
 msgstr "Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point."
 
@@ -11403,39 +12015,39 @@ msgstr "# (Optional) The fist last of the CUT, that attackers are allowed to edi
 msgid "# This is ignored for DEFENDER puzzles."
 msgstr "# This is ignored for DEFENDER puzzles."
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:64
+#: src/main/webapp/WEB-INF/tags/js_init.tag:79
 msgid "Defender"
 msgstr "Defender"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:69
+#: src/main/webapp/WEB-INF/tags/js_init.tag:84
 msgid "Any role"
 msgstr "Any role"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:74
+#: src/main/webapp/WEB-INF/tags/js_init.tag:89
 msgid "Attacker"
 msgstr "Attacker"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:83
+#: src/main/webapp/WEB-INF/tags/js_init.tag:98
 msgid "Defender"
 msgstr "Defender"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:87
+#: src/main/webapp/WEB-INF/tags/js_init.tag:102
 msgid "Attacker"
 msgstr "Attacker"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:91
+#: src/main/webapp/WEB-INF/tags/js_init.tag:106
 msgid "Any role"
 msgstr "Any role"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:95
+#: src/main/webapp/WEB-INF/tags/js_init.tag:110
 msgid "Join"
 msgstr "Join"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:102
+#: src/main/webapp/WEB-INF/tags/js_init.tag:117
 msgid "Invite received"
 msgstr "Invite received"
 
-#: src/main/webapp/WEB-INF/tags/js_init.tag:103
+#: src/main/webapp/WEB-INF/tags/js_init.tag:118
 msgid "You have been invited to join a game.\\n Join as: "
 msgstr "You have been invited to join a game.\\n Join as: "
 
@@ -11740,30 +12352,34 @@ msgid "Leaderboard"
 msgstr "Leaderboard"
 
 #: src/main/webapp/WEB-INF/tags/navbar.tag:82
+msgid "Mutle"
+msgstr "Mutle"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:90
 msgid "Admin"
 msgstr "Admin"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:96
+#: src/main/webapp/WEB-INF/tags/navbar.tag:104
 msgid "Profile"
 msgstr "Profile"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:98
+#: src/main/webapp/WEB-INF/tags/navbar.tag:106
 msgid "Account"
 msgstr "Account"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:100
+#: src/main/webapp/WEB-INF/tags/navbar.tag:108
 msgid "Help"
 msgstr "Help"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:102
+#: src/main/webapp/WEB-INF/tags/navbar.tag:110
 msgid "Logout"
 msgstr "Logout"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:119
+#: src/main/webapp/WEB-INF/tags/navbar.tag:127
 msgid "Language"
 msgstr "Language"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:143
+#: src/main/webapp/WEB-INF/tags/navbar.tag:151
 msgid "Login"
 msgstr "Login"
 
@@ -11835,19 +12451,27 @@ msgstr "My mutant is equivalent"
 msgid "I don\'t know if my mutant is killable"
 msgstr "I don\'t know if my mutant is killable"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:41
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:42
 msgid "Only {0} assertion per test"
 msgstr "Only {0} assertion per test"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:42
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:43
 msgid "Only {0} assertions per test"
 msgstr "Only {0} assertions per test"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:48
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:49
+msgid "Only {0} assertion per test"
+msgstr "Only {0} assertion per test"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
+msgid "Only {0} assertions per test"
+msgstr "Only {0} assertions per test"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:56
 msgid "Only the configured number of assertions per test (default: {0})"
 msgstr "Only the configured number of assertions per test (default: {0})"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:57
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:65
 msgid "Test rules"
 msgstr "Test rules"
 
@@ -11914,6 +12538,49 @@ msgstr "Failed to copy"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Error updating whitelist"
+
+msgid "Find the hidden change in Java code with six tests."
+msgstr ""
+
+msgid "Play Mutle"
+msgstr ""
+
+msgid "Guest progress stays in this browser session. Log in to play with your account and earn achievements."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:111
+msgid "Please shorten your test and try again."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:115
+msgid "This guest game has reached its submission limit. Log in to keep playing."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:120
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
+msgid "Your test could not run within the execution limits. Please simplify it or try again later."
+msgstr ""
+
+msgid "How to play"
+msgstr ""
+
+msgid "Find the hidden change in six tests. Write a test that passes on the original code but fails on the mutant. After each attempt, feedback tells you whether you covered the mutated method or line."
+msgstr ""
+
+msgid "Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and your goal is to find and kill a hidden mutant: a small change to the code."
+msgstr ""
+
+msgid "Read the original class and its specification. The mutant is hidden until the game ends."
+msgstr ""
+
+msgid "Use the test editor to write a JUnit test that passes on the original class but fails on the mutant. This kills the mutant and solves the puzzle."
+msgstr ""
+
+msgid "If the mutant survives, use the feedback to narrow down the change: no relevant coverage, the mutated method covered, or the changed line covered. Select an attempt to see its test and coverage, then refine your next test. You have six attempts."
+msgstr ""
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:136
 msgid "Missing Parameter: {0}"

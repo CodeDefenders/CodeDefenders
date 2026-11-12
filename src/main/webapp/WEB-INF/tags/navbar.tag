@@ -77,6 +77,14 @@
 
                         <t:puzzle_navigation/>
 
+                        <c:if test="${mutleSettings.enabled()}">
+                            <li class="nav-item nav-item-highlight me-3">
+                                <a class="nav-link" id="header-mutle" href="${url.forPath(Paths.MUTLE)}">
+                                    ${i18n.tr('Mutle')}
+                                </a>
+                            </li>
+                        </c:if>
+
                         <c:set var="season" value="${seasonStyle.currentSeasonalChapter}"/>
                         <c:if test="${season.present}">
                             <li class="nav-item nav-item-highlight me-3 ${season.get().seasonalStyle}">

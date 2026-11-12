@@ -1,0 +1,26 @@
+{
+  "id":"service-queue",
+  "title":"Service Queue",
+  "specification":"A queue accepts distinct requests up to capacity and serves them first in first out.",
+  "concepts":["boundaries","collections","state"],
+  "sourcePath":"ServiceQueue.java",
+  "tests":[
+    {"key":"capacity-range","title":"Zero capacity is invalid","sourcePath":"tests/ServiceQueueCapacityRangeTest.java"},
+    {"key":"first-add","title":"First request is accepted","sourcePath":"tests/ServiceQueueAddTest.java"},
+    {"key":"full","title":"Capacity rejects another request","sourcePath":"tests/ServiceQueueFullTest.java"},
+    {"key":"duplicate","title":"Later duplicate request is rejected","sourcePath":"tests/ServiceQueueDuplicateTest.java"},
+    {"key":"empty","title":"Empty queue serves null","sourcePath":"tests/ServiceQueueEmptyTest.java"},
+    {"key":"fifo","title":"Requests are served in order","sourcePath":"tests/ServiceQueueFifoTest.java"},
+    {"key":"single-service","title":"A queued request is served","sourcePath":"tests/ServiceQueueSingleServiceTest.java"},
+    {"key":"serve-decreases-size","title":"Serving decreases queue size","sourcePath":"tests/ServiceQueueServeDecreasesSizeTest.java"},
+    {"key":"cancel","title":"Queued request can be canceled","sourcePath":"tests/ServiceQueueCancelTest.java"},
+    {"key":"cancel-reports-success","title":"Cancellation reports success","sourcePath":"tests/ServiceQueueCancelReportsSuccessTest.java"},
+    {"key":"cancel-removes-request","title":"Cancellation changes queue size","sourcePath":"tests/ServiceQueueCancelRemovesRequestTest.java"},
+    {"key":"cancel-missing","title":"Missing request cannot be canceled","sourcePath":"tests/ServiceQueueCancelMissingTest.java"},
+    {"key":"blank","title":"Blank request is invalid","sourcePath":"tests/ServiceQueueBlankTest.java"},
+    {"key":"size","title":"Size tracks queue contents","sourcePath":"tests/ServiceQueueSizeTest.java"}
+  ],
+  "mutants":[
+    {"key":"serves-last","sourcePath":"mutants/serves-last/ServiceQueue.java","method":"serveNext","mutatedLines":[32],"operator":"argument-replacement","proofTestKey":"fifo","revealExplanation":"The newest request is served before the oldest."}
+  ]
+}

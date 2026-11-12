@@ -1,0 +1,31 @@
+{
+  "id": "parcel-locker",
+  "title": "Parcel Locker",
+  "specification": "A parcel locker reserves slots for arriving parcels, accepts each reserved delivery, lets customers collect stored parcels, and releases canceled reservations.",
+  "concepts": ["state", "boundaries", "reservations", "boolean-results"],
+  "sourcePath": "ParcelLocker.java",
+  "tests": [
+    {"key":"allows-zero-capacity","title":"Allows zero capacity","sourcePath":"tests/ParcelLockerAllowsZeroCapacityTest.java"},
+    {"key":"rejects-negative-capacity","title":"Rejects negative capacity","sourcePath":"tests/ParcelLockerRejectsNegativeCapacityTest.java"},
+    {"key":"reports-initial-slots","title":"Reports initial slots","sourcePath":"tests/ParcelLockerReportsInitialSlotsTest.java"},
+    {"key":"rejects-non-positive-reservation","title":"Rejects non-positive reservation","sourcePath":"tests/ParcelLockerRejectsNonPositiveReservationTest.java"},
+    {"key":"reserve-reports-success","title":"Reservation reports success","sourcePath":"tests/ParcelLockerReserveReportsSuccessTest.java"},
+    {"key":"reserves-requested-slots","title":"Reserves requested slots","sourcePath":"tests/ParcelLockerReservesRequestedSlotsTest.java"},
+    {"key":"rejects-reservation-beyond-capacity","title":"Rejects reservation beyond capacity","sourcePath":"tests/ParcelLockerRejectsReservationBeyondCapacityTest.java"},
+    {"key":"deposit-requires-positive-reservation","title":"Deposit requires a positive reservation","sourcePath":"tests/ParcelLockerDepositRequiresPositiveReservationTest.java"},
+    {"key":"deposit-reports-success","title":"Deposit reports success","sourcePath":"tests/ParcelLockerDepositReportsSuccessTest.java"},
+    {"key":"deposit-consumes-reservation","title":"Deposit consumes a reservation","sourcePath":"tests/ParcelLockerDepositConsumesReservationTest.java"},
+    {"key":"rejects-collection-outside-range","title":"Rejects collection outside stored range","sourcePath":"tests/ParcelLockerRejectsCollectionOutsideRangeTest.java"},
+    {"key":"collection-reports-repeated-success","title":"Repeated collection reports success","sourcePath":"tests/ParcelLockerCollectionReportsRepeatedSuccessTest.java"},
+    {"key":"collection-frees-slots","title":"Collection frees slots","sourcePath":"tests/ParcelLockerCollectionFreesSlotsTest.java"},
+    {"key":"cancellation-reports-repeated-success","title":"Repeated cancellation reports success","sourcePath":"tests/ParcelLockerCancellationReportsRepeatedSuccessTest.java"},
+    {"key":"partial-cancellation-allows-delivery","title":"Partial cancellation allows delivery","sourcePath":"tests/ParcelLockerPartialCancellationAllowsDeliveryTest.java"},
+    {"key":"cancellation-frees-slots","title":"Cancellation frees slots","sourcePath":"tests/ParcelLockerCancellationFreesSlotsTest.java"}
+  ],
+  "mutants": [
+    {"key":"occupied-capacity-ignored","sourcePath":"mutants/occupied-capacity-ignored/ParcelLocker.java","method":"reserve","mutatedLines":[19],"operator":"EXPRESSION_REPLACEMENT","proofTestKey":"rejects-reservation-beyond-capacity","revealExplanation":"Existing occupancy is ignored when checking reservation capacity."},
+    {"key":"partial-deposit-rejected","sourcePath":"mutants/partial-deposit-rejected/ParcelLocker.java","method":"deposit","mutatedLines":[26],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"deposit-reports-success","revealExplanation":"A partial deposit is rejected unless it matches the reservation exactly."},
+    {"key":"reservation-not-consumed","sourcePath":"mutants/reservation-not-consumed/ParcelLocker.java","method":"deposit","mutatedLines":[27],"operator":"STATEMENT_DELETION","proofTestKey":"deposit-consumes-reservation","revealExplanation":"A deposit does not consume the reserved slots."},
+    {"key":"cancellation-keeps-reservation","sourcePath":"mutants/cancellation-keeps-reservation/ParcelLocker.java","method":"cancelReservation","mutatedLines":[42],"operator":"STATEMENT_DELETION","proofTestKey":"cancellation-frees-slots","revealExplanation":"Cancellation reports success without freeing the reserved slots."}
+  ]
+}

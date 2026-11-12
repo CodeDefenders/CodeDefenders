@@ -1,0 +1,21 @@
+{
+  "id": "password-policy",
+  "title": "Password Policy",
+  "specification": "A password must meet a configurable minimum length and contain both a digit and an uppercase letter.",
+  "concepts": ["boundaries", "validation", "boolean-results"],
+  "sourcePath": "PasswordPolicy.java",
+  "tests": [
+    {"key":"constructor-range","title":"Constructor rejects invalid length","sourcePath":"tests/PasswordPolicyConstructorRangeTest.java"},
+    {"key":"minimum-length","title":"Minimum length is retained","sourcePath":"tests/PasswordPolicyMinimumLengthTest.java"},
+    {"key":"exact-length-accepted","title":"Exact minimum length is accepted","sourcePath":"tests/PasswordPolicyExactLengthAcceptedTest.java"},
+    {"key":"short-password","title":"Short password is rejected","sourcePath":"tests/PasswordPolicyShortPasswordTest.java"},
+    {"key":"missing-digit","title":"Password without a digit is rejected","sourcePath":"tests/PasswordPolicyMissingDigitTest.java"},
+    {"key":"missing-uppercase","title":"Password without uppercase is rejected","sourcePath":"tests/PasswordPolicyMissingUppercaseTest.java"},
+    {"key":"complete-password","title":"Password with both requirements is accepted","sourcePath":"tests/PasswordPolicyCompletePasswordTest.java"},
+    {"key":"null-password","title":"Null password is rejected","sourcePath":"tests/PasswordPolicyNullPasswordTest.java"}
+  ],
+  "mutants": [
+    {"key":"minimum-length-rejected","sourcePath":"mutants/minimum-length-rejected/PasswordPolicy.java","method":"accepts","mutatedLines":[13],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"exact-length-accepted","revealExplanation":"A password exactly at the minimum length is rejected."},
+    {"key":"requirements-joined","sourcePath":"mutants/requirements-joined/PasswordPolicy.java","method":"accepts","mutatedLines":[23],"operator":"LOGICAL_OPERATOR_REPLACEMENT","proofTestKey":"missing-digit","revealExplanation":"A password with only one of the required character types is accepted."}
+  ]
+}

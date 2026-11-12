@@ -301,13 +301,22 @@ public class KillMapService {
                             entry = new KillMapEntry(test, mutant, KillMapEntry.Status.NO_COVERAGE);
 
                         } else {
-                            TargetExecution executedTarget = backendExecutorService.testMutant(mutant, test);
-                            KillMapEntry.Status status = switch (executedTarget.status) {
-                                case FAIL -> KILL;
-                                case SUCCESS -> NO_KILL;
-                                case ERROR -> ERROR;
-                                default -> UNKNOWN;
-                            };
+                            KillMapEntry.Status status;
+                            try {
+                                TargetExecution executedTarget = backendExecutorService.testMutant(mutant, test);
+                                status = switch (executedTarget.status) {
+                                    case FAIL -> KILL;
+                                    case SUCCESS -> NO_KILL;
+                                    case ERROR -> ERROR;
+                                    default -> UNKNOWN;
+                                };
+                            } catch (AntRunner.ExecutionLimitException e) {
+                                if (Thread.currentThread().isInterrupted()) {
+                                    throw e;
+                                }
+                                logger.warn("Execution rejected for test {} and mutant {}", test.getId(), mutant.getId(), e);
+                                status = ERROR;
+                            }
 
                             entry = new KillMapEntry(test, mutant, status);
                         }

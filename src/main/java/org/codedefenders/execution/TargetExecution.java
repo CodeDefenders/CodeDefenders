@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TargetExecution {
+    public static final int MESSAGE_LIMIT = 2000;
+
     private static final Logger logger = LoggerFactory.getLogger(TargetExecution.class);
 
     public int id;
@@ -55,7 +57,8 @@ public class TargetExecution {
         this.mutantId = mutantId;
         this.target = target;
         this.status = status;
-        this.message = message;
+        this.message = message == null || message.length() <= MESSAGE_LIMIT
+                ? message : message.substring(0, MESSAGE_LIMIT);
     }
 
     public TargetExecution(int id, int testId, int mutantId, Target target, Status status,

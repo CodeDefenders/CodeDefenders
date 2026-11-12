@@ -178,6 +178,10 @@ public class AdminSystemSettings extends HttpServlet {
                 I18n.marktr("Allow Puzzle Section"),
                 I18n.marktr("Let users play the puzzles in the puzzle section.")
         ),
+        ALLOW_MUTLE_SECTION(
+                I18n.marktr("Allow Mutle Section"),
+                I18n.marktr("Let users play Mutle puzzles.")
+        ),
         FAILED_DUEL_VALIDATION_THRESHOLD(
                 I18n.marktr("Failed Duel Validation Threshold"),
                 I18n.marktr("The maximum number of tests that will run to validate a lost equivalence duel.")

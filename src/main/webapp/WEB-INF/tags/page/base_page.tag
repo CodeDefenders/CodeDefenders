@@ -35,7 +35,10 @@
 
 <!DOCTYPE html>
 <html lang="${i18n.locale.language}">
-    <head>
+    <head
+        data-context-path="${url.forPath("/")}"
+        data-application-url="${url.getAbsoluteURLForPath("/")}">
+
         <title>${title}</title>
 
         <meta charset="utf-8">

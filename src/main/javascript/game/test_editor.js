@@ -18,6 +18,7 @@
  */
 import CodeMirror from '../thirdparty/codemirror'
 import CodeCompletion from './code_completion';
+import {getTestMethods} from './test_completion';
 import {LoadingAnimation, objects} from '../main';
 
 
@@ -128,6 +129,9 @@ class TestEditor {
         if (this._readonly) {
             this.editor.getWrapperElement().classList.add('codemirror-readonly');
         }
+        this.editor.getInputField().setAttribute(
+                'aria-label', this.editorElement.getAttribute('aria-label')
+                        || this.editorElement.getAttribute('title') || 'Test source');
 
         /* Refresh editor when resized. */
         if (window.hasOwnProperty('ResizeObserver')) {
@@ -155,70 +159,7 @@ class TestEditor {
 
     /** @private */
     _getTestMethods() {
-        let testMethods = [];
-
-        if (this._assertionLibrary.includes('JUNIT4')) {
-            testMethods = testMethods.concat([
-                    'assertArrayEquals',
-                    'assertEquals',
-                    'assertFalse',
-                    'assertNotEquals',
-                    'assertNotNull',
-                    'assertNotSame',
-                    'assertNull',
-                    'assertSame',
-                    // 'assertThat',
-                    'assertThrows',
-                    'assertTrue',
-                    'fail'
-            ]);
-        }
-
-        if (this._assertionLibrary.includes('JUNIT5')) {
-            testMethods = testMethods.concat([
-                    'assertAll',
-                    'assertArrayEquals',
-                    'assertDoesNotThrow',
-                    'assertEquals',
-                    'assertFalse',
-                    'assertInstanceOf',
-                    'assertIterableEquals',
-                    'assertLinesMatch',
-                    'assertNotEquals',
-                    'assertNotNull',
-                    'assertNotSame',
-                    'assertNull',
-                    'assertSame',
-                    'assertThrows',
-                    'assertThrowsExactly',
-                    // 'assertTimeout',
-                    // 'assertTimeoutPreemptively',
-                    'assertTrue',
-                    'fail'
-            ]);
-        }
-
-        if (this._assertionLibrary.includes('HAMCREST') || this._assertionLibrary.includes('GOOGLE_TRUTH')) {
-            testMethods.push('assertThat');
-        }
-
-        if (this._mockingEnabled) {
-            // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
-            // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
-            // Behavior verification is currently not implemented (Mockito.verify)
-
-            testMethods = testMethods.concat([
-                    'mock',
-                    'when',
-                    'then',
-                    'thenThrow',
-                    'doThrow',
-                    'doReturn',
-                    'doNothing'
-            ]);
-        }
-
-        return testMethods;
+        return getTestMethods(this._assertionLibrary, this._mockingEnabled);
     }
 
 

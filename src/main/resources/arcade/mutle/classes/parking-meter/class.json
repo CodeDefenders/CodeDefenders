@@ -1,0 +1,20 @@
+{
+  "id": "parking-meter",
+  "title": "Parking Meter",
+  "specification": "A parking meter accepts positive prepaid minutes up to its capacity and consumes only minutes that remain.",
+  "concepts": ["state", "boundaries", "arithmetic"],
+  "sourcePath": "ParkingMeter.java",
+  "tests": [
+    {"key":"capacity-range","title":"Capacity must be positive and bounded","sourcePath":"tests/ParkingMeterCapacityRangeTest.java"},
+    {"key":"starts-expired","title":"A new meter is expired","sourcePath":"tests/ParkingMeterStartsExpiredTest.java"},
+    {"key":"exact-capacity","title":"Exact capacity can be inserted","sourcePath":"tests/ParkingMeterExactCapacityTest.java"},
+    {"key":"partial-insert","title":"Partial minutes are retained","sourcePath":"tests/ParkingMeterPartialInsertTest.java"},
+    {"key":"overflow-rejected","title":"Overflow is rejected","sourcePath":"tests/ParkingMeterOverflowRejectedTest.java"},
+    {"key":"exact-consume","title":"All remaining minutes can be consumed","sourcePath":"tests/ParkingMeterExactConsumeTest.java"},
+    {"key":"underflow-rejected","title":"Underflow is rejected","sourcePath":"tests/ParkingMeterUnderflowRejectedTest.java"},
+    {"key":"nonpositive-rejected","title":"Non-positive minutes are rejected","sourcePath":"tests/ParkingMeterNonpositiveRejectedTest.java"}
+  ],
+  "mutants": [
+    {"key":"exact-capacity-rejected","sourcePath":"mutants/exact-capacity-rejected/ParkingMeter.java","method":"insert","mutatedLines":[14],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"exact-capacity","revealExplanation":"A meter rejects an insertion that exactly fills its capacity."}
+  ]
+}

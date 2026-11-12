@@ -1,0 +1,493 @@
+/**
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+.mutle-hero {
+    overflow: hidden;
+    border-radius: 1rem;
+    background: linear-gradient(90deg, rgba(15, 23, 42, .96) 0%, rgba(15, 23, 42, .76) 48%, rgba(15, 23, 42, .6)), url('../images/mutle/hero.jpg') center/cover;
+    color: #fff;
+    text-shadow: 0 1px 2px #000;
+}
+
+.mutle-instructions li + li {
+    margin-top: .5rem;
+}
+
+.mutle-play {
+    --mutle-ink: #172033;
+    --mutle-none: #888c90;
+    --mutle-method: #eab833;
+    --mutle-line: #fe5c2c;
+    --mutle-killed: #47297c;
+    --bs-card-cap-bg: #f8f9fb;
+    padding-bottom: 4rem;
+}
+
+.mutle-case-header {
+    position: relative;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    overflow: hidden;
+    min-height: 15rem;
+    padding: 2.5rem;
+    background:
+            linear-gradient(100deg, rgba(10, 17, 36, .98) 0%, rgba(20, 26, 51, .91) 52%, rgba(32, 19, 58, .58) 100%),
+            url('../images/mutle/hero.jpg') center/cover;
+    color: #fff;
+}
+
+.mutle-case-header::after {
+    position: absolute;
+    right: -4rem;
+    bottom: -7rem;
+    width: 20rem;
+    height: 20rem;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2rem rgba(255, 255, 255, .04), 0 0 0 5rem rgba(255, 255, 255, .025);
+    content: '';
+}
+
+.mutle-case-header,
+.mutle-play .card,
+.mutle-reveal {
+    border-radius: 1rem;
+}
+
+.mutle-case-copy,
+.mutle-case-state {
+    position: relative;
+    z-index: 1;
+}
+
+.mutle-case-copy {
+    max-width: 58rem;
+}
+
+.mutle-case-header h1,
+.mutle-case-header h2 {
+    margin-bottom: .75rem;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-weight: 800;
+    letter-spacing: -.04em;
+}
+
+.mutle-series {
+    display: inline-block;
+    padding: .35rem .75rem;
+    border: 1px solid rgba(255, 255, 255, .38);
+    border-radius: 50rem;
+    background: rgba(255, 255, 255, .12);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.mutle-case-state {
+    flex: 0 0 auto;
+    min-width: 12rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: .8rem;
+    background: rgba(7, 12, 28, .62);
+    font-weight: 700;
+    backdrop-filter: blur(5px);
+}
+
+.mutle-code-card,
+.mutle-feedback {
+    overflow: hidden;
+    border: 1px solid rgba(25, 32, 51, .14);
+}
+
+.mutle-code-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.mutle-code-card .card-body {
+    min-height: 0;
+}
+
+.mutle-code-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: .85rem 1rem;
+    background: var(--bs-card-cap-bg);
+}
+
+.mutle-code-card h2,
+.mutle-feedback h2 {
+    margin: 0;
+    color: var(--mutle-ink);
+    font-size: 1.05rem;
+    font-weight: 750;
+}
+
+.mutle-code-card .CodeMirror-scrollbar-filler {
+    background: var(--bs-card-cap-bg);
+}
+
+.mutle-code-card .card-footer {
+    display: flex;
+    min-height: 4.75rem;
+    align-items: center;
+    padding: .8rem 1rem;
+    background: var(--bs-card-cap-bg);
+}
+
+.mutle-code-hint {
+    gap: .5rem;
+    font-size: .82rem;
+    line-height: 1.35;
+}
+
+.mutle-code-card .card-footer.text-end {
+    justify-content: flex-end;
+}
+
+.mutle-code-card .btn {
+    min-width: 10rem;
+    border-radius: .65rem;
+    font-weight: 700;
+}
+
+.mutle-notice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-radius: .7rem;
+    font-weight: 600;
+}
+
+.mutle-notice details {
+    flex-basis: 100%;
+    min-width: 0;
+    margin-top: .5rem;
+}
+
+#mutle-notice-message {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.mutle-notice pre {
+    overflow-x: auto;
+    color: inherit;
+    font: inherit;
+    white-space: pre-wrap;
+}
+
+.mutle-test-rules .card-body > h3 {
+    font-size: 1.15rem;
+}
+
+.mutle-play .CodeMirror {
+    border: 0;
+    height: 32rem;
+    color: #202634;
+    font-size: .9rem;
+    line-height: 1.55;
+}
+
+.mutle-play .CodeMirror-gutters {
+    border-right-color: #e5e7eb;
+    background: #f7f8fa;
+}
+
+.mutle-feedback .card-body {
+    padding: 1.25rem;
+}
+
+.mutle-results {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(2rem, 1fr));
+    gap: .5rem;
+    list-style: none;
+    margin: 1rem 0;
+    padding: 0;
+}
+
+.mutle-cell {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    max-height: 5.75rem;
+    border-radius: .7rem;
+    background: #f5f6f8;
+    color: #737988;
+    font-size: 1.35rem;
+    font-weight: 800;
+    text-align: center;
+    padding: 0;
+}
+
+.mutle-cell.none { background: var(--mutle-none); color: #000; }
+.mutle-cell.method { background: var(--mutle-method); color: #000; }
+.mutle-cell.line { background: var(--mutle-line); color: #000; }
+.mutle-cell.killed { background: var(--mutle-killed); color: #fff; }
+
+.mutle-cell-button {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.mutle-cell-button:not(:disabled) {
+    cursor: pointer;
+}
+
+.mutle-cell-button:disabled {
+    opacity: 1;
+}
+
+.mutle-cell-button.selected {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+.mutle-cell-button:focus-visible {
+    outline: 2px solid #888c90;
+    outline-offset: 2px;
+}
+
+.mutle-legend {
+    display: flex;
+    flex-direction: column;
+    gap: .65rem 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border-color);
+    font-size: .88rem;
+}
+
+.mutle-legend span {
+    display: inline-flex;
+    gap: .45rem;
+    align-items: center;
+}
+
+.mutle-legend-swatch {
+    width: .85rem;
+    height: .85rem;
+    flex: 0 0 auto;
+    border: 1px solid rgba(0, 0, 0, .18);
+    border-radius: .2rem;
+}
+
+.mutle-legend-swatch.none { background: var(--mutle-none); }
+.mutle-legend-swatch.method { background: var(--mutle-method); }
+.mutle-legend-swatch.line { background: var(--mutle-line); }
+.mutle-legend-swatch.killed { background: var(--mutle-killed); }
+
+.mutle-covered-none {
+    background: rgba(108, 117, 125, .14);
+    box-shadow: inset 4px 0 var(--mutle-none);
+}
+
+.mutle-covered-method {
+    background: rgba(255, 193, 7, .18);
+    box-shadow: inset 4px 0 var(--mutle-method);
+}
+
+.mutle-covered-line {
+    background: rgba(254 92 44 / .16);
+    box-shadow: inset 4px 0 var(--mutle-line);
+}
+
+.mutle-covered-killed {
+    background: rgb(71 41 124 / .14);
+    box-shadow: inset 4px 0 var(--mutle-killed);
+}
+
+.mutle-attempts-layout {
+    margin-top: 1.5rem;
+}
+
+.mutle-attempts-layout .mutle-feedback .card-body {
+    padding: 1rem;
+}
+
+.mutle-history {
+    overflow: hidden;
+    border: 1px solid var(--bs-border-color);
+    background: #fff;
+}
+
+.mutle-history .accordion-button {
+    gap: .75rem;
+    padding: .8rem 1rem;
+    background: var(--bs-card-cap-bg);
+    box-shadow: none;
+    color: var(--mutle-ink);
+    font-weight: 700;
+}
+
+.mutle-history .accordion-button.selected {
+    box-shadow: inset 4px 0 var(--bs-primary);
+}
+
+.mutle-history-mark {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: .4rem;
+    color: #000;
+    font-size: .82rem;
+    font-weight: 800;
+}
+
+.mutle-history-mark.none { background: var(--mutle-none); }
+.mutle-history-mark.method { background: var(--mutle-method); }
+.mutle-history-mark.line { background: var(--mutle-line); }
+.mutle-history-mark.killed { background: var(--mutle-killed);  color: #fff; }
+
+.mutle-readonly-code {
+    position: relative;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.mutle-history-actions {
+    position: absolute;
+    z-index: 1;
+    top: .5rem;
+    right: 1.5rem;
+}
+
+.mutle-readonly-code .CodeMirror {
+    height: 15rem;
+    background: #fff;
+    font-size: .84rem;
+}
+
+.mutle-reveal {
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid rgba(111, 66, 193, .28);
+    background: #fff;
+}
+
+.mutle-reveal-intro {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.35rem 1.5rem;
+    background: linear-gradient(120deg, #24143f, #58339a);
+    color: #fff;
+}
+
+.mutle-reveal-intro > .fa {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+}
+
+.mutle-reveal-intro h2 {
+    margin: 0 0 .35rem;
+    font-size: 1.35rem;
+}
+
+.mutle-reveal-intro p {
+    margin: 0;
+    color: rgba(255, 255, 255, .88);
+    white-space: pre-line;
+}
+
+.mutle-reveal-accordion {
+    border-radius: 0;
+}
+
+.mutle-reveal-accordion .accordion-item {
+    border-right: 0;
+    border-left: 0;
+}
+
+.mutle-reveal-accordion .accordion-item:last-child {
+    border-bottom: 0;
+}
+
+.mutle-reveal-accordion .accordion-button {
+    padding: .85rem 1rem;
+    background: var(--bs-card-cap-bg);
+    box-shadow: none;
+    color: var(--mutle-ink);
+    font-weight: 700;
+}
+
+.mutle-reveal-code .CodeMirror {
+    height: 17rem;
+}
+
+#mutle-reveal-panel .mutle-reveal,
+#mutle-reveal-panel .mutle-reveal-accordion,
+#mutle-reveal-panel .accordion-item.expanded,
+#mutle-reveal-panel .accordion-item.expanded .accordion-collapse,
+#mutle-reveal-panel .accordion-item.expanded .accordion-body {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+}
+
+#mutle-reveal-panel .mutle-reveal-accordion,
+#mutle-reveal-panel .accordion-item.expanded,
+#mutle-reveal-panel .accordion-item.expanded .accordion-collapse,
+#mutle-reveal-panel .accordion-item.expanded .accordion-body,
+#mutle-reveal-panel .accordion-item.expanded .CodeMirror {
+    flex: 1 1 auto;
+}
+
+#mutle-reveal-panel .accordion-item.expanded .CodeMirror {
+    height: 100%;
+    min-height: 0;
+}
+
+@media (max-width: 767px) {
+    .mutle-play .CodeMirror { height: 20rem; }
+    .mutle-case-header {
+        display: block;
+        min-height: 0;
+        padding: 1.5rem;
+    }
+    .mutle-case-state {
+        margin-top: 1.25rem;
+    }
+    .mutle-results {
+        grid-template-columns: repeat(3, minmax(3rem, 1fr));
+    }
+}

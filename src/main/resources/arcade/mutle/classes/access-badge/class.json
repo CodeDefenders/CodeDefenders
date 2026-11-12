@@ -1,0 +1,26 @@
+{
+  "id": "access-badge",
+  "title": "Access Badge",
+  "specification": "A badge evaluates bounded clearance, suspension, and denied checks.",
+  "concepts": ["boundaries", "state", "boolean-results"],
+  "sourcePath": "AccessBadge.java",
+  "tests": [
+    {"key":"permits-equal","title":"Matching clearance is permitted","sourcePath":"tests/AccessBadgePermitsEqualTest.java"},
+    {"key":"denies-higher","title":"Higher clearance is denied","sourcePath":"tests/AccessBadgeDenialTest.java"},
+    {"key":"allowed-count","title":"Allowed checks do not count","sourcePath":"tests/AccessBadgeAllowedCountTest.java"},
+    {"key":"suspended-denial","title":"Suspension denies valid request","sourcePath":"tests/AccessBadgeSuspendedTest.java"},
+    {"key":"suspend-repeat","title":"Repeated suspension is unchanged","sourcePath":"tests/AccessBadgeSuspendRepeatTest.java"},
+    {"key":"restore","title":"Restoring re-enables a badge","sourcePath":"tests/AccessBadgeRestoreTest.java"},
+    {"key":"restore-reports-change","title":"Restoring reports a change","sourcePath":"tests/AccessBadgeRestoreReportsChangeTest.java"},
+    {"key":"restore-unsuspended","title":"Unsuspended badge cannot restore","sourcePath":"tests/AccessBadgeRestoreUnsuspendedTest.java"},
+    {"key":"change-clearance","title":"Changed clearance affects checks","sourcePath":"tests/AccessBadgeChangeTest.java"},
+    {"key":"changed-clearance-keeps-lower-access","title":"Changed clearance keeps lower access","sourcePath":"tests/AccessBadgeChangeKeepsLowerAccessTest.java"},
+    {"key":"same-change","title":"Equal clearance is unchanged","sourcePath":"tests/AccessBadgeSameChangeTest.java"},
+    {"key":"constructor-range","title":"Constructor rejects high clearance","sourcePath":"tests/AccessBadgeConstructorRangeTest.java"},
+    {"key":"request-range","title":"Check rejects negative clearance","sourcePath":"tests/AccessBadgeRequestRangeTest.java"}
+  ],
+  "mutants": [
+    {"key":"exact-clearance-only","sourcePath":"mutants/exact-clearance-only/AccessBadge.java","method":"permits","mutatedLines":[21],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"changed-clearance-keeps-lower-access","revealExplanation":"A badge permits only a request at exactly its current clearance."},
+    {"key":"allowed-count","sourcePath":"mutants/allowed-count/AccessBadge.java","method":"permits","mutatedLines":[22],"operator":"conditional-negation","proofTestKey":"allowed-count","revealExplanation":"Allowed checks are counted as denials."}
+  ]
+}

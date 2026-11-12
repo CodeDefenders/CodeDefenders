@@ -44,6 +44,9 @@
         <a class="nav-link ${activePage.equals('adminPuzzles') ? 'active' : ''}" id="adminPuzzleManagement" href="${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}">${i18n.tr('Puzzles')}</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link ${activePage.equals('adminMutle') ? 'active' : ''}" id="adminMutle" href="${url.forPath(Paths.ADMIN_MUTLE)}">${i18n.tr('Mutle')}</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link ${activePage.equals('adminKillMaps') ? 'active' : ''}" id="adminKillMaps" href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">${i18n.tr('Analysis')}</a>
     </li>
     <li class="nav-item dropdown">

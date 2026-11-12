@@ -1,0 +1,20 @@
+{
+  "id": "signal-lamp",
+  "title": "Signal Lamp",
+  "specification": "A signal lamp cycles from red to green to amber and back to red; crossing is safe only on green.",
+  "concepts": ["state", "transitions", "boolean-results"],
+  "sourcePath": "SignalLamp.java",
+  "tests": [
+    {"key":"valid-colours","title":"Known colours are accepted","sourcePath":"tests/SignalLampValidColoursTest.java"},
+    {"key":"invalid-colour","title":"Unknown colours are rejected","sourcePath":"tests/SignalLampInvalidColourTest.java"},
+    {"key":"red-to-green","title":"Red advances to green","sourcePath":"tests/SignalLampRedToGreenTest.java"},
+    {"key":"green-to-amber","title":"Green advances to amber","sourcePath":"tests/SignalLampGreenToAmberTest.java"},
+    {"key":"amber-to-red","title":"Amber advances to red","sourcePath":"tests/SignalLampAmberToRedTest.java"},
+    {"key":"green-safe","title":"Green permits crossing","sourcePath":"tests/SignalLampGreenSafeTest.java"},
+    {"key":"red-unsafe","title":"Red does not permit crossing","sourcePath":"tests/SignalLampRedUnsafeTest.java"},
+    {"key":"amber-unsafe","title":"Amber does not permit crossing","sourcePath":"tests/SignalLampAmberUnsafeTest.java"}
+  ],
+  "mutants": [
+    {"key":"amber-safe","sourcePath":"mutants/amber-safe/SignalLamp.java","method":"safeToCross","mutatedLines":[30],"operator":"LOGICAL_OPERATOR_INSERTION","proofTestKey":"amber-unsafe","revealExplanation":"An amber signal is incorrectly treated as safe for crossing."}
+  ]
+}

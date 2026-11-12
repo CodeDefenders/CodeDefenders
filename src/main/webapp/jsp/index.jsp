@@ -18,7 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%@ page import="java.util.List" %>
@@ -42,6 +44,7 @@
 <p:main_page title="${i18n.tr('Welcome to Code Defenders')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/landing_page.css")}" rel="stylesheet">
+        <link href="${url.forPath('/css/mutle.css')}" rel="stylesheet">
     </jsp:attribute>
 
     <jsp:body>
@@ -56,13 +59,16 @@
                 </h1>
             </div>
 
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center mb-4">
                 <a href="${url.forPath(Paths.LOGIN)}"
-           class="btn btn-lg btn-primary btn-highlight"
-           style="margin-bottom: 5rem;">
-                ${i18n.tr('Log in or Sign up')}
+                   class="btn btn-lg btn-primary btn-highlight">
+                    ${i18n.tr('Log in or Sign up')}
                 </a>
             </div>
+
+            <c:if test="${not empty mutleFixture}">
+                <t:mutle_banner fixture="${mutleFixture}" homepage="${true}"/>
+            </c:if>
 
             <div class="anim">
                 <div class="status" id="status"></div>

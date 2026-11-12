@@ -1,0 +1,24 @@
+{
+  "id": "thermostat",
+  "title": "Thermostat",
+  "specification": "A thermostat keeps a temperature in an inclusive range, reports changes only when the setting changes, and requests heating below a target.",
+  "concepts": ["boundaries", "state", "boolean-results"],
+  "sourcePath": "Thermostat.java",
+  "tests": [
+    {"key":"range-order","title":"Constructor rejects reversed range","sourcePath":"tests/ThermostatRangeOrderTest.java"},
+    {"key":"initial-range","title":"Constructor rejects initial value outside range","sourcePath":"tests/ThermostatInitialRangeTest.java"},
+    {"key":"initial-temperature","title":"Initial temperature is retained","sourcePath":"tests/ThermostatInitialTemperatureTest.java"},
+    {"key":"lower-bound","title":"Lower bound can be selected","sourcePath":"tests/ThermostatLowerBoundTest.java"},
+    {"key":"upper-bound","title":"Upper bound can be selected","sourcePath":"tests/ThermostatUpperBoundTest.java"},
+    {"key":"setting-changes","title":"New setting is reported","sourcePath":"tests/ThermostatSettingChangesTest.java"},
+    {"key":"same-setting","title":"Same setting reports no change","sourcePath":"tests/ThermostatSameSettingTest.java"},
+    {"key":"equal-target","title":"Equal target needs no heating","sourcePath":"tests/ThermostatEqualTargetTest.java"},
+    {"key":"lower-target","title":"Lower target needs no heating","sourcePath":"tests/ThermostatLowerTargetTest.java"},
+    {"key":"higher-target","title":"Higher target needs heating","sourcePath":"tests/ThermostatHigherTargetTest.java"},
+    {"key":"target-range","title":"Heating target must be in range","sourcePath":"tests/ThermostatTargetRangeTest.java"}
+  ],
+  "mutants": [
+    {"key":"lower-bound-rejected","sourcePath":"mutants/lower-bound-rejected/Thermostat.java","method":"setTemperature","mutatedLines":[20],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"lower-bound","revealExplanation":"The thermostat cannot be set to its inclusive lower bound."},
+    {"key":"equal-target-heats","sourcePath":"mutants/equal-target-heats/Thermostat.java","method":"heatingNeeded","mutatedLines":[34],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"equal-target","revealExplanation":"The thermostat requests heating even when it already equals the target."}
+  ]
+}

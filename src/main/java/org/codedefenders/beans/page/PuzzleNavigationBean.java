@@ -67,9 +67,7 @@ public class PuzzleNavigationBean {
         this.login = login;
 
         // maps the puzzle id to the puzzle game
-        activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
-                .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity(),
-                        (a, b) -> a));
+        activePuzzles = activePuzzles(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
@@ -140,6 +138,14 @@ public class PuzzleNavigationBean {
 
     public Optional<PuzzleEntry> getNextSeasonalPuzzle() {
         return nextSeasonalPuzzle;
+    }
+
+    static Map<Integer, PuzzleGame> activePuzzles(List<PuzzleGame> games) {
+        return games.stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity(),
+                // The repository returns games newest first. Repeated Mutle practice games can
+                // legitimately share a puzzle ID, so retain the newest active game instead of
+                // failing the whole navigation bean with a duplicate-key exception.
+                (newest, older) -> newest));
     }
 
     /**

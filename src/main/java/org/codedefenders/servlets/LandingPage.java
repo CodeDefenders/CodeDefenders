@@ -35,6 +35,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.arcade.mutle.service.MutleService;
+import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -75,6 +77,12 @@ public class LandingPage extends HttpServlet {
     @Inject
     private MeleeGameRepository meleeGameRepo;
 
+    @Inject
+    private MutleService mutleService;
+
+    @Inject
+    private MutleSettings mutleSettings;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -111,6 +119,10 @@ public class LandingPage extends HttpServlet {
                                             .orElse("Unknown user")));
 
             request.setAttribute("gameCreatorNames", gameCreatorNames);
+
+            if (mutleSettings.enabled() && mutleService.isReady()) {
+                request.setAttribute("mutleFixture", mutleService.currentFixture());
+            }
 
             request.getRequestDispatcher(Constants.INDEX_JSP).forward(request, response);
         }

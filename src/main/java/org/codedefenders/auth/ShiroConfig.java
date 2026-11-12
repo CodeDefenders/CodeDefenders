@@ -137,6 +137,9 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.PUZZLE_GAME_SELECTION = "/puzzle/games";
         fcMan.createChain("/puzzle**", "authc");
 
+        fcMan.createChain(Paths.MUTLE, "anon");
+        fcMan.createChain(Paths.MUTLE + "/**", "anon");
+
         // API URLs. I assume they require authentication, but I might be wrong. Maybe
         // they require a different type of authentication, e.g., if the are REST
         // org.codedefenders.util.Paths.API_MESSAGES = "/api/messages"; // path used in messaging.js
@@ -146,6 +149,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_TEST = "/api/test";
         // org.codedefenders.util.Paths.API_MUTANT = "/api/mutant";
         fcMan.createChain("/api/messages", "anon");
+        fcMan.createChain(Paths.API_MUTLE + "/**", "anon");
         fcMan.createChain("/api/**", "authc");
         fcMan.createChain("/llm-api/**", "authcBasic");
 

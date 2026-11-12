@@ -1,0 +1,30 @@
+{
+  "id": "score-board",
+  "title": "Score Board",
+  "specification": "A score board records positive points for named players, keeps a fixed number of players, and allows scores to be reduced without going below zero.",
+  "concepts": ["state", "boundaries", "collections", "boolean-results"],
+  "sourcePath": "ScoreBoard.java",
+  "tests": [
+    {"key":"rejects-limit-outside-range","title":"Rejects limits outside the allowed range","sourcePath":"tests/ScoreBoardRejectsLimitOutsideRangeTest.java"},
+    {"key":"starts-empty","title":"Starts without players","sourcePath":"tests/ScoreBoardStartsEmptyTest.java"},
+    {"key":"record-reports-success","title":"Recording reports success","sourcePath":"tests/ScoreBoardRecordReportsSuccessTest.java"},
+    {"key":"record-updates-score","title":"Recording updates the score","sourcePath":"tests/ScoreBoardRecordUpdatesScoreTest.java"},
+    {"key":"repeated-records-accumulate","title":"Repeated records accumulate","sourcePath":"tests/ScoreBoardRepeatedRecordsAccumulateTest.java"},
+    {"key":"adds-different-players","title":"Different players occupy entries","sourcePath":"tests/ScoreBoardAddsDifferentPlayersTest.java"},
+    {"key":"rejects-new-player-at-limit","title":"A full board rejects new players","sourcePath":"tests/ScoreBoardRejectsNewPlayerAtLimitTest.java"},
+    {"key":"allows-existing-player-at-limit","title":"A full board allows an existing player","sourcePath":"tests/ScoreBoardAllowsExistingPlayerAtLimitTest.java"},
+    {"key":"rejects-non-positive-record","title":"Non-positive records are rejected","sourcePath":"tests/ScoreBoardRejectsNonPositiveRecordTest.java"},
+    {"key":"rejects-blank-player","title":"Blank players are rejected","sourcePath":"tests/ScoreBoardRejectsBlankPlayerTest.java"},
+    {"key":"deduct-reports-success","title":"Deduction reports success","sourcePath":"tests/ScoreBoardDeductReportsSuccessTest.java"},
+    {"key":"deduct-updates-score","title":"Deduction updates the score","sourcePath":"tests/ScoreBoardDeductUpdatesScoreTest.java"},
+    {"key":"allows-exact-deduction","title":"Exact deduction leaves zero","sourcePath":"tests/ScoreBoardAllowsExactDeductionTest.java"},
+    {"key":"rejects-excess-deduction","title":"Deduction cannot exceed the score","sourcePath":"tests/ScoreBoardRejectsExcessDeductionTest.java"},
+    {"key":"rejects-unknown-deduction","title":"Unknown players cannot lose points","sourcePath":"tests/ScoreBoardRejectsUnknownDeductionTest.java"},
+    {"key":"rejects-non-positive-deduction","title":"Non-positive deductions are rejected","sourcePath":"tests/ScoreBoardRejectsNonPositiveDeductionTest.java"}
+  ],
+  "mutants": [
+    {"key":"new-player-at-limit-allowed","sourcePath":"mutants/new-player-at-limit-allowed/ScoreBoard.java","method":"record","mutatedLines":[21],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"rejects-new-player-at-limit","revealExplanation":"A new player can be recorded after the board reaches its limit."},
+    {"key":"exact-deduction-rejected","sourcePath":"mutants/exact-deduction-rejected/ScoreBoard.java","method":"deduct","mutatedLines":[34],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"allows-exact-deduction","revealExplanation":"A score cannot be reduced exactly to zero."},
+    {"key":"record-replaces-score","sourcePath":"mutants/record-replaces-score/ScoreBoard.java","method":"record","mutatedLines":[24],"operator":"MANUAL_ASSIGNMENT_REPLACEMENT","proofTestKey":"repeated-records-accumulate","revealExplanation":"Recording points replaces the existing score instead of adding to it."}
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "water-tank",
+  "title": "Water Tank",
+  "specification": "A water tank has positive capacity, accepts a fill only when it fits completely, and drains only available water without crossing empty or full boundaries.",
+  "concepts": ["state", "boundaries", "order", "boolean-results"],
+  "sourcePath": "WaterTank.java",
+  "tests": [
+    {"key":"rejects-nonpositive-capacity","title":"Rejects non-positive capacity","sourcePath":"tests/WaterTankRejectsNonPositiveCapacityTest.java"},
+    {"key":"starts-empty","title":"Tank starts empty","sourcePath":"tests/WaterTankStartsEmptyTest.java"},
+    {"key":"fill-success","title":"Fill reports success","sourcePath":"tests/WaterTankFillSuccessTest.java"},
+    {"key":"fill-raises-level","title":"Fill raises the level","sourcePath":"tests/WaterTankFillRaisesLevelTest.java"},
+    {"key":"repeated-fills","title":"Repeated fills accumulate","sourcePath":"tests/WaterTankRepeatedFillsAccumulateTest.java"},
+    {"key":"fill-exact-capacity","title":"Exact capacity can be filled","sourcePath":"tests/WaterTankFillExactCapacityTest.java"},
+    {"key":"rejects-overflow","title":"Overflow fill is rejected","sourcePath":"tests/WaterTankRejectsOverflowTest.java"},
+    {"key":"overflow-keeps-level","title":"Rejected overflow keeps the level","sourcePath":"tests/WaterTankOverflowKeepsLevelTest.java"},
+    {"key":"rejects-nonpositive-fill","title":"Non-positive fill is rejected","sourcePath":"tests/WaterTankRejectsNonPositiveFillTest.java"},
+    {"key":"drain-success","title":"Drain reports success","sourcePath":"tests/WaterTankDrainSuccessTest.java"},
+    {"key":"drain-lowers-level","title":"Drain lowers the level","sourcePath":"tests/WaterTankDrainLowersLevelTest.java"},
+    {"key":"repeated-drains","title":"Repeated drains accumulate","sourcePath":"tests/WaterTankRepeatedDrainsAccumulateTest.java"},
+    {"key":"rejects-underflow","title":"Underflow drain is rejected","sourcePath":"tests/WaterTankRejectsUnderflowTest.java"},
+    {"key":"underflow-keeps-level","title":"Rejected underflow keeps the level","sourcePath":"tests/WaterTankUnderflowKeepsLevelTest.java"},
+    {"key":"rejects-nonpositive-drain","title":"Non-positive drain is rejected","sourcePath":"tests/WaterTankRejectsNonPositiveDrainTest.java"},
+    {"key":"remaining-capacity","title":"Remaining capacity tracks level","sourcePath":"tests/WaterTankRemainingCapacityTest.java"},
+    {"key":"full-and-empty-state","title":"Full and empty states are reported","sourcePath":"tests/WaterTankFullAndEmptyStateTest.java"}
+  ],
+  "mutants": [
+    {"key":"exact-fill-rejected","sourcePath":"mutants/exact-fill-rejected/WaterTank.java","method":"fill","mutatedLines":[17],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"fill-exact-capacity","revealExplanation":"A fill that exactly reaches capacity is rejected."},
+    {"key":"exact-drain-rejected","sourcePath":"mutants/exact-drain-rejected/WaterTank.java","method":"drain","mutatedLines":[28],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"full-and-empty-state","revealExplanation":"A drain that exactly empties the tank is rejected."},
+    {"key":"underflow-allowed","sourcePath":"mutants/underflow-allowed/WaterTank.java","method":"drain","mutatedLines":[28],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"rejects-underflow","revealExplanation":"A drain can take more water than the tank currently contains."},
+    {"key":"fill-replaces-level","sourcePath":"mutants/fill-replaces-level/WaterTank.java","method":"fill","mutatedLines":[20],"operator":"ASSIGNMENT_REPLACEMENT","proofTestKey":"repeated-fills","revealExplanation":"A fill replaces the current level instead of accumulating with it."}
+  ]
+}

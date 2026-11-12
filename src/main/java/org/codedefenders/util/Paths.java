@@ -72,6 +72,9 @@ public class Paths {
     public static final String PUZZLE_OVERVIEW = "/puzzles";
     public static final String PUZZLE_GAME = "/puzzlegame";
 
+    public static final String MUTLE = "/mutle";
+    public static final String MUTLE_PLAY = "/mutle/play";
+
     public static final String CLASSROOM = "/classroom";
     public static final String CLASSROOMS_OVERVIEW = "/classrooms";
     public static final String CLASSROOM_CREATE_GAMES = "/classroom/creategames";
@@ -93,6 +96,7 @@ public class Paths {
     public static final String ADMIN_PUZZLE_OVERVIEW = "/admin/puzzles";
     public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
     public static final String ADMIN_PUZZLE_UPLOAD = "/admin/puzzles/upload";
+    public static final String ADMIN_MUTLE = "/admin/mutle";
 
     public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
@@ -109,6 +113,7 @@ public class Paths {
     public static final String API_CLASSROOM = "/api/classroom";
     public static final String API_MESSAGES = "/api/messages";
     public static final String API_LLM = "/api/llm";
+    public static final String API_MUTLE = "/api/mutle";
 
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";

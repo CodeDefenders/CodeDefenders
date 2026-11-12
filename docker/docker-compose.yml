@@ -1,6 +1,6 @@
 services:
   database:
-    image: "docker.io/library/mariadb:10.5"
+    image: "docker.io/library/mariadb:11.4"
     restart: always
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=YES

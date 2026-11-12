@@ -76,6 +76,7 @@ import static org.codedefenders.model.EventType.ATTACKER_MUTANT_CREATED;
 import static org.codedefenders.model.EventType.DEFENDER_TEST_CREATED;
 import static org.codedefenders.model.EventType.PLAYER_MUTANT_CREATED;
 import static org.codedefenders.model.EventType.PLAYER_TEST_CREATED;
+import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 
 /**
  * Service for achievements. Handles updating the achievements for users.
@@ -205,6 +206,13 @@ public class AchievementService {
         }
     }
 
+    public void addMutleSolved(int userId, int acceptedGuesses) {
+        updateAchievement(userId, AchievementType.SOLVE_MUTLES, 1);
+        if (acceptedGuesses <= 2) {
+            updateAchievement(userId, AchievementType.MUTLE_SOLVE_IN_TWO, 1);
+        }
+    }
+
     private void addTestWritten(int userId) {
         updateAchievement(userId, AchievementType.WRITE_TESTS, 1);
     }
@@ -295,6 +303,9 @@ public class AchievementService {
     }
 
     private void updateAchievement(int userId, AchievementType achievementType, int metricChange) {
+        if (userId == MUTLE_GUEST_USER_ID) {
+            return;
+        }
         int affected = repo.updateAchievementForUser(userId, achievementType, metricChange);
         if (affected > 0) {
             logger.info("Updated achievement {} for user with id {}", achievementType.name(), userId);
@@ -303,6 +314,9 @@ public class AchievementService {
     }
 
     private void setAchievementMax(int userId, AchievementType achievementType, int newMetricAbsolute) {
+        if (userId == MUTLE_GUEST_USER_ID) {
+            return;
+        }
         int affected = repo.setAchievementForUser(userId, achievementType, newMetricAbsolute);
         if (affected > 0) {
             logger.info("Updated achievement {} for user with id {}", achievementType.name(), userId);
