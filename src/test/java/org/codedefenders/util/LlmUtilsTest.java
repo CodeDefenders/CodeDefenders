@@ -21,14 +21,65 @@ package org.codedefenders.util;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class LlmUtilsTest {
+
+    private static final String TEMPLATE = "class ExampleTest {\n"
+            + "    void test() {\n        " + Constants.TEST_TEMPLATE_PLACEHOLDER + "\n    }\n}";
+
+    private AbstractGame gameWithTemplate() {
+        AbstractGame game = mock(AbstractGame.class);
+        GameClass cut = mock(GameClass.class);
+        when(game.getCUT()).thenReturn(cut);
+        when(cut.getTestTemplate()).thenReturn(TEMPLATE);
+        return game;
+    }
+
+    @ParameterizedTest
+    @MethodSource("indentedTestBodies")
+    void insertsTestBodyAtTemplateIndentation(String reply) {
+        String expectedBody = "        int value = 1;\n"
+                + "        if (value > 0) {\n            assertEquals(1, value);\n        }";
+        assertEquals(TEMPLATE.replace("        " + Constants.TEST_TEMPLATE_PLACEHOLDER, expectedBody),
+                LlmUtils.testTemplateFromReply(reply, gameWithTemplate()));
+    }
+
+    static Stream<String> indentedTestBodies() {
+        String body = "int value = 1;\nif (value > 0) {\n    assertEquals(1, value);\n}";
+        return Stream.of(body, body.indent(8),
+                "class Reply {\n    @Test\n    void test() {\n" + body.indent(8) + "    }\n}");
+    }
+
+    @Test
+    void indentsEveryTestInSuite() {
+        String reply = "class Reply { void first() { int a = 1; int b = 2; } "
+                + "void second() { if (true) { assertTrue(true); } } }";
+        List<String> templates = LlmUtils.suiteOfTestTemplatesFromReply(reply, gameWithTemplate());
+        assertEquals(List.of(
+                TEMPLATE.replace("        " + Constants.TEST_TEMPLATE_PLACEHOLDER,
+                        "        int a = 1;\n        int b = 2;"),
+                TEMPLATE.replace("        " + Constants.TEST_TEMPLATE_PLACEHOLDER,
+                        "        if (true) {\n            assertTrue(true);\n        }")), templates);
+    }
+
+    @Test
+    void preservesTextBlockContentAndTrailingWhitespace() {
+        String body = "        String value = \"\"\"\n"
+                + "            first  \n          second\n            \"\"\";\n"
+                + "        assertNotNull(value);";
+        assertEquals(TEMPLATE.replace("        " + Constants.TEST_TEMPLATE_PLACEHOLDER, body),
+                LlmUtils.testTemplateFromReply(body, gameWithTemplate()));
+    }
 
     @ParameterizedTest
     @MethodSource("testSource")
