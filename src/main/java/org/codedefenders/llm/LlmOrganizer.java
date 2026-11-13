@@ -96,8 +96,12 @@ public class LlmOrganizer {
 
     @Inject
     public LlmOrganizer() {
-        organizerExecutor = Executors.newSingleThreadScheduledExecutor();
-        llmExecutor = Executors.newCachedThreadPool();
+        this(Executors.newSingleThreadScheduledExecutor(), Executors.newCachedThreadPool());
+    }
+
+    LlmOrganizer(ScheduledExecutorService organizerExecutor, ExecutorService llmExecutor) {
+        this.organizerExecutor = organizerExecutor;
+        this.llmExecutor = llmExecutor;
     }
 
 
@@ -294,6 +298,7 @@ public class LlmOrganizer {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
                         game.getId(), role);
                 context.setErrorMessage(e);
+                finishPlayer(gameId, role);
             } catch (NoSuchModelException e) {
                 logger.error("The model is no longer active, llm player thread will be aborted.");
                 context.setErrorMessage(e);
