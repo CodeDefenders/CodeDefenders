@@ -76,7 +76,8 @@ public class PuzzleGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
+    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole,
+                                  boolean hasKilledMutants) {
         PuzzleGame puzzleGame = (PuzzleGame) game;
         return test.getPlayerId() == player.getId()
                 || game.isFinished()
