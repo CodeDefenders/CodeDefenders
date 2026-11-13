@@ -36,6 +36,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
 import org.xnap.commons.i18n.I18n;
 
 /**
@@ -76,10 +77,12 @@ public class HistoryBean {
     }
 
     private HistoryBeanEventDTO createHistoryBeanEvent(Event e, I18n i18n) {
-        if (e.getUserId() < 100) {
+        int userId = e.getUserId();
+        if (userId < 100 && userId != Constants.AI_ATTACKER_USER_ID
+                && userId != Constants.AI_DEFENDER_USER_ID && userId != Constants.AI_PLAYER_USER_ID) {
             return null;
         }
-        String userName = userService.getSimpleUserById(e.getUserId())
+        String userName = userService.getSimpleUserById(userId)
                 .map(SimpleUser::getName)
                 .orElse(i18n.tr("Unknown user"));
         String userMessage = userName + " ";
