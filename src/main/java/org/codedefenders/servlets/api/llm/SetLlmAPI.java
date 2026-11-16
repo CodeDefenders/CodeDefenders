@@ -27,6 +27,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -36,6 +37,8 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -49,8 +52,19 @@ public class SetLlmAPI extends APIServlet {
     @Inject
     LlmOrganizer llmService;
 
+    @Inject
+    CodeDefendersAuth login;
+
+    private final Logger logger = LoggerFactory.getLogger(SetLlmAPI.class);
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (!login.isAdmin()) {
+            logger.warn("User {} tried to POST to the llm-api/battleground/set-llm API", login.getUserId());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         final Optional<Integer> gameId = ServletUtils.getIntParameter(request, "gameId");
         final Optional<String> modelName = ServletUtils.getStringParameter(request, "modelName");
         final Optional<LlmType> modelType = ServletUtils.getEnumParameter(request, LlmType.class, "modelType");
@@ -110,6 +124,13 @@ public class SetLlmAPI extends APIServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        if (!login.isAdmin()) {
+            logger.warn("User {} tried to GET from the llm-api/battleground/set-llm API", login.getUserId());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         final Optional<Integer> gameId = ServletUtils.getIntParameter(request, "gameId");
         if (gameId.isEmpty()) {
             writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
