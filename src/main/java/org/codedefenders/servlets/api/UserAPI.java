@@ -20,6 +20,7 @@ package org.codedefenders.servlets.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,9 +28,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,9 @@ public class UserAPI extends HttpServlet {
 
 
     @Inject
+    CodeDefendersAuth login;
+
+    @Inject
     UserRepository userRepo;
 
     @Inject
@@ -50,14 +57,24 @@ public class UserAPI extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         List<String> userNames;
-        Map<String, String[]> params = request.getParameterMap();
-        if (params.containsKey("forGame") && Boolean.parseBoolean(request.getParameter("forGame"))) {
-            if (!params.containsKey("gameId")) {
+        Optional<Integer> gameId = ServletUtils.getIntParameter(request, "gameId");
+        Optional<Boolean> forGame = ServletUtils.getBooleanParameter(request, "forGame");
+        if (forGame.isPresent() && forGame.get()) {
+            //This is used for whitelist management and therefor only of interest for game owners and admins
+            if (gameId.isEmpty()) {
                 logger.error("forGame is true, but no gameId given");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            userNames = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
+            AbstractGame game = gameRepo.getGame(gameId.get());
+            if (login.isAdmin() || login.getUserId() == game.getCreatorId()) {
+                userNames = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
+            } else {
+                logger.warn("User {} tried to access users for a game he has no business with.", login.getUserId());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
         } else {
             userNames = userRepo.getRealUsers().stream()
                     .map(UserEntity::getUsername)
