@@ -32,8 +32,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
@@ -57,6 +63,12 @@ public class MutantAPI extends HttpServlet {
     MutantRepository mutantRepo;
 
     @Inject
+    GameRepository gameRepository;
+
+    @Inject
+    PlayerRepository playerRepository;
+
+    @Inject
     CodeDefendersAuth login;
 
     @Override
@@ -70,23 +82,37 @@ public class MutantAPI extends HttpServlet {
             return;
         }
 
-        PrintWriter out = response.getWriter();
+        AbstractGame game = gameRepository.getGame(mutant.get().getGameId());
 
-        String json = generateJsonForMutant(mutant.get());
+        PrintWriter out = response.getWriter();
+        Role loginRole = playerRepository.getRole(login.getUserId(), game.getId());
+
+        boolean withDiff = game.getLevel() == GameLevel.EASY
+                || login.isAdmin()
+                || !mutant.get().isAlive()
+                || loginRole == Role.ATTACKER
+                || loginRole == Role.OBSERVER
+                || game.isFinished()
+                || mutant.get().getCreatorId() == login.getUserId(); // Relevant for melee games
+
+
+        String json = generateJsonForMutant(mutant.get(), withDiff);
 
         response.setContentType("application/json");
         out.print(json);
         out.flush();
     }
 
-    private String generateJsonForMutant(Mutant mutant) {
+    private String generateJsonForMutant(Mutant mutant, boolean withDiff) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
         root.add("id", gson.toJsonTree(mutant.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(mutant.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(mutant.getGameId(), Integer.class));
-        root.add("diff", gson.toJsonTree(mutant.getPatchString(), String.class));
+        if (withDiff) {
+            root.add("diff", gson.toJsonTree(mutant.getPatchString(), String.class));
+        }
 
         return gson.toJson(root);
 
