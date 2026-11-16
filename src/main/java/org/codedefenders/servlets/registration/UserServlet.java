@@ -79,11 +79,11 @@ public class UserServlet extends HttpServlet {
             } else {
                 logger.warn("Someone tried to create a user account, even though it is disabled. Username {}, email {}",
                         username, email);
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
-            response.sendRedirect(url.forPath(Paths.LOGIN));
         } else { // Anything different from "create" is an error, so we not allow it
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
+        response.sendRedirect(url.forPath(Paths.LOGIN));
     }
 }
