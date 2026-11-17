@@ -65,7 +65,10 @@ public class ClassroomServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Optional<Classroom> classroom = getClassroomFromRequest(request);
+
+        //For GET requests, only UUIDs are accepted, as plain IDs can be guessed
+        Optional<Classroom> classroom = ServletUtils.getUUIDParameter(request, "classroomUid")
+                .flatMap(classroomService::getClassroomByUUID);
         if (classroom.isEmpty()) {
             messages.add(I18n.marktr("Classroom not found."));
             Redirect.redirectBack(request, response);
@@ -177,7 +180,7 @@ public class ClassroomServlet extends HttpServlet {
         response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomUid=" + classroomUUID.toString());
     }
 
-    public void checkPermission(boolean permitted) throws PermissionDeniedException {
+    private void checkPermission(boolean permitted) throws PermissionDeniedException {
         if (!permitted) {
             throw new PermissionDeniedException();
         }
