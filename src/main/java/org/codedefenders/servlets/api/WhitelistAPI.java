@@ -147,6 +147,18 @@ public class WhitelistAPI extends HttpServlet {
             return;
         }
         int gameId = Integer.parseInt(params.get("gameId")[0]);
+
+        if (!login.isAdmin()) {
+            AbstractGame game = gameRepo.getGame(gameId);
+            int creatorId = game.getCreatorId();
+            if (creatorId != login.getUserId()) {
+                logger.warn("User {} tried to access the whitelist of game {} without being creator or admin.",
+                        login.getUserId(), gameId);
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        }
+
         List<String> userNames;
         if (!params.containsKey("type")) {
             userNames = whitelistRepo.getWhiteListedPlayerNames(gameId);
