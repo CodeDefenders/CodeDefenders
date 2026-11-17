@@ -68,6 +68,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.service.RoleService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 
@@ -123,6 +125,8 @@ public class ClassUploadManager extends HttpServlet {
     @Inject
     private GameClassRepository gameClassRepo;
 
+    @Inject
+    private RoleService roleService;
 
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
@@ -144,8 +148,21 @@ public class ClassUploadManager extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final boolean classUploadEnabled = AdminDAO.getSystemSetting(CLASS_UPLOAD).getBoolValue();
+        final boolean gameCreationEnabled = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         if (!classUploadEnabled && !login.isAdmin()) {
             logger.warn("User {} tried to upload a class, but class upload is disabled.", login.getUserId());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        if (!(gameCreationEnabled
+                || login.isAdmin()
+                || roleService.getRolesForUser(login.getUserId())
+                .stream().anyMatch(r -> r.getName().equals("teacher")))
+        ) {
+            logger.warn("User {} tried to upload a class, but they are not a teacher, and game creation is" +
+                    "disabled.", login.getUserId());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
