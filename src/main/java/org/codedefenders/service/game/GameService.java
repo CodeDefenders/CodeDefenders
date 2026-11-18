@@ -37,11 +37,13 @@ import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.model.Player;
 import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.game.GameResolvedAllDuelsEvent;
 import org.codedefenders.notification.impl.NotificationService;
@@ -198,6 +200,12 @@ public class GameService implements IGameService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
+        IGameService gameService = getGameServiceForGame(game);
+        return gameService != null && gameService.canViewMutant(mutant, game, user, player, playerRole);
     }
 
     @Override

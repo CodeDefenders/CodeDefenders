@@ -31,12 +31,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
@@ -71,6 +68,9 @@ public class MutantAPI extends HttpServlet {
     @Inject
     CodeDefendersAuth login;
 
+    @Inject
+    GameService gameService;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -85,15 +85,10 @@ public class MutantAPI extends HttpServlet {
         AbstractGame game = gameRepository.getGame(mutant.get().getGameId());
 
         PrintWriter out = response.getWriter();
-        Role loginRole = playerRepository.getRole(login.getUserId(), game.getId());
+        Player loginPlayer = playerRepository.getPlayerForUserAndGame(login.getUserId(), game.getId());
 
-        boolean withDiff = game.getLevel() == GameLevel.EASY
-                || login.isAdmin()
-                || !mutant.get().isAlive()
-                || loginRole == Role.ATTACKER
-                || loginRole == Role.OBSERVER
-                || game.isFinished()
-                || mutant.get().getCreatorId() == login.getUserId(); // Relevant for melee games
+        boolean withDiff = gameService.canViewMutant(mutant.get(), game, login.getSimpleUser(), loginPlayer,
+                loginPlayer.getRole());
 
 
         String json = generateJsonForMutant(mutant.get(), withDiff);

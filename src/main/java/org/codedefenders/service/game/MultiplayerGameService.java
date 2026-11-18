@@ -104,29 +104,6 @@ public class MultiplayerGameService extends AbstractGameService {
         return mutant.isCovered(game.getTests(true));
     }
 
-    // TODO: This could use some tests
-    @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
-        // User must participate in the Game
-        if (playerRole == Role.NONE) {
-            return false;
-        }
-        // Anybody can see Mutants if the game is over, or it's an easy Game
-        if (game.isFinished() || game.getLevel() == GameLevel.EASY) {
-            return true;
-        }
-        if (game.getLevel() == GameLevel.HARD) {
-            return mutant.getCreatorId() == user.getId()
-                    // In Hard Games the User must either be an Attacker or Observer
-                    || playerRole == Role.ATTACKER
-                    || playerRole == Role.OBSERVER
-                    // Or the mutant must be killed or equivalent
-                    || mutant.getState() == State.KILLED
-                    || mutant.getState() == State.EQUIVALENT;
-        }
-        return false;
-    }
-
     @Override
     protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user, Role playerRole) {
         return game.getState() == GameState.ACTIVE
