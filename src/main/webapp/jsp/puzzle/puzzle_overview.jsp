@@ -96,7 +96,12 @@ or are locked for the logged in user.
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
-                            <c:set var="status" value="${puzzle.blockedBySeason ? 'locked season-blocked' : puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
+                            <c:set var="status" value="${
+                                        puzzleEntry.equals(nextPuzzleObj) ? 'next'
+                                          : puzzleEntry.solved ? 'solved'
+                                          : puzzle.seasonalUnlocked ? 'next'
+                                          : 'locked'
+                                        }"/> <%-- puzzleEntry.locked does not work for type GAME --%>
                             <a class="chapter__level puzzle-${status}"
                                     <c:choose>
                                         <c:when test="${(puzzleEntry.type == 'GAME' || !puzzleEntry.locked) && !puzzle.blockedBySeason}">

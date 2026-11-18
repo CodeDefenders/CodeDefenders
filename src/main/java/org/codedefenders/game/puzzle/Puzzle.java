@@ -296,16 +296,24 @@ public class Puzzle {
      */
     public boolean isBlockedBySeason() {
         PuzzleChapter chapter = getChapter();
-        if (chapter == null) {
+        if (chapter == null || !chapter.isSeasonalChapter()) {
             return false;
-        } else if (chapter.getCalendarDate() == null) {
-            return false;
-        } else {
-            return !chapter.getCalendarDate()
-                    .withYear(2000)
-                    .plusDays(position - 2)
-                    .isBefore(LocalDate.now().withYear(2000));
         }
+        return !chapter.getCalendarDate()
+                .withYear(2000)
+                .plusDays(position - 2)
+                .isBefore(LocalDate.now().withYear(2000));
+    }
+
+    public boolean isSeasonalUnlocked() {
+        PuzzleChapter chapter = getChapter();
+        if (chapter == null || !chapter.isSeasonalChapter()) {
+            return false;
+        }
+        return chapter.getCalendarDate()
+                .withYear(2000)
+                .plusDays(position - 2)
+                .isBefore(LocalDate.now().withYear(2000));
     }
 
     public boolean isDummy() {
