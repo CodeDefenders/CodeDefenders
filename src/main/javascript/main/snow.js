@@ -19,16 +19,16 @@
 
 class Snow {
     static init(selector) {
-        const chapter = document.querySelector(selector);
-        if (chapter) return new Snow(chapter);
+        const parent = document.querySelector(selector);
+        if (parent) return new Snow(parent);
     }
 
-    constructor(chapter) {
-        this.chapter = chapter;
+    constructor(parent) {
+        this.parent = parent;
         this.canvas = document.createElement("canvas");
         this.canvas.className = "christmas-scene__snow";
         this.canvas.setAttribute("aria-hidden", "true");
-        chapter.prepend(this.canvas);
+        parent.prepend(this.canvas);
 
         this.context = this.canvas.getContext("2d");
         this.width = 0;
@@ -45,7 +45,7 @@ class Snow {
         new IntersectionObserver(([entry]) => {
             this.visible = entry.isIntersecting;
             this.updateAnimation();
-        }).observe(chapter);
+        }).observe(parent);
 
         window.addEventListener("resize", this.resize);
         window.addEventListener("load", this.resize, { once: true });
@@ -89,28 +89,27 @@ class Snow {
     }
 
     resize() {
-        const { chapter, canvas, context } = this;
         const root = document.documentElement;
         const rootBounds = root.getBoundingClientRect();
-        const width = this.width = Math.min(root.clientWidth, rootBounds.width);
-        const height = this.height = chapter.clientHeight;
-        const left = rootBounds.left - chapter.getBoundingClientRect().left;
-        chapter.style.setProperty("--christmas-scene-width", `${width}px`);
-        chapter.style.setProperty("--christmas-scene-left", `${left}px`);
-        if (!context) return;
+        this.width = Math.min(root.clientWidth, rootBounds.width);
+        this.height = this.parent.clientHeight;
+        const left = rootBounds.left - this.parent.getBoundingClientRect().left;
+        this.parent.style.setProperty("--christmas-scene-width", `${this.width}px`);
+        this.parent.style.setProperty("--christmas-scene-left", `${left}px`);
+        if (!this.context) return;
 
         // Cap canvas memory for tall mobile calendars and high-DPI screens.
         const scale = Math.min(window.devicePixelRatio || 1, 2,
-                Math.sqrt(4_000_000 / Math.max(1, width * height)));
-        canvas.width = Math.max(1, Math.round(width * scale));
-        canvas.height = Math.max(1, Math.round(height * scale));
-        context.setTransform(scale, 0, 0, scale, 0, 0);
+                Math.sqrt(4_000_000 / Math.max(1, this.width * this.height)));
+        this.canvas.width = Math.max(1, Math.round(this.width * scale));
+        this.canvas.height = Math.max(1, Math.round(this.height * scale));
+        this.context.setTransform(scale, 0, 0, scale, 0, 0);
 
         this.flakes = Array.from(
-                {length: Math.min(160, Math.max(18, Math.round(width * height / 14000)))},
+                {length: Math.min(160, Math.max(18, Math.round(this.width * this.height / 14000)))},
                 () => ({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
+                    x: Math.random() * this.width,
+                    y: Math.random() * this.height,
                     radius: .8 + Math.random() * 1.7,
                     speed: 14 + Math.random() * 24,
                     opacity: .25 + Math.random() * .6,

@@ -1,0 +1,27 @@
+/* Snow, white text on dark blue bg */
+body {
+    background: #0c2233;
+}
+.christmas-scene__snow {
+    position: absolute;
+    z-index: -1;
+    user-select: none;
+    width: 100%;
+
+    /* padding block of #content */
+    margin-top: -2rem;
+}
+#game-container.christmas-season :is(h3, h4, h3 + p, hr, .puzzle-header, .puzzle-header button:not(.dropdown-item)) {
+    color: #fff;
+}
+#game-container.christmas-season .puzzle-header .modal-dialog {
+    color: #212529;
+}
+#game-container.christmas-season #ma-filter .btn-check:not(:checked)+.btn-outline-secondary:not(:hover) {
+    background: #fff; /* give ma filter buttons white bg only in default state */
+}
+/* candy cane border */
+#game-container.christmas-season .equivalence-container {
+    border: 8px solid var(--bs-danger);
+    border-image: repeating-linear-gradient(45deg, var(--bs-danger), var(--bs-danger) 8px, white 8px, white 16px) 8;
+}

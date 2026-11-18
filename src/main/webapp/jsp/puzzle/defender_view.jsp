@@ -96,15 +96,19 @@
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+
+        <c:if test="${puzzle.chapter.seasonalChapter}">
+            <link href="${url.forPath("/css/specific/advent_game.css")}" rel="stylesheet">
+        </c:if>
     </jsp:attribute>
 
     <jsp:body>
         <t:game_js_init/>
 
-        <div id="game-container" class="container-fluid">
+        <div id="game-container" class="container-fluid ${puzzle.chapter.seasonalStyle}">
 
             <h4><b>${title}</b></h4>
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div class="puzzle-header d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
@@ -191,6 +195,13 @@
                 </div>
             </div>
         </div>
+
+        <c:if test="${puzzle.chapter.seasonalChapter}">
+            <script type="module">
+                import {Snow} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                Snow.init("#content");
+            </script>
+        </c:if>
     </jsp:body>
 </p:main_page>
 
