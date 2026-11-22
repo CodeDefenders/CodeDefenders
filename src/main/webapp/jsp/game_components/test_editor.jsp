@@ -25,6 +25,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="testEditor" type="org.codedefenders.beans.game.TestEditorBean"--%>
 
 <div class="card game-component-resize loading">
     <div class="card-body p-0 codemirror-fill">

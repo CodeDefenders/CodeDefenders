@@ -135,7 +135,7 @@
                                 ${i18n.tr("Your test killed the mutant flagged as equivalent.")}
                             </c:otherwise>
                         </c:choose>
-                            ${requestScope.nextPuzzleMessage}
+                        ${requestScope.nextPuzzleMessage}
                     </p>
                 </div>
             </c:if>
