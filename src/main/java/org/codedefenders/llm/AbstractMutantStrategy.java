@@ -53,7 +53,7 @@ public abstract class AbstractMutantStrategy extends AbstractStrategy {
                 conversation.setMutantId(result.mutant().orElseThrow().getId());
                 onSubmitSuccess();
             } else {
-                conversation.addSystemMessage(
+                conversation.addUserMessage(
                         switch (result.failureReason().orElseThrow()) {
                             case VALIDATION_FAILED -> "Your mutant has violated the following rule: \n"
                                     + result.validationErrorMessage().orElseThrow();
@@ -64,7 +64,7 @@ public abstract class AbstractMutantStrategy extends AbstractStrategy {
             }
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
-                conversation.addSystemMessage(
+                conversation.addUserMessage(
                         "Your mutant changed to many lines. Stick closer to the original code", context.model());
             }
         } catch (IOException | GameManagingUtils.MutantCreationException e) {

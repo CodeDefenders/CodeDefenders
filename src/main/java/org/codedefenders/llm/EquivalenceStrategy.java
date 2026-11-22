@@ -122,7 +122,7 @@ public class EquivalenceStrategy extends AbstractStrategy {
                         default -> throw new RuntimeException();
                     }
                     correction.append("\nFix these problems.");
-                    conversation.addSystemMessage(correction.toString(), context.model());
+                    conversation.addUserMessage(correction.toString(), context.model());
                 } else {
                     gameManagingUtils.acceptBattlegroundEquivalence(context.game(), context.user().getId(),
                             equivalentMutant);
