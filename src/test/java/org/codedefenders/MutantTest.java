@@ -460,8 +460,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -0,6 +1,6 @@
                          line 1
                          line 2
@@ -500,8 +498,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -0,6 +1,6 @@
                          line 1 x
                          line 2
@@ -540,8 +536,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -0,6 +1,6 @@
                          line 1
                          line 2
@@ -580,8 +574,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -0,6 +1,6 @@
                          line 1
                          line 2 x
@@ -619,8 +611,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -1,6 +1,6 @@
                     -    "line 1"
                     +      "line   1"
@@ -650,8 +640,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                        --- /dev/null
-                        +++ /dev/null
                         @@ -0,2 +1,2 @@
                         -    private final Example e = new Example(5);
                         +    private finalExample e = newExample(5);
@@ -683,8 +671,6 @@ public class MutantTest {
 
             Consumer<Mutant> assertions = mutant -> {
                 var expected = """
-                    --- /dev/null
-                    +++ /dev/null
                     @@ -1,6 +1,6 @@
                     +    new line
                          line 1
