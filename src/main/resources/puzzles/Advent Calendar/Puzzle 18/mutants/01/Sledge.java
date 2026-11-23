@@ -6,7 +6,7 @@
  * ~	ice, the sledge slides across it until it lands on normal ground or an obstacle
  * H	normal ground with a house where a gift should be delivered to
  */
-public class Sledge {
+public final class Sledge {
 
     private final char[][] map;
     private int row;
