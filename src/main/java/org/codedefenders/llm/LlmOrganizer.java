@@ -96,8 +96,12 @@ public class LlmOrganizer {
 
     @Inject
     public LlmOrganizer() {
-        organizerExecutor = Executors.newSingleThreadScheduledExecutor();
-        llmExecutor = Executors.newCachedThreadPool();
+        this(Executors.newSingleThreadScheduledExecutor(), Executors.newCachedThreadPool());
+    }
+
+    LlmOrganizer(ScheduledExecutorService organizerExecutor, ExecutorService llmExecutor) {
+        this.organizerExecutor = organizerExecutor;
+        this.llmExecutor = llmExecutor;
     }
 
 
@@ -251,23 +255,16 @@ public class LlmOrganizer {
      * @param role may be {@link Role#ATTACKER} or {@link Role#DEFENDER}
      */
     private void runLlmAction(int gameId, Role role) {
-        LlmContext context = getContext(gameId, role);
-
-
-        context.updateGame();
-
-
-        final AbstractGame game = context.game();
-        final LlmStrategy strategy = context.strategy();
-
-
         logger.info("Running llmAction for game {} with role {}", gameId, role);
-
+        LlmContext context = getContext(gameId, role);
+        context.updateGame();
+        final LlmStrategy strategy = context.strategy();
         double timeModifier = strategy.getTimeModifier();
 
         long timeToStartNextThread = (int) (getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
-        if (equivalentOnlyGames.contains(game.getId())) {
+        if (equivalentOnlyGames.contains(gameId)) {
+            final AbstractGame game = context.game();
             game.getAliveMutants().stream()
                     .filter(m -> m.getCreatorId() == Constants.AI_ATTACKER_USER_ID)
                     .forEach(m -> {
@@ -281,7 +278,7 @@ public class LlmOrganizer {
             try {
                 singleLlmAction(context);
                 long timeToWait;
-                if (equivalentOnlyGames.contains(game.getId())) {
+                if (equivalentOnlyGames.contains(gameId)) {
                     timeToWait = 0;
                 } else {
                     timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
@@ -290,30 +287,22 @@ public class LlmOrganizer {
                 organizerExecutor.schedule(() -> llmExecutor.execute(
                                 () -> runLlmAction(gameId, role)),
                         timeToWait, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                logger.error("AiPlayerThread for game {} with role {} timed out.",
-                        game.getId(), role);
-                context.setErrorMessage(e);
-            } catch (NoSuchModelException e) {
-                logger.error("The model is no longer active, llm player thread will be aborted.");
-                context.setErrorMessage(e);
-                finishPlayer(game.getId(), role);
             } catch (Exception e) {
                 logger.error("""
                                 LLM player thread in game {} and role {} threw an exception:
                                 {}
                                 The thread will be terminated.""",
-                        game.getId(), role, e.toString());
+                        gameId, role, e.toString());
                 context.setErrorMessage(e);
-                finishPlayer(game.getId(), role);
+                finishPlayer(gameId, role);
             }
-        } else if (gameRepository.isGameCreated(game.getId())) {
+        } else if (gameRepository.isGameCreated(gameId)) {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
                             () -> runLlmAction(gameId, role)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
-            finishPlayer(game.getId(), role);
+            finishPlayer(gameId, role);
         }
     }
 
