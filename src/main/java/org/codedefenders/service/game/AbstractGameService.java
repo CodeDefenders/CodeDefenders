@@ -226,11 +226,14 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     protected TestDTO convertTest(Test test, SimpleUser user, Player player, AbstractGame game) {
+        List<Integer> killedMutantIds = testRepo.getKilledMutantsForTestId(test.getId()).stream()
+                .map(Mutant::getId)
+                .toList();
         boolean viewable;
 
         if (player != null) {
             Role playerRole = determineRole(user, player, game);
-            viewable = canViewTest(test, game, player, playerRole);
+            viewable = canViewTest(test, game, player, playerRole, !killedMutantIds.isEmpty());
         } else {
             // The current user is probably not in the same game where the test was created, causing player to be null.
 
@@ -241,10 +244,6 @@ public abstract class AbstractGameService implements IGameService {
         }
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
-
-        List<Integer> killedMutantIds = testRepo.getKilledMutantsForTestId(test.getId()).stream()
-            .map(Mutant::getId)
-            .toList();
 
         return new TestDTO(test.getId(), creator, test.getScore(), viewable,
                 test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
@@ -257,7 +256,8 @@ public abstract class AbstractGameService implements IGameService {
         );
     }
 
-    protected abstract boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole);
+    protected abstract boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole,
+                                           boolean hasKilledMutants);
 
     // TODO:
     protected Role determineRole(SimpleUser user, Player player, AbstractGame game) {

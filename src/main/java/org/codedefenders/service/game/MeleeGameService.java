@@ -126,11 +126,13 @@ public class MeleeGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
+    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole,
+                                  boolean hasKilledMutants) {
         return game.isFinished()
                 || playerRole == Role.OBSERVER
                 || game.getLevel() == GameLevel.EASY
-                || test.getPlayerId() == player.getId();
+                || test.getPlayerId() == player.getId()
+                || (playerRole == Role.PLAYER && hasKilledMutants);
     }
 
     public boolean createGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {

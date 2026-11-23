@@ -139,12 +139,14 @@ public class MultiplayerGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
+    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole,
+                                  boolean hasKilledMutants) {
         return game.isFinished()
                 || playerRole == Role.OBSERVER
                 || playerRole == Role.DEFENDER
                 || game.getLevel() == GameLevel.EASY
-                || test.getPlayerId() == player.getId();
+                || test.getPlayerId() == player.getId()
+                || (playerRole == Role.ATTACKER && hasKilledMutants);
     }
 
     /**
