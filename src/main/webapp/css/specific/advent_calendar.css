@@ -309,15 +309,17 @@
 
 /* lid next to gift for solved puzzles. Lift up gift on hover. */
 .chapter.christmas-season .chapter__level.puzzle-solved[href] .advent-gift__top {
-    transform: translate(-40%, 95%) rotate(-65deg);
-    transform-origin: bottom;
+    transform: translate(-15%, 40%) rotate(-70deg);
+    transform-origin: center left;
+    bottom: 0;
+    top: unset;
 }
 .chapter.christmas-season .chapter__level.puzzle-solved[href]:hover .advent-gift,
 .chapter.christmas-season .chapter__level.puzzle-solved[href]:focus-visible .advent-gift {
     transform: translateY(-7px);
 }
 .chapter.christmas-season .chapter__level.puzzle-solved[href]:hover .advent-gift__top {
-    transform: translate(-45%, calc(95% + 7px)) rotate(-69deg);
+    transform: translate(-20%, calc(40% + 7px)) rotate(-72deg);
 }
 /* make solved puzzles b/w */
 .chapter.christmas-season .chapter__level.puzzle-solved {
