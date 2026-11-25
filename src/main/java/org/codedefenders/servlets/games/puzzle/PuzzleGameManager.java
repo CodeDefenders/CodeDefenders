@@ -315,11 +315,9 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        // check if puzzle is locked
         Optional<Puzzle> nextNormalPuzzle = getNextPuzzleForUser(false);
-        Optional<Puzzle> nextSeasonalPuzzle = getNextPuzzleForUser(true);
         if (nextNormalPuzzle.isPresent() && nextNormalPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()
-                && (nextSeasonalPuzzle.isEmpty() || nextSeasonalPuzzle.get().getPuzzleId() != puzzle.getPuzzleId())) {
+                && !puzzle.getChapter().isSeasonalChapter()) {
             logger.error("Cannot create puzzle game for puzzleId: {}. Puzzle is locked.", puzzleId);
             response.setStatus(SC_FORBIDDEN);
             Redirect.redirectBack(request, response);

@@ -94,11 +94,11 @@ public class PuzzleNavigationBean {
 
         for (PuzzleEntry puzzleEntry : unsolvedPuzzles) {
             if (puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE) {
-                if (puzzleEntry.getPuzzle().getChapter().getCalendarDate() == null) {
+                if (!puzzleEntry.getPuzzle().getChapter().isSeasonalChapter()) {
                     if (!nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
                         puzzleEntry.lock();
                     }
-                } else if (puzzleEntry.getPuzzle().isBlockedBySeason() || !nextSeasonalPuzzle.map(puzzleEntry::equals).orElse(true)) {
+                } else if (puzzleEntry.getPuzzle().isBlockedBySeason()) {
                     puzzleEntry.lock();
                 }
             }
