@@ -16,7 +16,7 @@ public final class ChristmasLights {
         while (round < lights.length * 2) {
             if ((position + round) % 3 == 0) {
                 lights[position] = !lights[position];
-            } else if (position % 4 < 1) {
+            } else if (position % 2 == 0) {
                 lights[position] = true;
             } else if (round % 4 == 0) {
                 lights[position] = false;

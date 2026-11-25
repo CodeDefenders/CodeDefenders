@@ -39,4 +39,18 @@ public class WishList {
         return sum;
     }
 
+    public String mostWished() {
+        String mostWishedWish = null;
+        int mostWishes = 0;
+
+        for (Map.Entry<String, Integer> wish : wishes.entrySet()) {
+            if (wish.getValue() > mostWishes) {
+                mostWishedWish = wish.getKey();
+                mostWishes = wish.getValue();
+            }
+        }
+
+        return mostWishedWish;
+    }
+
 }

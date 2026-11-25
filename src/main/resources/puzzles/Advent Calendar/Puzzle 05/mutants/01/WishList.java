@@ -16,8 +16,8 @@ public class WishList {
 
     public void removeWish(String wish) {
         if (wishes.containsKey(wish)) {
-            int n = wishes.get(wish) - 1;
-            if (n == 1) {
+            int n = wishes.get(wish) - 2;
+            if (n == 0) {
                 wishes.remove(wish);
             } else {
                 wishes.put(wish, n);
