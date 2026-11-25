@@ -165,6 +165,6 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
             default -> throw new RuntimeException("Checkstyle");
         }
         correction.append("\nFix these problems.");
-        conversation.addSystemMessage(correction.toString(), context.model());
+        conversation.addUserMessage(correction.toString(), context.model());
     }
 }

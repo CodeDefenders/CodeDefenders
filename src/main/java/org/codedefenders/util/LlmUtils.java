@@ -146,7 +146,18 @@ public class LlmUtils {
     }
 
     private static String insertIntoTestTemplate(AbstractGame game, String toInsert) {
-        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, toInsert);
+        String template = game.getCUT().getTestTemplate();
+        Matcher placeholder = Pattern.compile("(?m)^([\\t ]*)" + Pattern.quote(Constants.TEST_TEMPLATE_PLACEHOLDER))
+                .matcher(template);
+        List<String> lines = toInsert.lines().toList();
+        // Move the whole body to the placeholder's indentation, keeping relative indentation
+        // (including whitespace inside text blocks) and trailing whitespace intact.
+        int commonIndent = lines.stream().filter(line -> !line.isBlank())
+                .mapToInt(line -> line.length() - line.stripLeading().length()).min().orElse(0);
+        return placeholder.replaceAll(match -> Matcher.quoteReplacement(lines.stream()
+                .map(line -> match.group(1) + line.substring(Math.min(commonIndent,
+                        line.length() - line.stripLeading().length())))
+                .collect(Collectors.joining("\n"))));
     }
 
     private static int indexOfDependencyDeclaration(String code, String dependencyName) {
