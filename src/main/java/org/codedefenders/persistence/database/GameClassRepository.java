@@ -32,6 +32,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.SQLMappingException;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.dto.User;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -151,12 +152,12 @@ public class GameClassRepository {
      */
     public Optional<GameClass> getClassForGameId(int gameId) {
         @Language("SQL") String query = """
-                SELECT classes.*
-                FROM classes
-                INNER JOIN games
-                  ON classes.Class_ID = games.Class_ID
-                WHERE games.ID=?;
-        """;
+                        SELECT classes.*
+                        FROM classes
+                        INNER JOIN games
+                          ON classes.Class_ID = games.Class_ID
+                        WHERE games.ID=?;
+                """;
         return queryRunner.query(query, oneFromRS(GameClassRepository::gameClassFromRS), gameId);
     }
 
@@ -171,12 +172,12 @@ public class GameClassRepository {
      */
     public List<GameClassInfo> getAllClassInfos() {
         @Language("SQL") String query = """
-                SELECT classes.*,
-                    (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count
-                FROM classes
-                WHERE Puzzle != 1
-                GROUP BY classes.Class_ID;
-        """;
+                        SELECT classes.*,
+                            (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count
+                        FROM classes
+                        WHERE Puzzle != 1
+                        GROUP BY classes.Class_ID;
+                """;
 
         return queryRunner.query(query, listFromRS(GameClassRepository::gameClassInfoFromRS));
     }
@@ -204,10 +205,10 @@ public class GameClassRepository {
      */
     public boolean gamesExistsForClass(Integer classId) {
         @Language("SQL") String query = """
-            SELECT EXISTS(SELECT ID from games WHERE games.Class_ID = ?) as games_exist;
-        """;
+                    SELECT EXISTS(SELECT ID from games WHERE games.Class_ID = ?) as games_exist;
+                """;
         return queryRunner.query(query, oneFromRS(rs -> rs.getBoolean("games_exist")), classId)
-            .orElseThrow();
+                .orElseThrow();
     }
 
     /**
@@ -231,10 +232,10 @@ public class GameClassRepository {
     public List<Integer> getMappedMutantIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT Mutant_ID
-                FROM mutant_uploaded_with_class
-                WHERE Class_ID = ?
-        """;
+                        SELECT Mutant_ID
+                        FROM mutant_uploaded_with_class
+                        WHERE Class_ID = ?
+                """;
         return queryRunner.query(query, listFromRS(rs -> rs.getInt("Mutant_ID")), classId);
     }
 
@@ -248,11 +249,11 @@ public class GameClassRepository {
     public List<Mutant> getMappedMutantsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT mutants.*
-                FROM mutants, mutant_uploaded_with_class up
-                WHERE up.Class_ID = ?
-                   AND up.Mutant_ID = mutants.Mutant_ID
-        """;
+                        SELECT mutants.*
+                        FROM mutants, mutant_uploaded_with_class up
+                        WHERE up.Class_ID = ?
+                           AND up.Mutant_ID = mutants.Mutant_ID
+                """;
         return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classId);
     }
 
@@ -266,10 +267,10 @@ public class GameClassRepository {
     public List<Integer> getMappedTestIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT Test_ID
-                FROM test_uploaded_with_class
-                WHERE Class_ID = ?;
-        """;
+                        SELECT Test_ID
+                        FROM test_uploaded_with_class
+                        WHERE Class_ID = ?;
+                """;
         return queryRunner.query(query, listFromRS(rs -> rs.getInt("Test_ID")), classId);
     }
 
@@ -283,11 +284,11 @@ public class GameClassRepository {
     public List<Test> getMappedTestsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT tests.*
-                FROM tests, test_uploaded_with_class up
-                WHERE up.Class_ID = ?
-                   AND up.Test_ID = tests.Test_ID
-        """;
+                        SELECT tests.*
+                        FROM tests, test_uploaded_with_class up
+                        WHERE up.Class_ID = ?
+                           AND up.Test_ID = tests.Test_ID
+                """;
         return queryRunner.query(query, listFromRS(TestRepository::testFromRS), classId);
     }
 
@@ -314,12 +315,12 @@ public class GameClassRepository {
     public List<Dependency> getMappedDependenciesForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT
-                   Dependency_ID,
-                   JavaFile,
-                   Class_ID
-                FROM dependencies WHERE Class_ID = ?;
-        """;
+                        SELECT
+                           Dependency_ID,
+                           JavaFile,
+                           Class_ID
+                        FROM dependencies WHERE Class_ID = ?;
+                """;
         return queryRunner.query(query,
                 listFromRS(DependencyDAO::dependencyFromRS),
                 classId);
@@ -346,19 +347,19 @@ public class GameClassRepository {
         boolean isActive = cut.isActive();
 
         @Language("SQL") String query = """
-                INSERT INTO classes (
-                    Name,
-                    Alias,
-                    JavaFile,
-                    ClassFile,
-                    RequireMocking,
-                    TestingFramework,
-                    AssertionLibrary,
-                    Puzzle,
-                    Parent_Class,
-                    Active
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """;
+                        INSERT INTO classes (
+                            Name,
+                            Alias,
+                            JavaFile,
+                            ClassFile,
+                            RequireMocking,
+                            TestingFramework,
+                            AssertionLibrary,
+                            Puzzle,
+                            Parent_Class,
+                            Active
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                """;
 
         var key = queryRunner.insert(query,
                 generatedKeyFromRS(),
@@ -397,13 +398,13 @@ public class GameClassRepository {
         boolean isActive = cut.isActive();
 
         @Language("SQL") String query = """
-                UPDATE classes
-                  SET
-                  Alias = ? ,
-                  RequireMocking = ? ,
-                  Active = ?
-                WHERE class_ID = ?
-        """;
+                        UPDATE classes
+                          SET
+                          Alias = ? ,
+                          RequireMocking = ? ,
+                          Active = ?
+                        WHERE class_ID = ?
+                """;
 
         return queryRunner.update(query,
                 alias,
@@ -444,10 +445,10 @@ public class GameClassRepository {
         @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
         @Language("SQL") String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";
         @Language("SQL") String query4 = """
-                DELETE FROM targetexecutions
-                WHERE Mutant_ID IN
-                (SELECT Mutant_ID FROM mutants WHERE Class_ID = ?);
-        """;
+                        DELETE FROM targetexecutions
+                        WHERE Mutant_ID IN
+                        (SELECT Mutant_ID FROM mutants WHERE Class_ID = ?);
+                """;
         @Language("SQL") String query5 = "DELETE FROM mutants WHERE Class_ID = ?;";
         @Language("SQL") String query6 = "DELETE FROM tests WHERE Class_ID = ?;";
 
@@ -502,5 +503,35 @@ public class GameClassRepository {
                 """;
         List<String> similarAliases = queryRunner.query(query, listFromRS(rs -> rs.getString("Alias")), bareAlias);
         return nextFreeName(similarAliases, bareAlias);
+    }
+
+    /**
+     * Returns true if the user has ever played a game with this class.
+     */
+    public boolean userHasPlayedClass(int classId, int userId) {
+        @Language("SQL")
+        String sql = """
+                SELECT Game_ID
+                FROM games
+                    JOIN classes ON games.Class_ID = classes.Class_ID
+                    JOIN players ON games.ID = players.Game_ID
+                WHERE classes.Class_ID = ? AND players.User_ID = ?
+                LIMIT 1;
+                """;
+        return queryRunner.query(sql, ResultSet::isBeforeFirst, classId, userId);
+    }
+
+    /**
+     * Returns true if any game with this class is currently active
+     */
+    public boolean gameWithClassIsActive(int classId) {
+        @Language("SQL")
+        String sql = """
+                SELECT ID
+                FROM games
+                WHERE Class_ID = ? AND State IN ('ACTIVE', 'CREATED')
+                LIMIT 1;
+                """;
+        return queryRunner.query(sql, ResultSet::isBeforeFirst, classId);
     }
 }

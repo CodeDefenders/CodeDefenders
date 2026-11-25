@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,9 +31,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.dto.User;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.persistence.database.RoleRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -52,13 +60,24 @@ public class GameClassAPI extends HttpServlet {
 
     private boolean withDependencies;
 
+    private Logger logger = LoggerFactory.getLogger(GameClassAPI.class);
+
     @Inject
     private GameClassRepository gameClassRepo;
+
+    @Inject
+    private CodeDefendersAuth login;
+
+    @Inject
+    private RoleRepository roleRepository;
+
+    @Inject
+    private AdminDAO adminDAO;
 
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        final Optional<GameClass> classId = ServletUtils.getIntParameter(request, "classId")
+        final Optional<GameClass> gameClass = ServletUtils.getIntParameter(request, "classId")
                 .flatMap(gameClassRepo::getClassForId);
 
         int withDependenciesInt = ServletUtils.getIntParameter(request, "withDependencies").orElse(0);
@@ -74,14 +93,26 @@ public class GameClassAPI extends HttpServlet {
                 return;
         }
 
-        if (classId.isEmpty()) {
+        if (gameClass.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return;
+        }
+
+        if (!login.isAdmin()
+                && !gameClass.get().isPuzzleClass()
+                && !AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()
+                && roleRepository.getRoleNamesForUser(login.getUserId()).isEmpty()
+                && !gameClassRepo.gameWithClassIsActive(gameClass.get().getId())
+                && !gameClassRepo.userHasPlayedClass(gameClass.get().getId(), login.getUserId())) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            logger.warn("User {} tried to access class {}, but is not authorized to do that",
+                    login.getUserId(), gameClass.get().getId());
             return;
         }
 
         PrintWriter out = response.getWriter();
 
-        String json = generateJsonForClass(classId.get());
+        String json = generateJsonForClass(gameClass.get());
 
         response.setContentType("application/json");
         out.print(json);
