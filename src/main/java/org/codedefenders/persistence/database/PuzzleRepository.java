@@ -444,13 +444,15 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 UPDATE puzzle_chapters
                 SET Position = ?,
-                Calendar_date = ?
+                Calendar_date = ?,
+                Days_available = ?
                 WHERE Chapter_ID = ?;
         """;
 
         int updatedRows = queryRunner.update(query,
                 chapter.getPosition(),
                 chapter.getCalendarDate() != null ? Date.valueOf(chapter.getCalendarDate()) : null,
+                chapter.getDaysAvailable(),
                 chapter.getId()
         );
         return updatedRows > 0;
@@ -881,9 +883,9 @@ public class PuzzleRepository {
 
         Date sqlDate = rs.getDate("puzzle_chapters.Calendar_date");
         LocalDate localDate = sqlDate == null ? null : sqlDate.toLocalDate();
+        int daysAvailable = rs.getInt("puzzle_chapters.Days_available");
 
-
-        return new PuzzleChapter(chapterId, position, localDate);
+        return new PuzzleChapter(chapterId, position, localDate, daysAvailable);
     }
 
     /**

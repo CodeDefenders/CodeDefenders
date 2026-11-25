@@ -202,6 +202,7 @@ public class PuzzleImporter {
             } else {
                 var props = readPuzzleChapterProperties(data.properties);
                 chapter.setCalendarDate(props.calendarDate());
+                chapter.setDaysAvailable(props.daysAvailable());
                 puzzleRepo.updatePuzzleChapter(chapter);
                 logger.info("Skipping existing default puzzle chapter '{}'.",
                         props.title());
@@ -272,7 +273,7 @@ public class PuzzleImporter {
         return files;
     }
 
-    public record PuzzleChapterProperties(String title, String description, LocalDate calendarDate) { }
+    public record PuzzleChapterProperties(String title, String description, LocalDate calendarDate, int daysAvailable) { }
 
     public PuzzleChapterProperties readPuzzleChapterProperties(SimpleFile propertiesFile) throws IOException {
         Properties cfg = new Properties();
@@ -295,7 +296,20 @@ public class PuzzleImporter {
             }
         }
 
-        return new PuzzleChapterProperties(title, description, calendarDate);
+        int daysAvailable = 30;
+        String daysAvailableProperty = cfg.getProperty("daysAvailable");
+        if (daysAvailableProperty != null && !daysAvailableProperty.isBlank()) {
+            try {
+                daysAvailable = Integer.parseInt(daysAvailableProperty.strip());
+                if (daysAvailable <= 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                throw new ValidationException("Invalid daysAvailable value. Use a positive integer.");
+            }
+        }
+
+        return new PuzzleChapterProperties(title, description, calendarDate, daysAvailable);
     }
 
     private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
@@ -303,6 +317,7 @@ public class PuzzleImporter {
 
         PuzzleChapter chapter = puzzleRepo.createNewPuzzleChapter();
         chapter.setCalendarDate(props.calendarDate());
+        chapter.setDaysAvailable(props.daysAvailable());
         puzzleRepo.updatePuzzleChapter(chapter);
 
         // Store chapter text using the default locale

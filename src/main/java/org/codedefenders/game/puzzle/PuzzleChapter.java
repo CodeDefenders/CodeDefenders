@@ -26,6 +26,7 @@ import java.time.LocalDate;
  * @see Puzzle
  */
 public class PuzzleChapter {
+    private static final int DEFAULT_DAYS_AVAILABLE = 30;
 
     /**
      * ID of the chapter.
@@ -38,6 +39,7 @@ public class PuzzleChapter {
     private Integer position;
 
     private LocalDate calendarDate;
+    private int daysAvailable;
 
 
     public PuzzleChapter(int id, Integer position) {
@@ -54,9 +56,22 @@ public class PuzzleChapter {
      *                     Always refers to the local Date of the server.
      */
     public PuzzleChapter(int id, Integer position, LocalDate calendarDate) {
+        this(id, position, calendarDate, DEFAULT_DAYS_AVAILABLE);
+    }
+
+    /**
+     * Constructs a new puzzle chapter instance.
+     *
+     * @param id           ID of the chapter in the database.
+     * @param position     Position of the chapter in the chapter list. Can be null.
+     * @param calendarDate The first day of a seasonal puzzle chapter. If null, the chapter is always available.
+     * @param daysAvailable Number of days the seasonal chapter is available from its start date.
+     */
+    public PuzzleChapter(int id, Integer position, LocalDate calendarDate, int daysAvailable) {
         this.id = id;
         this.position = position;
         this.calendarDate = calendarDate;
+        this.daysAvailable = daysAvailable;
     }
 
     public int getId() {
@@ -87,12 +102,20 @@ public class PuzzleChapter {
         this.calendarDate = calendarDate;
     }
 
+    public int getDaysAvailable() {
+        return daysAvailable;
+    }
+
+    public void setDaysAvailable(int daysAvailable) {
+        this.daysAvailable = daysAvailable;
+    }
+
     public boolean isVisible() {
         if (calendarDate == null) {
             return true;
         } else {
             return calendarDate.withYear(2000).plusDays(-1).isBefore(LocalDate.now().withYear(2000))
-                    && calendarDate.withYear(2000).plusDays(30).isAfter(LocalDate.now().withYear(2000));
+                    && calendarDate.withYear(2000).plusDays(daysAvailable).isAfter(LocalDate.now().withYear(2000));
         }
     }
 
