@@ -26,6 +26,8 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -65,6 +67,7 @@ import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.DateUtils;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.SimpleFile;
@@ -197,8 +200,11 @@ public class PuzzleImporter {
             if (chapter == null) {
                 chapter = storePuzzleChapterToDB(data.properties);
             } else {
+                var props = readPuzzleChapterProperties(data.properties);
+                chapter.setCalendarDate(props.calendarDate());
+                puzzleRepo.updatePuzzleChapter(chapter);
                 logger.info("Skipping existing default puzzle chapter '{}'.",
-                        readPuzzleChapterProperties(data.properties).title());
+                        props.title());
             }
 
             for (PuzzleData puzzleData : data.puzzles) {
@@ -266,7 +272,7 @@ public class PuzzleImporter {
         return files;
     }
 
-    public record PuzzleChapterProperties(String title, String description) { }
+    public record PuzzleChapterProperties(String title, String description, LocalDate calendarDate) { }
 
     public PuzzleChapterProperties readPuzzleChapterProperties(SimpleFile propertiesFile) throws IOException {
         Properties cfg = new Properties();
@@ -278,13 +284,26 @@ public class PuzzleImporter {
         }
 
         String description = cfg.getProperty("description");
-        return new PuzzleChapterProperties(title, description);
+        String startDate = cfg.getProperty("startDate");
+
+        LocalDate calendarDate = null;
+        if (startDate != null && !startDate.isBlank()) {
+            try {
+                calendarDate = DateUtils.parseSeasonalDate(startDate.strip());
+            } catch (DateTimeParseException e) {
+                throw new ValidationException("Invalid startDate format. Use MM-dd.");
+            }
+        }
+
+        return new PuzzleChapterProperties(title, description, calendarDate);
     }
 
     private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
         var props = readPuzzleChapterProperties(propertiesFile);
 
         PuzzleChapter chapter = puzzleRepo.createNewPuzzleChapter();
+        chapter.setCalendarDate(props.calendarDate());
+        puzzleRepo.updatePuzzleChapter(chapter);
 
         // Store chapter text using the default locale
         String language = i18nService.getDefaultLocale().getLanguage();
