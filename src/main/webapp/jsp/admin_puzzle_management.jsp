@@ -831,6 +831,15 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">${i18n.tr("Days available after the start date")}</label>
+                                    <input type="number" name="daysAvailable" class="form-control" min="1" step="1"
+                                        required>
+                                    <div class="invalid-feedback">${i18n.tr('Enter a positive number of days.')}</div>
+                                </div>
+                            </div>
+
                         </form>`;
                     modal.title.innerText = '${i18n.tr("Edit Chapter")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
@@ -840,6 +849,7 @@
                     modal.body.querySelector('input[name="description"]').value = chapterText.isFallback ? '' : chapterText.description;
                     console.log(chapter)
                     modal.body.querySelector('input[name="date"]').value = chapter.date;
+                    modal.body.querySelector('input[name="daysAvailable"]').value = chapter.daysAvailable;
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
@@ -857,13 +867,16 @@
                         const title = modal.body.querySelector('input[name="title"]').value;
                         const description = modal.body.querySelector('input[name="description"]').value;
                         const date = modal.body.querySelector('input[name="date"]').value;
+                        const daysAvailable = Number(modal.body.querySelector('input[name="daysAvailable"]').value);
 
                         PuzzleAPI.updatePuzzleChapter(chapter.id, {
                             title: title,
                             description: description,
-                            date: date
+                            date: date,
+                            daysAvailable: daysAvailable
                         }, currentLanguage).then(response => {
                             chapter.texts = response.chapter.texts;
+                            chapter.daysAvailable = response.chapter.daysAvailable;
                             chapterComp.updateDisplay();
                             ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {

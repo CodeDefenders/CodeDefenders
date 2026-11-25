@@ -459,6 +459,14 @@ public class AdminPuzzleAPI extends HttpServlet {
             }
         }
 
+        if (data.daysAvailable != null) {
+            if (data.daysAvailable <= 0) {
+                writeJSONMessage(response, 400, i18n.tr("Days available must be a positive number."));
+                return;
+            }
+            chapter.setDaysAvailable(data.daysAvailable);
+        }
+
         String description = data.description.strip();
         if (description.length() > 1000) {
             writeJSONMessage(response, 400, i18n.tr("Invalid description."));
@@ -609,7 +617,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             out.beginObject()
                     .name("id").value(chapter.getId())
                     .name("position").value(chapter.getPosition())
-                    .name("date").value(DateUtils.toSeasonalDateString(chapter.getCalendarDate()));
+                    .name("date").value(DateUtils.toSeasonalDateString(chapter.getCalendarDate()))
+                    .name("daysAvailable").value(chapter.getDaysAvailable());
 
             out.name("texts").beginObject();
             for (PuzzleChapterText text : puzzleRepo.getAllPuzzleChapterTexts(chapter.getId())) {
@@ -688,7 +697,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     public record CreateChapterData(String title, String description) {
     }
 
-    public record UpdateChapterData(String title, String description, String date) {
+    public record UpdateChapterData(String title, String description, String date, Integer daysAvailable) {
     }
 
     public record UpdatePuzzleData(
