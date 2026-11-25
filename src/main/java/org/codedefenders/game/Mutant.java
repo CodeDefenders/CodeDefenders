@@ -410,7 +410,8 @@ public class Mutant implements Serializable {
         List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
         for (String s : unifiedPatches) {
-            if ("--- null".equals(s) || "+++ null".equals(s)) {
+            if ("--- null".equals(s) || "+++ null".equals(s)
+                    || "--- /dev/null".equals(s) || "+++ /dev/null".equals(s)) {
                 continue;
             }
             unifiedPatch.append(s).append(System.getProperty("line.separator"));

@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.util.JSONUtils;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,6 +34,7 @@ public class APIServlet extends HttpServlet {
     protected void writeResponse(HttpServletResponse response, int statusCode, Object responseBody) throws IOException {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new JSONUtils.OptionalTypeAdapterFactory())
+                .registerTypeAdapter(MutantValidationRuleSet.class, new JSONUtils.MutantRuleSetNameSerializer())
                 .serializeNulls()
                 .create();
         PrintWriter out = response.getWriter();
