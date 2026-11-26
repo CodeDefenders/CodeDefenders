@@ -43,3 +43,9 @@ body {
     border: 8px solid var(--bs-danger);
     border-image: repeating-linear-gradient(45deg, var(--bs-danger), var(--bs-danger) 8px, white 8px, white 16px) 8;
 }
+
+/* Chapter completed message  */
+#game-container.christmas-season .alert-chapter-completed {
+    color: #e7e200;
+    text-align: center;
+}
