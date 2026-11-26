@@ -24,6 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="previousTest" type="org.codedefenders.game.Test"--%>
 
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
@@ -154,6 +155,7 @@
                             </c:otherwise>
                         </c:choose>
                         <div>
+                            <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
                             <button type="submit" class="btn btn-defender btn-highlight ${season}" id="submitTest" form="def"
                                 ${game.state == GameState.SOLVED ? 'disabled' : ''}>
                                     ${i18n.tr('Defend')}

@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
+import org.intellij.lang.annotations.RegExp;
 
 
 public class MutantStrategyAnnotatedFullClass extends AbstractMutantStrategy {
@@ -48,7 +49,14 @@ public class MutantStrategyAnnotatedFullClass extends AbstractMutantStrategy {
             );
             conversation.addUserMessage(LlmUtils.annotatedCut(context.game()), context.model());
         }
-        String result = promptService.getResponse(context.model(), conversation);
+        String rawResult = promptService.getResponse(context.model(), conversation);
+        String result = removeCoverageCommentsFromResponse(rawResult);
         return Optional.of(LlmUtils.extractMutantFromReply(result, true, context.game()));
+    }
+
+    static String removeCoverageCommentsFromResponse(String response) {
+        @RegExp
+        String regex = "\\h*//coverage:\\d+, killed:\\d+, alive:\\d+\\s*(\\n|$)";
+        return response.replaceAll(regex, "\n");
     }
 }
