@@ -790,16 +790,18 @@ public class PuzzleRepository {
      */
     public void storePuzzleChapterText(PuzzleChapterText text) {
         @Language("SQL") String query = """
-                INSERT INTO puzzle_chapter_text (Chapter_ID, Language, Title, Description)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description);
+                INSERT INTO puzzle_chapter_text (Chapter_ID, Language, Title, Description, Completion_text)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description),
+                    Completion_text = VALUES(Completion_text);
         """;
 
         queryRunner.update(query,
                 text.chapterId(),
                 text.language(),
                 text.title(),
-                text.description()
+                text.description(),
+                text.completionText()
         );
     }
 
@@ -863,7 +865,8 @@ public class PuzzleRepository {
                 rs.getInt("Chapter_ID"),
                 rs.getString("Language"),
                 rs.getString("Title"),
-                rs.getString("Description")
+                rs.getString("Description"),
+                rs.getString("Completion_text")
         );
     }
 

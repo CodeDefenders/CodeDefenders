@@ -261,7 +261,8 @@ public class PuzzleGameManager extends HttpServlet {
         request.setAttribute("chapterTitle", chapterText != null ? chapterText.title() : "");
 
         if (game.getState() == GameState.SOLVED) {
-            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
+            request.setAttribute("nextPuzzleMessage",
+                    generateNextPuzzleMessage(game, new StringBuilder(), i18n, request));
         }
 
         if (game.getPuzzle().isBlockedBySeason()) {
@@ -1016,7 +1017,8 @@ public class PuzzleGameManager extends HttpServlet {
         return Optional.empty();
     }
 
-    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n) {
+    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n,
+                                             HttpServletRequest request) {
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
@@ -1054,6 +1056,7 @@ public class PuzzleGameManager extends HttpServlet {
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
                         if (puzzleChapter.getId() > currentChapter) {
+                            setChapterCompletionText(request, currentChapter, i18n);
                             var chapterText = puzzleRepo.getPuzzleChapterText(
                                     puzzleChapter.getId(),
                                     i18n.getLocale().getLanguage()
@@ -1090,6 +1093,7 @@ public class PuzzleGameManager extends HttpServlet {
         /*
          * If we got here, the user has solved all the puzzles in a chapter
          */
+        setChapterCompletionText(request, currentChapter, i18n);
         message.append(" ").append(
                 i18n.tr(
                         "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>.",
@@ -1097,5 +1101,15 @@ public class PuzzleGameManager extends HttpServlet {
                 )
         );
         return message.toString();
+    }
+
+    private void setChapterCompletionText(HttpServletRequest request, int chapterId, I18n i18n) {
+        var chapterText = puzzleRepo.getPuzzleChapterTextWithFallback(
+                chapterId,
+                i18n.getLocale().getLanguage(),
+                i18nService.getDefaultLocale().getLanguage()
+        );
+        request.setAttribute("chapterCompletionText",
+                chapterText != null ? chapterText.completionText() : null);
     }
 }

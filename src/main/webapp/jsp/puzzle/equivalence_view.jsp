@@ -137,6 +137,9 @@
                         </c:choose>
                         ${requestScope.nextPuzzleMessage}
                     </p>
+                    <c:if test="${not empty requestScope.chapterCompletionText}">
+                        ${requestScope.chapterCompletionText}
+                    </c:if>
                 </div>
             </c:if>
 

@@ -840,6 +840,13 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">${i18n.tr("HTML shown after completing the chapter")}</label>
+                                    <textarea name="completionText" class="form-control" rows="5"></textarea>
+                                </div>
+                            </div>
+
                         </form>`;
                     modal.title.innerText = '${i18n.tr("Edit Chapter")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
@@ -850,6 +857,8 @@
                     console.log(chapter)
                     modal.body.querySelector('input[name="date"]').value = chapter.date;
                     modal.body.querySelector('input[name="daysAvailable"]').value = chapter.daysAvailable;
+                    modal.body.querySelector('textarea[name="completionText"]').value =
+                        chapterText.isFallback ? '' : (chapterText.completionText || '');
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
@@ -868,12 +877,14 @@
                         const description = modal.body.querySelector('input[name="description"]').value;
                         const date = modal.body.querySelector('input[name="date"]').value;
                         const daysAvailable = Number(modal.body.querySelector('input[name="daysAvailable"]').value);
+                        const completionText = modal.body.querySelector('textarea[name="completionText"]').value;
 
                         PuzzleAPI.updatePuzzleChapter(chapter.id, {
                             title: title,
                             description: description,
                             date: date,
-                            daysAvailable: daysAvailable
+                            daysAvailable: daysAvailable,
+                            completionText: completionText
                         }, currentLanguage).then(response => {
                             chapter.texts = response.chapter.texts;
                             chapter.daysAvailable = response.chapter.daysAvailable;

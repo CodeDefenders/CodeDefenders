@@ -125,6 +125,9 @@
                         <strong class="alert-heading">${i18n.tr('Congratulations!')}</strong>
                             ${i18n.tr('Your mutant solved the puzzle. {0}', requestScope.nextPuzzleMessage)}
                     </p>
+                    <c:if test="${not empty requestScope.chapterCompletionText}">
+                        ${requestScope.chapterCompletionText}
+                    </c:if>
                 </div>
             </c:if>
 

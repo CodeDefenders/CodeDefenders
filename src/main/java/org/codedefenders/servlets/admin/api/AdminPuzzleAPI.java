@@ -479,7 +479,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(puzzleChapterId, getLanguage(request), title, description));
+        puzzleRepo.storePuzzleChapterText(
+                new PuzzleChapterText(puzzleChapterId, getLanguage(request), title, description, data.completionText));
 
         gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
@@ -625,6 +626,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 out.name(text.language()).beginObject()
                         .name("title").value(text.title())
                         .name("description").value(text.description())
+                        .name("completionText").value(text.completionText())
                         .endObject();
             }
             out.endObject();
@@ -697,7 +699,8 @@ public class AdminPuzzleAPI extends HttpServlet {
     public record CreateChapterData(String title, String description) {
     }
 
-    public record UpdateChapterData(String title, String description, String date, Integer daysAvailable) {
+    public record UpdateChapterData(String title, String description, String date, Integer daysAvailable,
+                                    String completionText) {
     }
 
     public record UpdatePuzzleData(
