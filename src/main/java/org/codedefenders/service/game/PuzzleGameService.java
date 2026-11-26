@@ -58,15 +58,12 @@ public class PuzzleGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
+    public boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole) {
         PuzzleGame puzzleGame = (PuzzleGame) game;
-        return mutant.getCreatorId() == user.getId()
-                || game.isFinished()
-                || game.getLevel() == GameLevel.EASY
+        return super.canViewMutant(mutant, game, user, player, playerRole)
                 || puzzleGame.getPuzzle().getType() == PuzzleType.ATTACKER
-                || puzzleGame.getPuzzle().getType() == PuzzleType.EQUIVALENCE
-                || mutant.getState() == Mutant.State.KILLED;
+                || puzzleGame.getPuzzle().getType() == PuzzleType.EQUIVALENCE;
     }
 
     @Override

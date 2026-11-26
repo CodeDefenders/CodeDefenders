@@ -30,6 +30,7 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -181,9 +182,6 @@ public abstract class AbstractGameService implements IGameService {
 
     protected abstract boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player);
 
-    protected abstract boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
-            Role playerRole);
-
     protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
             Role playerRole);
 
@@ -258,6 +256,29 @@ public abstract class AbstractGameService implements IGameService {
 
     protected abstract boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole,
                                            boolean hasKilledMutants);
+
+    // TODO: This could use some tests
+    @Override
+    public boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
+        // User must participate in the Game
+        if (playerRole == Role.NONE) {
+            return false;
+        }
+        // Anybody can see Mutants if the game is over, or it's an easy Game
+        if (game.isFinished() || game.getLevel() == GameLevel.EASY) {
+            return true;
+        }
+        if (game.getLevel() == GameLevel.HARD) {
+            return mutant.getCreatorId() == user.getId()
+                    // In Hard Games the User must either be an Attacker or Observer
+                    || playerRole == Role.ATTACKER
+                    || playerRole == Role.OBSERVER
+                    // Or the mutant must be killed or equivalent
+                    || mutant.getState() == Mutant.State.KILLED
+                    || mutant.getState() == Mutant.State.EQUIVALENT;
+        }
+        return false;
+    }
 
     // TODO:
     protected Role determineRole(SimpleUser user, Player player, AbstractGame game) {

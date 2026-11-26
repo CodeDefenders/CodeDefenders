@@ -98,23 +98,6 @@ public class MeleeGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
-        if (playerRole == Role.NONE) {
-            return false;
-        }
-        if (game.isFinished() || game.getLevel() == GameLevel.EASY) {
-            return true;
-        }
-        if (game.getLevel() == GameLevel.HARD) {
-            return mutant.getCreatorId() == user.getId()
-                    || playerRole == Role.OBSERVER
-                    || mutant.getState() == State.KILLED
-                    || mutant.getState() == State.EQUIVALENT;
-        }
-        return false;
-    }
-
-    @Override
     protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user, Role playerRole) {
         return playerRole == Role.PLAYER
                 && game.getState() == GameState.ACTIVE

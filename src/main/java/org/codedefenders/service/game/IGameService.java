@@ -25,7 +25,9 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.Player;
 
 public interface IGameService {
 
@@ -46,6 +48,9 @@ public interface IGameService {
 
     @Deprecated
     List<TestDTO> getTests(SimpleUser user, AbstractGame game);
+
+    boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
+                                          Role playerRole);
 
     /**
      * Closes a game.

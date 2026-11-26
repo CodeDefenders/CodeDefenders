@@ -51,6 +51,8 @@ import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,6 +60,8 @@ import com.google.gson.annotations.Expose;
 
 @WebServlet(Paths.API_CLASSROOM)
 public class ClassroomAPI extends HttpServlet {
+
+    private final Logger logger = LoggerFactory.getLogger(ClassroomAPI.class);
 
     @Inject
     private ClassroomService classroomService;
@@ -133,12 +137,18 @@ public class ClassroomAPI extends HttpServlet {
         }
 
         List<ClassroomMemberDTO> members = getMembersData(classroom.get());
-
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .serializeNulls()
-                .create();
-        gson.toJson(members, response.getWriter());
+        if (login.isAdmin()
+                || classroom.get().isVisible()
+                || members.stream().anyMatch(m -> m.user.getId() == login.getUserId())) {
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .serializeNulls()
+                    .create();
+            gson.toJson(members, response.getWriter());
+        } else {
+            logger.warn("User {} tried to access members for classroom {}", login.getUserId(), classroom.get().getId());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
     }
 
     private void handleGames(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -148,13 +158,21 @@ public class ClassroomAPI extends HttpServlet {
             return;
         }
 
-        List<ClassroomGameDTO> games = getGamesData(classroom.get());
+        List<ClassroomMemberDTO> members = getMembersData(classroom.get());
+        if (login.isAdmin()
+                || classroom.get().isVisible()
+                || members.stream().anyMatch(m -> m.user.getId() == login.getUserId())) {
+            List<ClassroomGameDTO> games = getGamesData(classroom.get());
 
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .serializeNulls()
-                .create();
-        gson.toJson(games, response.getWriter());
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .serializeNulls()
+                    .create();
+            gson.toJson(games, response.getWriter());
+        } else {
+            logger.warn("User {} tried to access games for classroom {}", login.getUserId(), classroom.get().getId());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
     }
 
     private Optional<List<ClassroomDTO>> getClassroomsData(String which) {
@@ -279,18 +297,18 @@ public class ClassroomAPI extends HttpServlet {
                 this.startTime = meleeGame.getStartTimeUnixSeconds();
                 this.duration = meleeGame.getGameDurationMinutes();
                 this.players = meleeGame.getPlayers().stream()
-                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
-                    .toList();
+                        .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                        .toList();
             } else if (game instanceof MultiplayerGame multiplayerGame) {
                 this.startTime = multiplayerGame.getStartTimeUnixSeconds();
                 this.duration = multiplayerGame.getGameDurationMinutes();
                 this.players = new ArrayList<>();
                 multiplayerGame.getAttackerPlayers().stream()
-                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
-                    .forEach(players::add);
+                        .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                        .forEach(players::add);
                 multiplayerGame.getDefenderPlayers().stream()
-                    .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
-                    .forEach(players::add);
+                        .map(player -> new ClassroomPlayerDTO(player.getUser().getUsername(), player.getRole()))
+                        .forEach(players::add);
             } else {
                 this.startTime = null;
                 this.duration = null;
@@ -299,6 +317,9 @@ public class ClassroomAPI extends HttpServlet {
         }
     }
 
-    private record ClassroomPlayerDTO(@Expose String name, @Expose Role role) {}
-    private record ClassroomGameClassDTO(@Expose int classId, @Expose String alias) {}
+    private record ClassroomPlayerDTO(@Expose String name, @Expose Role role) {
+    }
+
+    private record ClassroomGameClassDTO(@Expose int classId, @Expose String alias) {
+    }
 }

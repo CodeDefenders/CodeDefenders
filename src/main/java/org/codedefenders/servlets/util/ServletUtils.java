@@ -105,6 +105,19 @@ public final class ServletUtils {
     }
 
     /**
+     * Extracts a given boolean URL parameter from a given request, returning "true" for a non-case-sensitive
+     * String "true", "false" for every other value, or an empty Optional if the parameter does not exist.
+     *
+     * @param request   the request, which the parameter is extracted from.
+     * @param parameter the given URL parameter.
+     * @return a valid boolean extracted for the parameter of the given request wrapped in an {@link Optional},
+     *     or {@link Optional#empty()}.
+     */
+    public static Optional<Boolean> getBooleanParameter(HttpServletRequest request, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(Boolean::parseBoolean);
+    }
+
+    /**
      * Extracts a given float URL parameter from a given request.
      *
      * <p>If the parameter is no valid float value, the method returns an empty {@link Optional}.

@@ -207,14 +207,14 @@
 
         <% if (!models.isEmpty()) {
         %>
-        <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
-                data-bs-toggle="modal" data-bs-target="#llm-modal">
-            <i class="fa fa-industry"></i>
-            ${i18n.tr('Manage LLM players')}
-        </button>
-        <t:llm_select_modal htmlId="llm-modal" gameId="${gameId}" gameType="${gameType}">
-
-        </t:llm_select_modal>
+        <c:if test="${login.admin}">
+            <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
+                    data-bs-toggle="modal" data-bs-target="#llm-modal">
+                <i class="fa fa-industry"></i>
+                    ${i18n.tr('Manage LLM players')}
+            </button>
+            <t:llm_select_modal htmlId="llm-modal" gameId="${gameId}" gameType="${gameType}"/>
+        </c:if>
 
         <%
                 }

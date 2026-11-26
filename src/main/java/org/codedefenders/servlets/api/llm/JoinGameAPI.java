@@ -106,6 +106,7 @@ public class JoinGameAPI extends APIServlet {
                 writeResponse(response, HttpServletResponse.SC_FORBIDDEN,
                         new Common.ErrorResponseDTO("Could not join the game as Observer. "
                             + "Only admins and classroom moderators/owners can do that."));
+                return;
             }
         }
 

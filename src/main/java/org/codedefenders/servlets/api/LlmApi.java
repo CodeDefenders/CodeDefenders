@@ -34,6 +34,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.llm.LlmOrganizer;
@@ -57,7 +58,7 @@ import com.google.gson.Gson;
 
 /**
  * This class should provide details and interactions with the Large Language Models uses by the
- * {@link org.codedefenders.service.llm} package, integrated to normal games. It is not affiliated with the
+ * {@link org.codedefenders.llm} package, integrated to normal games. It is not affiliated with the
  * {@link org.codedefenders.servlets.api.llm} package.
  */
 @WebServlet(Paths.API_LLM)
@@ -78,6 +79,9 @@ public class LlmApi extends HttpServlet {
 
     @Inject
     private LlmOrganizer llmService;
+
+    @Inject
+    CodeDefendersAuth login;
 
     /**
      * Send back information about LLMs or LLM players. Supported actions:
@@ -105,9 +109,18 @@ public class LlmApi extends HttpServlet {
      * </p>
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
         Optional<String> action = ServletUtils.getStringParameter(req, "action");
         Optional<LlmType> type = ServletUtils.getEnumParameter(req, LlmType.class, "type");
         Optional<String> name = ServletUtils.getStringParameter(req, "name");
+
+        if (!login.isAdmin()) {
+            logger.warn("User {} made a GET request to LLM API: {}", login.getUserId(), req);
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         if (action.isPresent()) {
             String returnJson;
             Gson gson = new Gson();
@@ -161,6 +174,7 @@ public class LlmApi extends HttpServlet {
                         AbstractGame game = gameRepository.getGame(gameId.get());
                         List<LlmConversation> messages = inspectionService.getConversations(game);
                         returnJson = inspectionService.toJson(messages);
+
                     } else {
                         logger.error("gameId is missing while trying to access conversations.");
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -209,11 +223,11 @@ public class LlmApi extends HttpServlet {
      * Supported actions (formTypes):
      *
      * <p>
-     *     - createModel -> Make a new model available.
+     * - createModel -> Make a new model available.
      * </p>
      *
      * <p>
-     *     - deleteModel -> Remove a model.
+     * - deleteModel -> Remove a model.
      * </p>
      *
      * <p>
@@ -228,6 +242,13 @@ public class LlmApi extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Gson gson = new Gson();
         String action = ServletUtils.formType(req);
+
+        if (!login.isAdmin()) {
+            logger.warn("Non-Admin user {} made a POST request to the LLM API: {}", login.getUserId(), req);
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
         switch (action) {
             case "createModel" -> {
                 Optional<LlModel> model = getModelFromRequest(req, resp);

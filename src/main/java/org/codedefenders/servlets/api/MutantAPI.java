@@ -31,9 +31,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
@@ -57,7 +60,16 @@ public class MutantAPI extends HttpServlet {
     MutantRepository mutantRepo;
 
     @Inject
+    GameRepository gameRepository;
+
+    @Inject
+    PlayerRepository playerRepository;
+
+    @Inject
     CodeDefendersAuth login;
+
+    @Inject
+    GameService gameService;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -70,23 +82,32 @@ public class MutantAPI extends HttpServlet {
             return;
         }
 
-        PrintWriter out = response.getWriter();
+        AbstractGame game = gameRepository.getGame(mutant.get().getGameId());
 
-        String json = generateJsonForMutant(mutant.get());
+        PrintWriter out = response.getWriter();
+        Player loginPlayer = playerRepository.getPlayerForUserAndGame(login.getUserId(), game.getId());
+
+        boolean withDiff = gameService.canViewMutant(mutant.get(), game, login.getSimpleUser(), loginPlayer,
+                loginPlayer.getRole());
+
+
+        String json = generateJsonForMutant(mutant.get(), withDiff);
 
         response.setContentType("application/json");
         out.print(json);
         out.flush();
     }
 
-    private String generateJsonForMutant(Mutant mutant) {
+    private String generateJsonForMutant(Mutant mutant, boolean withDiff) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
         root.add("id", gson.toJsonTree(mutant.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(mutant.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(mutant.getGameId(), Integer.class));
-        root.add("diff", gson.toJsonTree(mutant.getPatchString(), String.class));
+        if (withDiff) {
+            root.add("diff", gson.toJsonTree(mutant.getPatchString(), String.class));
+        }
 
         return gson.toJson(root);
 
