@@ -131,12 +131,13 @@ public class UserSettingsManager extends HttpServlet {
             case "updateProfile" -> {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(user, email, allowContact);
-                if (success) {
+                final Optional<String> errorMessage = updateUserInformation(user, email, allowContact);
+                if (errorMessage.isEmpty()) {
                     messages.add(I18n.marktr("Successfully updated profile information."));
                 } else {
-                    logger.info("Failed to update profile information for user {}.", login.getUserId());
-                    messages.add(I18n.marktr("Failed to update profile information. Please contact the page administrator."));
+                    logger.info("Failed to update profile information for user {}: {}",
+                            login.getUserId(), errorMessage.get());
+                    messages.add(errorMessage.get());
                 }
                 response.sendRedirect(responsePath);
             }
@@ -202,15 +203,31 @@ public class UserSettingsManager extends HttpServlet {
         return userRepo.update(user);
     }
 
-    private boolean updateUserInformation(UserEntity user, Optional<String> email, boolean allowContact) {
+    /**
+     * Update a user's profile information. On success, return an empty Optional, otherwise return the error message
+     * displayed to the user.
+     */
+    private Optional<String> updateUserInformation(UserEntity user, Optional<String> email, boolean allowContact) {
         if (user == null) {
-            return false;
+            return Optional.of(
+                    I18n.marktr("Failed to update profile information. Please contact the page administrator."));
+        }
+
+        if (email.isPresent()
+                && !email.get().equals(user.getEmail())
+                && userRepo.getUserByEmail(email.get()).isPresent()) {
+            return Optional.of("Email " + email.get() + " is already in use.");
         }
 
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
-        return userRepo.update(user);
+        if (userRepo.update(user)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(
+                    I18n.marktr("Failed to update profile information. Please contact the page administrator."));
+        }
     }
 
     private boolean updateLanguage(UserEntity user, Optional<String> language) {
