@@ -49,6 +49,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
 import org.codedefenders.model.Event;
@@ -262,6 +263,11 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (game.getState() == GameState.SOLVED) {
             request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
+        }
+
+        if (game.getType() == PuzzleType.DEFENDER) {
+            Test prevTest = testRepo.getLatestTestForGameAndUser(game.getId(), login.getUserId());
+            request.setAttribute("previousTest", prevTest);
         }
 
         switch (game.getType()) {
