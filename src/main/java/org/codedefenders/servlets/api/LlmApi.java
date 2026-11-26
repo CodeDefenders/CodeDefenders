@@ -111,7 +111,6 @@ public class LlmApi extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-
         Optional<String> action = ServletUtils.getStringParameter(req, "action");
         Optional<LlmType> type = ServletUtils.getEnumParameter(req, LlmType.class, "type");
         Optional<String> name = ServletUtils.getStringParameter(req, "name");
@@ -173,16 +172,9 @@ public class LlmApi extends HttpServlet {
                     Optional<Integer> gameId = ServletUtils.gameId(req);
                     if (gameId.isPresent()) {
                         AbstractGame game = gameRepository.getGame(gameId.get());
+                        List<LlmConversation> messages = inspectionService.getConversations(game);
+                        returnJson = inspectionService.toJson(messages);
 
-                        if (login.isAdmin() || game.getCreatorId() == login.getUserId()) {
-                            List<LlmConversation> messages = inspectionService.getConversations(game);
-                            returnJson = inspectionService.toJson(messages);
-                        } else {
-                            logger.error("User {} who is neither an admin nor the game creator tried to access"
-                                    + " LLM conversations for game {}", login.getUserId(), game.getId());
-                            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-                            return;
-                        }
                     } else {
                         logger.error("gameId is missing while trying to access conversations.");
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -231,11 +223,11 @@ public class LlmApi extends HttpServlet {
      * Supported actions (formTypes):
      *
      * <p>
-     *     - createModel -> Make a new model available.
+     * - createModel -> Make a new model available.
      * </p>
      *
      * <p>
-     *     - deleteModel -> Remove a model.
+     * - deleteModel -> Remove a model.
      * </p>
      *
      * <p>
