@@ -29,10 +29,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 
 
@@ -48,6 +52,8 @@ public class UserServlet extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    private final Logger logger = LoggerFactory.getLogger(UserServlet.class);
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -57,21 +63,27 @@ public class UserServlet extends HttpServlet {
             String confirm = request.getParameter("confirm");
             String email = request.getParameter("email");
 
-            if (!password.equals(confirm)) {
-                // This check should be performed in the user interface too.
-                messages.add(I18n.marktr("Could not create user. Password entries did not match."));
-            } else {
-                var locale = I18nService.getSessionLocale(request); // init with session/request locale
-                Optional<String> result = userService.registerUser(username, password, email, locale);
-                if (result.isEmpty()) {
-                    messages.add(I18n.marktr("Your user has been created. You can login now."));
+            if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) {
+                if (!password.equals(confirm)) {
+                    // This check should be performed in the user interface too.
+                    messages.add(I18n.marktr("Could not create user. Password entries did not match."));
                 } else {
-                    messages.add(result.get());
+                    var locale = I18nService.getSessionLocale(request); // init with session/request locale
+                    Optional<String> result = userService.registerUser(username, password, email, locale);
+                    if (result.isEmpty()) {
+                        messages.add(I18n.marktr("Your user has been created. You can login now."));
+                    } else {
+                        messages.add(result.get());
+                    }
                 }
+            } else {
+                logger.warn("Someone tried to create a user account, even though it is disabled. Username {}, email {}",
+                        username, email);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
-            response.sendRedirect(url.forPath(Paths.LOGIN));
         } else { // Anything different from "create" is an error, so we not allow it
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
+        response.sendRedirect(url.forPath(Paths.LOGIN));
     }
 }
