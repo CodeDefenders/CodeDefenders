@@ -200,12 +200,20 @@ public class PuzzleImporter {
             if (chapter == null) {
                 chapter = storePuzzleChapterToDB(data.properties);
             } else {
+                /* the following block is not really necessary, it just updates the puzzle properties when they changed
+                 * since the last default puzzle import */
                 var props = readPuzzleChapterProperties(data.properties);
                 chapter.setCalendarDate(props.calendarDate());
                 chapter.setDaysAvailable(props.daysAvailable());
                 puzzleRepo.updatePuzzleChapter(chapter);
-                logger.info("Skipping existing default puzzle chapter '{}'.",
-                        props.title());
+                puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(
+                        chapter.getId(),
+                        i18nService.getDefaultLocale().getLanguage(),
+                        props.title(),
+                        props.description(),
+                        props.completionText()
+                ));
+                logger.info("Updated existing default puzzle chapter '{}'.", props.title());
             }
 
             for (PuzzleData puzzleData : data.puzzles) {
@@ -273,7 +281,9 @@ public class PuzzleImporter {
         return files;
     }
 
-    public record PuzzleChapterProperties(String title, String description, LocalDate calendarDate, int daysAvailable) { }
+    public record PuzzleChapterProperties(
+            String title, String description, LocalDate calendarDate, int daysAvailable, String completionText
+    ) {}
 
     public PuzzleChapterProperties readPuzzleChapterProperties(SimpleFile propertiesFile) throws IOException {
         Properties cfg = new Properties();
@@ -309,7 +319,8 @@ public class PuzzleImporter {
             }
         }
 
-        return new PuzzleChapterProperties(title, description, calendarDate, daysAvailable);
+        String completionText = cfg.getProperty("completionText");
+        return new PuzzleChapterProperties(title, description, calendarDate, daysAvailable, completionText);
     }
 
     private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
@@ -322,7 +333,8 @@ public class PuzzleImporter {
 
         // Store chapter text using the default locale
         String language = i18nService.getDefaultLocale().getLanguage();
-        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(chapter.getId(), language, props.title, props.description));
+        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(
+                chapter.getId(), language, props.title, props.description, props.completionText()));
 
         logger.info("Stored puzzle chapter with id {}", chapter.getId());
         return chapter;
