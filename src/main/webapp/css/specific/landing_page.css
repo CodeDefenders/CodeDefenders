@@ -22,6 +22,108 @@
     --color-error: #dc2626;
 }
 
+.advent-calendar-promo {
+    --advent-background: #0c2233;
+    --advent-foreground: #edf6fc;
+    --gift-ink: #103c57;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: 4rem;
+    background: var(--advent-background);
+    color: var(--advent-foreground);
+    text-align: center;
+    /* eat #content padding */
+    margin-top: -2rem;
+}
+
+.advent-calendar-promo::before,
+.advent-calendar-promo > .christmas-scene__snow {
+    position: absolute;
+    top: 0;
+    left: var(--christmas-scene-left, -50vw);
+    width: var(--christmas-scene-width, 150vw);
+    height: 100%;
+    pointer-events: none;
+}
+
+.advent-calendar-promo::before {
+    z-index: -1;
+    content: "";
+    background: var(--advent-background);
+}
+
+.advent-calendar-promo > .christmas-scene__snow {
+    z-index: 0;
+}
+
+.advent-calendar-promo > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.advent-calendar-promo > .container > p:first-of-type {
+    margin-bottom: .5rem;
+    color: #b9d7e8;
+    font-size: .9rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.advent-calendar-promo h2 {
+    margin-bottom: 1rem;
+    color: var(--advent-foreground);
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.advent-calendar-promo > .container > p:nth-of-type(2) {
+    max-width: 38rem;
+    margin: 0 auto 1.5rem;
+    color: #d3e2ec;
+    font-size: 1.1rem;
+}
+
+.advent-calendar-promo .login-note {
+    margin: 1rem 0 0;
+    color: #b9d7e8;
+    font-size: .95rem;
+}
+
+.advent-calendar-promo__gifts {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.advent-calendar-promo .advent-calendar-promo__gifts .advent-gift {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 6%;
+    --gift-width: 7rem;
+    --gift-height: 6rem;
+    transform: rotate(-12deg);
+    filter: drop-shadow(0 5px 8px #0005);
+}
+
+.advent-calendar-promo .advent-calendar-promo__gifts .advent-gift:nth-child(2) {
+    right: 6%;
+    left: auto;
+    --gift-width: 6rem;
+    --gift-height: 7rem;
+    transform: rotate(12deg);
+    --paper: #51b996;
+    --pattern: #8ed8b7;
+    --ribbon: #ff8581;
+    --wrapping: repeating-linear-gradient(135deg, transparent 0 12px, var(--pattern) 12px 22px);
+    --pattern-size: auto;
+}
+
+.advent-calendar-promo > :not(.christmas-scene__snow) {
+    position: relative;
+}
+
 .page > .mutle-hero {
     width: 100%;
     max-width: 1000px;
@@ -366,5 +468,50 @@
     .two-cols-xxl {
         column-count: 2;
         column-gap: 6rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .advent-calendar-promo {
+        padding-block: 3rem;
+    }
+
+}
+
+@media (max-width: 575.98px) {
+    .advent-calendar-promo .advent-calendar-promo__gifts .advent-gift {
+        left: .75rem;
+        bottom: .75rem;
+        --gift-width: 4.5rem;
+        --gift-height: 4rem;
+    }
+
+    .advent-calendar-promo .advent-calendar-promo__gifts .advent-gift:nth-child(2) {
+        right: .75rem;
+        left: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .advent-calendar-promo > .christmas-scene__snow {
+        display: none;
+    }
+}
+
+@media print {
+    .advent-calendar-promo {
+        background: white;
+        color: #103c57;
+    }
+
+    .advent-calendar-promo::before,
+    .advent-calendar-promo > .christmas-scene__snow {
+        display: none;
+    }
+
+    .advent-calendar-promo h2,
+    .advent-calendar-promo > .container > p,
+    .advent-calendar-promo .login-note {
+        color: #103c57;
     }
 }

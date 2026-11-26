@@ -72,7 +72,7 @@
 }
 
 /* inspired by https://codepen.io/stephenpierceio/pen/aPZdgo */
-.chapter.christmas-season .advent-gift {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift {
     --paper: #f36a70;
     --pattern: #ffe8a0;
     --ribbon: #5cbef0;
@@ -159,7 +159,7 @@
     --pattern-size: auto;
 }
 
-.chapter.christmas-season .advent-gift__box {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__box {
     position: absolute;
     inset: 0;
     background-color: var(--paper);
@@ -170,7 +170,7 @@
     box-shadow: inset 4px 0 #ffffff40, inset -5px -5px #103c5715;
 }
 
-.chapter.christmas-season .advent-gift__box::before {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__box::before {
     content: "";
     position: absolute;
     inset-block: 0;
@@ -181,7 +181,7 @@
     box-shadow: inset 3px 0 #ffffff55;
 }
 
-.chapter.christmas-season .advent-gift__top {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__top {
     display: block;
     position: absolute;
     z-index: 2;
@@ -193,7 +193,7 @@
     transition: transform 220ms ease;
 }
 
-.chapter.christmas-season .advent-gift__lid {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__lid {
     position: absolute;
     inset: 0;
     background: var(--paper);
@@ -202,7 +202,7 @@
     box-shadow: inset 3px 3px #ffffff55, 0 3px #103c5725;
 }
 
-.chapter.christmas-season .advent-gift__lid::after {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__lid::after {
     content: "";
     position: absolute;
     top: -3px;
@@ -214,7 +214,7 @@
     box-shadow: inset 3px 0 #ffffff55;
 }
 
-.chapter.christmas-season .advent-gift__bow {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow {
     position: absolute;
     bottom: 23px;
     left: 50%;
@@ -222,8 +222,8 @@
     height: 0;
 }
 
-.chapter.christmas-season .advent-gift__bow::before,
-.chapter.christmas-season .advent-gift__bow::after {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::before,
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::after {
     content: "";
     position: absolute;
     bottom: -2px;
@@ -234,14 +234,14 @@
     box-shadow: inset 3px 3px #ffffff55;
 }
 
-.chapter.christmas-season .advent-gift__bow::before {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::before {
     right: -2px;
     border-radius: 65% 65% 0 65%;
     transform: rotate(24deg);
     transform-origin: bottom right;
 }
 
-.chapter.christmas-season .advent-gift__bow::after {
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::after {
     left: -2px;
     border-radius: 65% 65% 65% 0;
     transform: rotate(-24deg);
