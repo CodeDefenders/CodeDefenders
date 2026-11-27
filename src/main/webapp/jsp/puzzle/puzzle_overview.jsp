@@ -89,15 +89,12 @@ or are locked for the logged in user.
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
-                            <c:set var="status" value="${
-                                        puzzleEntry.equals(nextPuzzleObj) ? 'next'
-                                          : puzzleEntry.solved ? 'solved'
-                                          : puzzle.seasonalUnlocked ? 'next'
-                                          : 'locked'
-                                        }"/> <%-- puzzleEntry.locked does not work for type GAME --%>
+                            <%-- puzzleEntry.locked does not work for type GAME --%>
+                            <c:set var="status"
+                                   value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
                             <a class="chapter__level puzzle-${status}"
                                     <c:choose>
-                                        <c:when test="${(puzzleEntry.type == 'GAME' || !puzzleEntry.locked) && !puzzle.blockedBySeason}">
+                                        <c:when test="${puzzleEntry.type == 'GAME' || !puzzleEntry.locked}">
                                             href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${puzzle.puzzleId}"
                                         </c:when>
                                         <c:otherwise>
@@ -110,7 +107,7 @@ or are locked for the logged in user.
                                         </c:otherwise>
                                     </c:choose>
                             >
-                                <img class="chapter__level__watermark"  alt="${puzzle.type}"
+                                <img class="chapter__level__watermark" alt="${puzzle.type}"
                                         <c:choose>
                                             <c:when test="${puzzle.type == 'EQUIVALENCE'}">
                                                 src="${url.forPath("/images/ingameicons/equivalence.png")}"
