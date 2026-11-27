@@ -34,7 +34,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.User;
 import org.slf4j.Logger;
@@ -125,7 +125,9 @@ public class I18nService {
      * Escapes sequences, so that it can be printed as JS string.
      */
     public String escape(String string) {
-        return StringEscapeUtils.escapeJson(string);
+        String escaped = StringEscapeUtils.escapeJson(string);
+        // Commons Text also escaped DEL; retain that output when using Commons Lang.
+        return escaped == null ? null : escaped.replace("\u007f", "\\u007F");
     }
 
 

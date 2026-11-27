@@ -20,7 +20,7 @@ package org.codedefenders.game;
 
 import java.util.List;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codedefenders.util.Constants;
 
 public class TestTemplate {

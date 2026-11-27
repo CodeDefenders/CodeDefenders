@@ -29,9 +29,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;

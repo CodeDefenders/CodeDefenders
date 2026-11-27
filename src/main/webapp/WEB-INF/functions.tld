@@ -31,7 +31,7 @@
 
     <function>
         <name>escapeJS</name>
-        <function-class>org.apache.commons.text.StringEscapeUtils</function-class>
+        <function-class>org.apache.commons.lang3.StringEscapeUtils</function-class>
         <function-signature>java.lang.String escapeEcmaScript(java.lang.String)</function-signature>
     </function>
     <function>

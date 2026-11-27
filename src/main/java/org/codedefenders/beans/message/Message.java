@@ -20,7 +20,7 @@ package org.codedefenders.beans.message;
 
 import java.io.Serializable;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codedefenders.util.PreparedMessage;
 
 /**
