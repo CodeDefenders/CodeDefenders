@@ -886,6 +886,7 @@
                             completionText: completionText
                         }, currentLanguage).then(response => {
                             chapter.texts = response.chapter.texts;
+                            chapter.date = response.chapter.date;
                             chapter.daysAvailable = response.chapter.daysAvailable;
                             chapterComp.updateDisplay();
                             ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
