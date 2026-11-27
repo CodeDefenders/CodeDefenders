@@ -1043,8 +1043,14 @@ public class PuzzleGameManager extends HttpServlet {
                  */
                 for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
                     if (puzzle.isBlockedBySeason()) {
-                        //If this puzzle is an invisible seasonal puzzle, all other puzzles in this chapter
-                        //will be too.
+                        //If this puzzle is an invisible seasonal puzzle, all other puzzles in this chapter will be too.
+                        if (puzzleChapter.getId() == currentChapter) {
+                            message.append(i18n.tr(
+                                    "You solved today's puzzle, come back tomorrow for the next one! (<a href=\"{0}\">Go to the Puzzle Overview</a>).",
+                                    url.forPath(Paths.PUZZLE_OVERVIEW)
+                            ));
+                            return message.toString();
+                        }
                         break;
                     }
 

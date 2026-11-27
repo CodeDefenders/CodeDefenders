@@ -3199,31 +3199,35 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:476
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:482
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "No, this mutant is not equivalent to the class under test."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:594
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:600
 msgid "Your test did not kill the mutant. Try again."
 msgstr "Your test did not kill the mutant. Try again."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:772
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:778
 msgid "Your test did not solve the puzzle. Try another one..."
 msgstr "Your test did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:974
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:980
 msgid "Your mutant did not solve the puzzle. Try another one..."
 msgstr "Your mutant did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1064
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1049
+msgid "You solved today's puzzle, come back tomorrow for the next one! (<a href=\"{0}\">Go to the Puzzle Overview</a>)."
+msgstr "You solved today's puzzle, come back tomorrow for the next one! (<a href=\"{0}\">Go to the Puzzle Overview</a>)."
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1076
 msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1077
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1089
 msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1099
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1111
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
@@ -3307,11 +3311,11 @@ msgstr "Your two password entries did not match"
 msgid "Your password reset link is not valid or has expired."
 msgstr "Your password reset link is not valid or has expired."
 
-#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:62
+#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:69
 msgid "Could not create user. Password entries did not match."
 msgstr "Could not create user. Password entries did not match."
 
-#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:67
+#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:74
 msgid "Your user has been created. You can login now."
 msgstr "Your user has been created. You can login now."
 
@@ -3343,33 +3347,37 @@ msgstr "Failed to update keep previous test preference."
 msgid "Successfully updated profile information."
 msgstr "Successfully updated profile information."
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:139
-msgid "Failed to update profile information. Please contact the page administrator."
-msgstr "Failed to update profile information. Please contact the page administrator."
-
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:147
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:148
 msgid "Successfully updated language."
 msgstr "Successfully updated language."
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:150
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:151
 msgid "Failed to update language. Please contact the page administrator"
 msgstr "Failed to update language. Please contact the page administrator"
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:160
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:161
 msgid "Successfully changed password."
 msgstr "Successfully changed password."
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:163
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:164
 msgid "Failed to change password. Please contact the page administrator."
 msgstr "Failed to change password. Please contact the page administrator."
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:167
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:168
 msgid "No or invalid password provided."
 msgstr "No or invalid password provided."
 
-#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:186
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:187
 msgid "Failed to set your account as inactive. Please contact the page administrator."
 msgstr "Failed to set your account as inactive. Please contact the page administrator."
+
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:213
+msgid "Failed to update profile information. Please contact the page administrator."
+msgstr "Failed to update profile information. Please contact the page administrator."
+
+#: src/main/java/org/codedefenders/servlets/UserSettingsManager.java:229
+msgid "Failed to update profile information. Please contact the page administrator."
+msgstr "Failed to update profile information. Please contact the page administrator."
 
 #: src/main/java/org/codedefenders/servlets/util/ServletUtils.java:52
 msgid "Your test could not run within the execution limits. Please simplify it or try again later."
@@ -8843,143 +8851,143 @@ msgstr "Create an account"
 msgid "Password forgotten"
 msgstr "Password forgotten"
 
-#: src/main/webapp/jsp/login_view.jsp:107
+#: src/main/webapp/jsp/login_view.jsp:109
 msgid "Create a new account"
 msgstr "Create a new account"
 
-#: src/main/webapp/jsp/login_view.jsp:114
+#: src/main/webapp/jsp/login_view.jsp:117
 msgid "Username"
 msgstr "Username"
 
-#: src/main/webapp/jsp/login_view.jsp:116
+#: src/main/webapp/jsp/login_view.jsp:120
 msgid "Username"
 msgstr "Username"
 
-#: src/main/webapp/jsp/login_view.jsp:119
+#: src/main/webapp/jsp/login_view.jsp:123
 msgid "Please enter a valid username."
 msgstr "Please enter a valid username."
 
-#: src/main/webapp/jsp/login_view.jsp:122
+#: src/main/webapp/jsp/login_view.jsp:126
 msgid "3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters."
 msgstr "3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters."
 
-#: src/main/webapp/jsp/login_view.jsp:127
+#: src/main/webapp/jsp/login_view.jsp:131
 msgid "Email"
 msgstr "Email"
 
-#: src/main/webapp/jsp/login_view.jsp:129
+#: src/main/webapp/jsp/login_view.jsp:133
 msgid "Email"
 msgstr "Email"
 
-#: src/main/webapp/jsp/login_view.jsp:132
+#: src/main/webapp/jsp/login_view.jsp:136
 msgid "Please enter a valid email address."
 msgstr "Please enter a valid email address."
 
-#: src/main/webapp/jsp/login_view.jsp:139
-msgid "Password"
-msgstr "Password"
-
-#: src/main/webapp/jsp/login_view.jsp:141
+#: src/main/webapp/jsp/login_view.jsp:143
 msgid "Password"
 msgstr "Password"
 
 #: src/main/webapp/jsp/login_view.jsp:145
+msgid "Password"
+msgstr "Password"
+
+#: src/main/webapp/jsp/login_view.jsp:150
 msgid "Please enter a valid password."
 msgstr "Please enter a valid password."
 
-#: src/main/webapp/jsp/login_view.jsp:151
+#: src/main/webapp/jsp/login_view.jsp:157
 msgid "Confirm Password"
 msgstr "Confirm Password"
 
-#: src/main/webapp/jsp/login_view.jsp:154
+#: src/main/webapp/jsp/login_view.jsp:160
 msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
-#: src/main/webapp/jsp/login_view.jsp:157
+#: src/main/webapp/jsp/login_view.jsp:163
 msgid "min. {0} alphanumeric characters, no whitespace or special characters."
 msgstr "min. {0} alphanumeric characters, no whitespace or special characters."
 
-#: src/main/webapp/jsp/login_view.jsp:166
+#: src/main/webapp/jsp/login_view.jsp:172
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/login_view.jsp:167
+#: src/main/webapp/jsp/login_view.jsp:173
 msgid "Create Account"
 msgstr "Create Account"
 
-#: src/main/webapp/jsp/login_view.jsp:204
+#: src/main/webapp/jsp/login_view.jsp:214
 msgid "Reset your password"
 msgstr "Reset your password"
 
-#: src/main/webapp/jsp/login_view.jsp:211
+#: src/main/webapp/jsp/login_view.jsp:222
 msgid "Username"
 msgstr "Username"
 
-#: src/main/webapp/jsp/login_view.jsp:213
+#: src/main/webapp/jsp/login_view.jsp:224
 msgid "Username"
 msgstr "Username"
 
-#: src/main/webapp/jsp/login_view.jsp:216
+#: src/main/webapp/jsp/login_view.jsp:227
 msgid "Please enter your username."
 msgstr "Please enter your username."
 
-#: src/main/webapp/jsp/login_view.jsp:221
+#: src/main/webapp/jsp/login_view.jsp:232
 msgid "Email"
 msgstr "Email"
 
-#: src/main/webapp/jsp/login_view.jsp:223
+#: src/main/webapp/jsp/login_view.jsp:235
 msgid "Email"
 msgstr "Email"
 
-#: src/main/webapp/jsp/login_view.jsp:226
+#: src/main/webapp/jsp/login_view.jsp:238
 msgid "Please enter your email address."
 msgstr "Please enter your email address."
 
-#: src/main/webapp/jsp/login_view.jsp:232
+#: src/main/webapp/jsp/login_view.jsp:244
 msgid "This will send a mail with a link to change your password to your email account."
 msgstr "This will send a mail with a link to change your password to your email account."
 
-#: src/main/webapp/jsp/login_view.jsp:240
+#: src/main/webapp/jsp/login_view.jsp:252
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/login_view.jsp:241
+#: src/main/webapp/jsp/login_view.jsp:253
 msgid "Reset Password"
 msgstr "Reset Password"
 
-#: src/main/webapp/jsp/login_view.jsp:270
+#: src/main/webapp/jsp/login_view.jsp:284
 msgid "Reset your password"
 msgstr "Reset your password"
 
-#: src/main/webapp/jsp/login_view.jsp:279
+#: src/main/webapp/jsp/login_view.jsp:294
 msgid "Password"
 msgstr "Password"
 
-#: src/main/webapp/jsp/login_view.jsp:281
+#: src/main/webapp/jsp/login_view.jsp:296
 msgid "Password"
 msgstr "Password"
 
-#: src/main/webapp/jsp/login_view.jsp:285
+#: src/main/webapp/jsp/login_view.jsp:301
 msgid "Please enter a valid password."
 msgstr "Please enter a valid password."
 
-#: src/main/webapp/jsp/login_view.jsp:292
+#: src/main/webapp/jsp/login_view.jsp:309
 msgid "Confirm Password"
 msgstr "Confirm Password"
 
-#: src/main/webapp/jsp/login_view.jsp:295
+#: src/main/webapp/jsp/login_view.jsp:312
 msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
-#: src/main/webapp/jsp/login_view.jsp:298
+#: src/main/webapp/jsp/login_view.jsp:315
 msgid "{0}-20 alphanumeric characters, no whitespace or special characters."
 msgstr "{0}-20 alphanumeric characters, no whitespace or special characters."
 
-#: src/main/webapp/jsp/login_view.jsp:307
+#: src/main/webapp/jsp/login_view.jsp:324
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/login_view.jsp:308
+#: src/main/webapp/jsp/login_view.jsp:325
 msgid "Change Password"
 msgstr "Change Password"
 
@@ -9711,35 +9719,35 @@ msgstr "Create a mutant here"
 msgid "Reset"
 msgstr "Reset"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:51
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:52
 msgid "Puzzle"
 msgstr "Puzzle"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:124
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:125
 msgid "Congratulations!"
 msgstr "Congratulations!"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:125
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:126
 msgid "Your test solved the puzzle. {0}"
 msgstr "Your test solved the puzzle. {0}"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:137
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:138
 msgid "Class Under Test"
 msgstr "Class Under Test"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:150
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:151
 msgid "Solving JUnit Test"
 msgstr "Solving JUnit Test"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:153
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:154
 msgid "Write a new JUnit test here"
 msgstr "Write a new JUnit test here"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:159
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:161
 msgid "Defend"
 msgstr "Defend"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:198
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:200
 msgid "JUnit Tests"
 msgstr "JUnit Tests"
 
