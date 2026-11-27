@@ -1034,9 +1034,17 @@ public class PuzzleGameManager extends HttpServlet {
          * {@link PuzzleGameManager#getNextPuzzleForUser(int)} cannot be used here, because the puzzle is marked as
          * solved only after this message is generated.
          */
-        for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            // Check in current and next chapters
-            if (puzzleChapter.getId() >= currentChapter && puzzleChapter.isVisible()) {
+        var puzzleChapters = puzzleRepo.getPuzzleChapters();
+        boolean currentChapterIsSeasonal = puzzleChapters.stream()
+                .filter(puzzleChapter -> puzzleChapter.getId() == currentChapter)
+                .findFirst()
+                .map(PuzzleChapter::isSeasonalChapter)
+                .orElse(false);
+        for (PuzzleChapter puzzleChapter : puzzleChapters) {
+            // Check in the current chapter and later chapters of the same type
+            if (puzzleChapter.getId() >= currentChapter
+                    && puzzleChapter.isSeasonalChapter() == currentChapterIsSeasonal
+                    && puzzleChapter.isVisible()) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * an empty, not-null list if there are no puzzles
