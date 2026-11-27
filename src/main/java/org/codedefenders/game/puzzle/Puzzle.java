@@ -299,10 +299,7 @@ public class Puzzle {
         if (chapter == null || !chapter.isSeasonalChapter()) {
             return false;
         }
-        return !chapter.getCalendarDate()
-                .withYear(2000)
-                .plusDays(position - 2)
-                .isBefore(LocalDate.now().withYear(2000));
+        return !isSeasonalUnlocked(chapter, LocalDate.now());
     }
 
     public boolean isSeasonalUnlocked() {
@@ -310,10 +307,13 @@ public class Puzzle {
         if (chapter == null || !chapter.isSeasonalChapter()) {
             return false;
         }
-        return chapter.getCalendarDate()
-                .withYear(2000)
-                .plusDays(position - 2)
-                .isBefore(LocalDate.now().withYear(2000));
+        return isSeasonalUnlocked(chapter, LocalDate.now());
+    }
+
+    boolean isSeasonalUnlocked(PuzzleChapter chapter, LocalDate today) {
+        return chapter.getCurrentSeasonStartDate(today)
+                .plusDays(position - 2) // puzzle with position=1 should be playable at the start date
+                .isBefore(today);
     }
 
     public boolean isDummy() {

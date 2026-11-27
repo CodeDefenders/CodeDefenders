@@ -113,10 +113,23 @@ public class PuzzleChapter {
     public boolean isVisible() {
         if (calendarDate == null) {
             return true;
-        } else {
-            return calendarDate.withYear(2000).plusDays(-1).isBefore(LocalDate.now().withYear(2000))
-                    && calendarDate.withYear(2000).plusDays(daysAvailable).isAfter(LocalDate.now().withYear(2000));
         }
+        var today = LocalDate.now();
+        var seasonStart = getCurrentSeasonStartDate(today);
+        return seasonStart.plusDays(-1).isBefore(today) && seasonStart.plusDays(daysAvailable).isAfter(today);
+    }
+
+    public LocalDate getCurrentSeasonStartDate(LocalDate today) {
+        if (calendarDate == null) return null;
+        var seasonStart = calendarDate.withYear(today.getYear());
+        if (today.isBefore(seasonStart)) {
+            var previousSeasonStart = calendarDate.withYear(today.getYear() - 1);
+            if (!today.isBefore(previousSeasonStart.plusDays(-1))
+                    && today.isBefore(previousSeasonStart.plusDays(daysAvailable))) {
+                return previousSeasonStart;
+            }
+        }
+        return seasonStart;
     }
 
     /**
