@@ -854,7 +854,6 @@
                     const chapterText = getTextForLang(chapter.texts, currentLanguage);
                     modal.body.querySelector('input[name="title"]').value = chapterText.isFallback ? '' : chapterText.title;
                     modal.body.querySelector('input[name="description"]').value = chapterText.isFallback ? '' : chapterText.description;
-                    console.log(chapter)
                     modal.body.querySelector('input[name="date"]').value = chapter.date;
                     modal.body.querySelector('input[name="daysAvailable"]').value = chapter.daysAvailable;
                     modal.body.querySelector('textarea[name="completionText"]').value =
