@@ -370,6 +370,12 @@
     background: var(--christmas-scene-background);
     color: var(--christmas-scene-foreground);
 }
+.container .chapter.christmas-season:first-child {
+    margin-block-start: -2rem;
+}
+.container .chapter.christmas-season:last-child {
+    margin-block-end: -2rem;
+}
 #content {
     overflow-x: clip;
 }

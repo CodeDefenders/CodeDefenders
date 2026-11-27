@@ -89,7 +89,7 @@
                         <c:if test="${season.present}">
                             <li class="nav-item nav-item-highlight me-3 ${season.get().seasonalStyle}">
                                 <a class="nav-link" id="header-season"
-                                   href="${url.forPath("/puzzles")}">
+                                   href="${url.forPath(Paths.SEASONAL_CHAPTERS)}">
                                        ${puzzleRepo.getPuzzleChapterTextWithFallback(season.get().id, auth.user.locale.language, i18nService.defaultLocale.language).title()}
                                 </a>
                             </li>

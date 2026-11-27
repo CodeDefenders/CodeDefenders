@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -32,7 +31,6 @@ or are locked for the logged in user.
 --%>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="seasonStyle" type="org.codedefenders.service.SeasonalStylingService"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 
 <c:set var="title" value="${i18n.tr('Puzzles')}"/>
@@ -40,9 +38,6 @@ or are locked for the logged in user.
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/puzzle_overview.css")}" rel="stylesheet">
-        <c:if test="${seasonStyle.currentSeasonalChapter.present}">
-            <link href="${url.forPath("/css/specific/advent_calendar.css")}" rel="stylesheet">
-        </c:if>
     </jsp:attribute>
 
     <jsp:body>
@@ -87,9 +82,7 @@ or are locked for the logged in user.
             </c:if>
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
-                <c:set var="chapter" value="${ChapterEntry.chapter}"/>
-                <c:set var="season" value="${chapter.seasonalStyle}"/>
-                <div class="chapter ${season}">
+                <div class="chapter">
                     <div class="chapter__title">
                         <h2>${ChapterEntry.title}</h2>
                     </div>
@@ -117,16 +110,6 @@ or are locked for the logged in user.
                                         </c:otherwise>
                                     </c:choose>
                             >
-                                <c:if test="${season == 'christmas-season'}">
-                                    <span class="advent-gift" aria-hidden="true">
-                                        <span class="advent-gift__box"></span>
-                                        <span class="advent-gift__top">
-                                            <span class="advent-gift__bow"></span>
-                                            <span class="advent-gift__lid"></span>
-                                        </span>
-                                        <span class="advent-gift__number"></span>
-                                    </span>
-                                </c:if>
                                 <img class="chapter__level__watermark"  alt="${puzzle.type}"
                                         <c:choose>
                                             <c:when test="${puzzle.type == 'EQUIVALENCE'}">
@@ -169,9 +152,5 @@ or are locked for the logged in user.
             </c:forEach>
         </div>
 
-        <script type="module">
-            import {Snow} from '${url.forPath("/js/codedefenders_main.mjs")}';
-            Snow.init(".chapter.christmas-season");
-        </script>
     </jsp:body>
 </p:main_page>

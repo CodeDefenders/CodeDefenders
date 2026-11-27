@@ -57,6 +57,7 @@ public class PuzzleNavigationBean {
     final Map<Integer, PuzzleGame> activePuzzles;
 
     SortedSet<PuzzleChapterEntry> puzzleChapters;
+    SortedSet<PuzzleChapterEntry> seasonalChapters;
     Optional<PuzzleEntry> nextPuzzle;
     Optional<PuzzleEntry> nextSeasonalPuzzle;
 
@@ -69,7 +70,7 @@ public class PuzzleNavigationBean {
         // maps the puzzle id to the puzzle game
         activePuzzles = activePuzzles(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
 
-        puzzleChapters = puzzleRepo.getPuzzleChapters()
+        SortedSet<PuzzleChapterEntry> allChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
                 .filter(PuzzleChapter::isVisible)
                 .map(toPuzzleChapterEntry(
@@ -79,7 +80,14 @@ public class PuzzleNavigationBean {
                 ))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final List<PuzzleEntry> unsolvedPuzzles = puzzleChapters.stream()
+        puzzleChapters = allChapters.stream()
+                .filter(chapter -> !chapter.getChapter().isSeasonalChapter())
+                .collect(Collectors.toCollection(TreeSet::new));
+        seasonalChapters = allChapters.stream()
+                .filter(chapter -> chapter.getChapter().isSeasonalChapter())
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        final List<PuzzleEntry> unsolvedPuzzles = allChapters.stream()
                 .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
                 .filter(Predicate.not(PuzzleEntry::isSolved))
                 .toList();
@@ -114,6 +122,10 @@ public class PuzzleNavigationBean {
      */
     public SortedSet<PuzzleChapterEntry> getPuzzleChapters() {
         return puzzleChapters;
+    }
+
+    public SortedSet<PuzzleChapterEntry> getSeasonalChapters() {
+        return seasonalChapters;
     }
 
     /**

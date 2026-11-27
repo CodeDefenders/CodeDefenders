@@ -80,6 +80,7 @@ public class Constants {
     public static final String MELEE_SCOREBOARD_JSP = "/jsp/melee/game_scoreboard_raw.jsp";
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
+    public static final String SEASONAL_CHAPTERS_VIEW_JSP = "/jsp/puzzle/seasonal_chapters.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
     public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
     public static final String PUZZLE_GAME_EQUIVALENCE_VIEW_JSP = "/jsp/puzzle/equivalence_view.jsp";

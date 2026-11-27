@@ -73,14 +73,13 @@
                                     </span>
                             </span>
                     </div>
-                    <p>${i18n.tr('Daily christmas themed challanges')}</p>
                     <h2 id="advent-calendar-title">${i18n.tr('Code Defenders Advent Calendar')}</h2>
                     <p>
                             ${i18n.tr('You cannot wait until Christmas arrives?')}<br>
                             ${i18n.tr('Code Defenders offers you something new for this holiday season:')}<br>
                             ${i18n.tr('24 little challenges to shorten the time until Christmas arrives.')}
                     </p>
-                    <a class="btn btn-lg btn-light" href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">
+                    <a class="btn btn-lg btn-light" href="${url.forPath(Paths.SEASONAL_CHAPTERS)}">
                             ${i18n.tr('Solve today\'s puzzle')}
                     </a>
                     <c:if test="${not auth.loggedIn}">
