@@ -108,7 +108,7 @@
 
     <jsp:body>
         <div id="game-container" class="container-fluid ${puzzle.chapter.seasonalStyle}">
-            <h4><b>${i18n.tr('Puzzle: {0}', title)}</b></h4>
+            <h4><b>${title}</b></h4>
             <div class="puzzle-header d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
