@@ -29,7 +29,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codedefenders.analysis.coverage.CoverageTest;
 import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
