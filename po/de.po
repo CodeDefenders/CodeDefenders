@@ -3102,40 +3102,40 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1049
 msgid ""
 "You solved today's puzzle, come back tomorrow for the next one! (<a "
-"href=\"{0}\">Advent Calendar</a>)."
+"href='{0}'>Advent Calendar</a>)."
 msgstr ""
 "Du hast das heutige Rätsel gelöst; schau morgen wieder vorbei, um das "
-"nächste zu lösen! (<a href=\"{0}\">Zum Adventskalender</a>)."
+"nächste zu lösen! (<a href='{0}'>Zum Adventskalender</a>)."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1076
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1077
 msgid ""
 "<br>\n"
 "You solved all the puzzles of the current chapter!\n"
 "Start with the\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">first puzzle</a>\n"
 "of the next chapter \"{2}\", or go back to the\n"
-"<a href=\"{0}\">Puzzle Overview</a>.\n"
+"<a href=\"{3}\">Puzzle Overview</a>.\n"
 msgstr ""
 "<br>\n"
 "Du hast alle Rätsel des aktuellen Kapitels gelöst!\n"
 "Beginne mit dem\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">ersten</a>Rätsel\n"
 "des nächsten Kapitels „{2}“ oder kehre zur\n"
-"<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
+"<a href=\"{3}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1089
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1092
 msgid ""
 "Try to solve the\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">next Puzzle</a>,\n"
 "or go back to the\n"
-"<a href=\"{0}\">Puzzle Overview</a>.\n"
+"<a href=\"{2}\">Puzzle Overview</a>.\n"
 msgstr ""
 "Versuche, das\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">nächste Rätsel</a> zu lösen,\n"
 "oder kehre zur\n"
-"<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
+"<a href=\"{2}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1111
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1115
 msgid ""
 "You solved all the puzzles of the current chapter, go back to the <a "
 "href=\"{0}\">Puzzle Overview</a>."
@@ -8666,10 +8666,6 @@ msgstr "Bisher hat noch kein Spieler Feedback zu diesem Spiel abgegeben."
 msgid "Puzzle: "
 msgstr "Rätsel: "
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:111
-msgid "Puzzle: {0}"
-msgstr "Rätsel: {0}"
-
 #: src/main/webapp/jsp/puzzle/attacker_view.jsp:125
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:125
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:129
@@ -8745,20 +8741,20 @@ msgstr "Nächstes Rätsel:"
 msgid "There are currently no puzzles available."
 msgstr "Derzeit sind keine Rätsel verfügbar."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:106
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:103
 #: src/main/webapp/jsp/puzzle/seasonal_chapters.jsp:65
 #: src/main/webapp/WEB-INF/tags/puzzle_navigation.tag:88
 msgid "This puzzle is locked."
 msgstr "Dieses Rätsel ist gesperrt."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:135
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 #: src/main/webapp/jsp/puzzle/seasonal_chapters.jsp:102
 #: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
 msgid "Puzzle solved in {0} attempt."
 msgstr "Rätsel in {0} Versuch gelöst."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:135
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 #: src/main/webapp/jsp/puzzle/seasonal_chapters.jsp:102
 #: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
@@ -10637,6 +10633,9 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Puzzle: {0}"
+#~ msgstr "Rätsel: {0}"
 
 #~ msgid "Daily christmas themed challanges"
 #~ msgstr "Tägliche weihnachtliche Herausforderungen"

@@ -3216,18 +3216,18 @@ msgid "Your mutant did not solve the puzzle. Try another one..."
 msgstr "Your mutant did not solve the puzzle. Try another one..."
 
 #: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1049
-msgid "You solved today's puzzle, come back tomorrow for the next one! (<a href=\"{0}\">Advent Calendar</a>)."
-msgstr "You solved today's puzzle, come back tomorrow for the next one! (<a href=\"{0}\">Advent Calendar</a>)."
+msgid "You solved today's puzzle, come back tomorrow for the next one! (<a href='{0}'>Advent Calendar</a>)."
+msgstr "You solved today's puzzle, come back tomorrow for the next one! (<a href='{0}'>Advent Calendar</a>)."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1076
-msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
-msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1077
+msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{3}">Puzzle Overview</a>.\n"
+msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{3}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1089
-msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
-msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1092
+msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{2}">Puzzle Overview</a>.\n"
+msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{2}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1111
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1115
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
@@ -9679,10 +9679,6 @@ msgstr "Close"
 msgid "Puzzle: "
 msgstr "Puzzle: "
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:111
-msgid "Puzzle: {0}"
-msgstr "Puzzle: {0}"
-
 #: src/main/webapp/jsp/puzzle/attacker_view.jsp:125
 msgid "Congratulations!"
 msgstr "Congratulations!"
@@ -9819,15 +9815,15 @@ msgstr "Next puzzle:"
 msgid "There are currently no puzzles available."
 msgstr "There are currently no puzzles available."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:106
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:103
 msgid "This puzzle is locked."
 msgstr "This puzzle is locked."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:135
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 msgid "Puzzle solved in {0} attempt."
 msgstr "Puzzle solved in {0} attempt."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:135
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 msgid "Puzzle solved in {0} attempts."
 msgstr "Puzzle solved in {0} attempts."
 

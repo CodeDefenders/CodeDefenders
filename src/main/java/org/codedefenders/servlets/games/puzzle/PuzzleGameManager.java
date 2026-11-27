@@ -1067,6 +1067,7 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
+                        var puzzleOverview = puzzleChapter.isSeasonalChapter() ? Paths.SEASONAL_CHAPTERS : Paths.PUZZLE_OVERVIEW;
                         if (puzzleChapter.getId() > currentChapter) {
                             setChapterCompletionText(request, currentChapter, i18n);
                             var chapterText = puzzleRepo.getPuzzleChapterText(
@@ -1079,21 +1080,23 @@ public class PuzzleGameManager extends HttpServlet {
                                             Start with the
                                             <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
                                             of the next chapter "{2}", or go back to the
-                                            <a href="{0}">Puzzle Overview</a>.
+                                            <a href="{3}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId(),
-                                    chapterText.title()
+                                    chapterText.title(),
+                                    url.forPath(puzzleOverview)
                             ));
                         } else {
                             message.append(i18n.tr("""
                                             Try to solve the
                                             <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
                                             or go back to the
-                                            <a href="{0}">Puzzle Overview</a>.
+                                            <a href="{2}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
-                                    puzzle.getPuzzleId()
+                                    puzzle.getPuzzleId(),
+                                    url.forPath(puzzleOverview)
                             ));
                         }
                         return message.toString();
