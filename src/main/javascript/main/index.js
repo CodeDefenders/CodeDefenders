@@ -29,6 +29,7 @@ import AchievementNotifications from './achievement_notifications';
 import DynamicClassViewer from "../game/dynamic_class_viewer";
 import ShowToasts from './show_toasts';
 import runLandingPageAnimation from './landing_page_animation';
+import Snow from "./snow.js";
 
 
 export {
@@ -45,6 +46,7 @@ export {
     DynamicClassViewer,
     ShowToasts,
     runLandingPageAnimation,
+    Snow,
 }
 
 export * from './utils';

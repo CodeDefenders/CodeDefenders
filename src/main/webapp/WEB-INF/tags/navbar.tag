@@ -31,6 +31,7 @@
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 <%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="seasonStyle" type="org.codedefenders.service.SeasonalStylingService"--%>
 
 <%--
     Provides the navigation bar.
@@ -80,6 +81,16 @@
                             <li class="nav-item nav-item-highlight me-3">
                                 <a class="nav-link" id="header-mutle" href="${url.forPath(Paths.MUTLE)}">
                                     ${i18n.tr('Mutle')}
+                                </a>
+                            </li>
+                        </c:if>
+
+                        <c:set var="season" value="${seasonStyle.currentSeasonalChapter}"/>
+                        <c:if test="${season.present}">
+                            <li class="nav-item nav-item-highlight me-3 ${season.get().seasonalStyle}">
+                                <a class="nav-link" id="header-season"
+                                   href="${url.forPath(Paths.SEASONAL_CHAPTERS)}">
+                                       ${puzzleRepo.getPuzzleChapterTextWithFallback(season.get().id, auth.user.locale.language, i18nService.defaultLocale.language).title()}
                                 </a>
                             </li>
                         </c:if>

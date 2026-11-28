@@ -18,6 +18,8 @@
  */
 package org.codedefenders.game.puzzle;
 
+import java.time.LocalDate;
+
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
@@ -286,6 +288,32 @@ public class Puzzle {
 
     public void setEquivalent(boolean equivalent) {
         this.isEquivalent = equivalent;
+    }
+
+    /**
+     * Returns true if this puzzle is part of a seasonal chapter and not available yet today, otherwise
+     * returns false.
+     */
+    public boolean isBlockedBySeason() {
+        PuzzleChapter chapter = getChapter();
+        if (chapter == null || !chapter.isSeasonalChapter()) {
+            return false;
+        }
+        return !isSeasonalUnlocked(chapter, LocalDate.now());
+    }
+
+    public boolean isSeasonalUnlocked() {
+        PuzzleChapter chapter = getChapter();
+        if (chapter == null || !chapter.isSeasonalChapter()) {
+            return false;
+        }
+        return isSeasonalUnlocked(chapter, LocalDate.now());
+    }
+
+    boolean isSeasonalUnlocked(PuzzleChapter chapter, LocalDate today) {
+        return chapter.getCurrentSeasonStartDate(today)
+                .plusDays(position - 2) // puzzle with position=1 should be playable at the start date
+                .isBefore(today);
     }
 
     public boolean isDummy() {

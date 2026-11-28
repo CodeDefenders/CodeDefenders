@@ -26,6 +26,8 @@
 <%@ page import="org.codedefenders.validation.code.DefaultRuleSets" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="season" type="java.lang.String"--%>
+
 
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
@@ -49,7 +51,7 @@
 
     <div class="mutantCUTLegend">
         <span class="text-nowrap">
-            <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+            <span class="mutantCUTImage mutantImageAlive align-middle ${season}"></span>
             <span class="mutantCUTLegendDesc align-middle me-1">${i18n.tr('Live')}</span>
         </span>
         <span class="text-nowrap">

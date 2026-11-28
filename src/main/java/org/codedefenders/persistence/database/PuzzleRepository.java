@@ -18,8 +18,10 @@
  */
 package org.codedefenders.persistence.database;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -201,6 +203,26 @@ public class PuzzleRepository {
     }
 
     /**
+     * Returns all puzzles in the given chapter, including inactive puzzles, sorted by position.
+     *
+     * @param chapterId The chapter ID.
+     * @return A list of all puzzles in the chapter.
+     */
+    public List<Puzzle> getAllPuzzlesForChapterId(int chapterId) {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM puzzles
+                WHERE Chapter_ID = ?
+                ORDER BY Position;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS),
+                chapterId
+        );
+    }
+
+    /**
      * Returns the {@link PuzzleGame} for the given game ID.
      *
      * @param gameId The game ID.
@@ -335,7 +357,7 @@ public class PuzzleRepository {
                 query, generatedKeyFromRS(), position
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
 
-        return new PuzzleChapter(id, position);
+        return new PuzzleChapter(id, position, null);
     }
 
     /**
@@ -421,12 +443,16 @@ public class PuzzleRepository {
     public boolean updatePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
                 UPDATE puzzle_chapters
-                SET Position = ?
+                SET Position = ?,
+                Calendar_date = ?,
+                Days_available = ?
                 WHERE Chapter_ID = ?;
         """;
 
         int updatedRows = queryRunner.update(query,
                 chapter.getPosition(),
+                chapter.getCalendarDate() != null ? Date.valueOf(chapter.getCalendarDate()) : null,
+                chapter.getDaysAvailable(),
                 chapter.getId()
         );
         return updatedRows > 0;
@@ -764,16 +790,18 @@ public class PuzzleRepository {
      */
     public void storePuzzleChapterText(PuzzleChapterText text) {
         @Language("SQL") String query = """
-                INSERT INTO puzzle_chapter_text (Chapter_ID, Language, Title, Description)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description);
+                INSERT INTO puzzle_chapter_text (Chapter_ID, Language, Title, Description, Completion_text)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description),
+                    Completion_text = VALUES(Completion_text);
         """;
 
         queryRunner.update(query,
                 text.chapterId(),
                 text.language(),
                 text.title(),
-                text.description()
+                text.description(),
+                text.completionText()
         );
     }
 
@@ -837,7 +865,8 @@ public class PuzzleRepository {
                 rs.getInt("Chapter_ID"),
                 rs.getString("Language"),
                 rs.getString("Title"),
-                rs.getString("Description")
+                rs.getString("Description"),
+                rs.getString("Completion_text")
         );
     }
 
@@ -855,7 +884,11 @@ public class PuzzleRepository {
             position = null;
         }
 
-        return new PuzzleChapter(chapterId, position);
+        Date sqlDate = rs.getDate("puzzle_chapters.Calendar_date");
+        LocalDate localDate = sqlDate == null ? null : sqlDate.toLocalDate();
+        int daysAvailable = rs.getInt("puzzle_chapters.Days_available");
+
+        return new PuzzleChapter(chapterId, position, localDate, daysAvailable);
     }
 
     /**

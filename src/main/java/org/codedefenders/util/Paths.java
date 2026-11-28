@@ -70,6 +70,7 @@ public class Paths {
     public static final String MELEE_GAME_SCORE = "/melee/score";
 
     public static final String PUZZLE_OVERVIEW = "/puzzles";
+    public static final String SEASONAL_CHAPTERS = "/advent-calendar";
     public static final String PUZZLE_GAME = "/puzzlegame";
 
     public static final String MUTLE = "/mutle";

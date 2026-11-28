@@ -57,7 +57,9 @@ public class PuzzleNavigationBean {
     final Map<Integer, PuzzleGame> activePuzzles;
 
     SortedSet<PuzzleChapterEntry> puzzleChapters;
+    SortedSet<PuzzleChapterEntry> seasonalChapters;
     Optional<PuzzleEntry> nextPuzzle;
+    Optional<PuzzleEntry> nextSeasonalPuzzle;
 
     @Inject
     public PuzzleNavigationBean(PuzzleRepository puzzleRepo, CodeDefendersAuth login, I18nService i18nService) {
@@ -68,8 +70,9 @@ public class PuzzleNavigationBean {
         // maps the puzzle id to the puzzle game
         activePuzzles = activePuzzles(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
 
-        puzzleChapters = puzzleRepo.getPuzzleChapters()
+        SortedSet<PuzzleChapterEntry> allChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
+                .filter(PuzzleChapter::isVisible)
                 .map(toPuzzleChapterEntry(
                         login.getUserId(), activePuzzles,
                         login.getUser().getLocale().getLanguage(),
@@ -77,17 +80,37 @@ public class PuzzleNavigationBean {
                 ))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final List<PuzzleEntry> unsolvedPuzzles = puzzleChapters.stream()
+        puzzleChapters = allChapters.stream()
+                .filter(chapter -> !chapter.getChapter().isSeasonalChapter())
+                .collect(Collectors.toCollection(TreeSet::new));
+        seasonalChapters = allChapters.stream()
+                .filter(chapter -> chapter.getChapter().isSeasonalChapter())
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        final List<PuzzleEntry> unsolvedPuzzles = allChapters.stream()
                 .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
                 .filter(Predicate.not(PuzzleEntry::isSolved))
                 .toList();
-        nextPuzzle = unsolvedPuzzles.stream().findFirst();
 
-        // lock puzzles if the user has not solved the previous puzzle
-        unsolvedPuzzles.stream()
-                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
-                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
-                .forEach(PuzzleEntry::lock);
+        nextPuzzle = unsolvedPuzzles.stream()
+                .filter(p -> !p.getPuzzle().getChapter().isSeasonalChapter())
+                .findFirst();
+
+        nextSeasonalPuzzle = unsolvedPuzzles.stream()
+                .filter(p -> p.getPuzzle().getChapter().isSeasonalChapter())
+                .findFirst();
+
+        for (PuzzleEntry puzzleEntry : unsolvedPuzzles) {
+            if (puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE) {
+                if (!puzzleEntry.getPuzzle().getChapter().isSeasonalChapter()) {
+                    if (!nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
+                        puzzleEntry.lock();
+                    }
+                } else if (puzzleEntry.getPuzzle().isBlockedBySeason()) {
+                    puzzleEntry.lock();
+                }
+            }
+        }
     }
 
     /**
@@ -99,6 +122,10 @@ public class PuzzleNavigationBean {
      */
     public SortedSet<PuzzleChapterEntry> getPuzzleChapters() {
         return puzzleChapters;
+    }
+
+    public SortedSet<PuzzleChapterEntry> getSeasonalChapters() {
+        return seasonalChapters;
     }
 
     /**
@@ -119,6 +146,10 @@ public class PuzzleNavigationBean {
      */
     public Optional<PuzzleEntry> getNextPuzzle() {
         return nextPuzzle;
+    }
+
+    public Optional<PuzzleEntry> getNextSeasonalPuzzle() {
+        return nextSeasonalPuzzle;
     }
 
     static Map<Integer, PuzzleGame> activePuzzles(List<PuzzleGame> games) {
@@ -154,6 +185,7 @@ public class PuzzleNavigationBean {
 
             final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())
                     .stream()
+                    //.filter(Puzzle::isSeasonablyAvailable)//TODO: Could be done more efficiently by checking for the dates here
                     .map(toPuzzleEntry(userId, activePuzzles, userLanguage, defaultLanguage, title))
                     .collect(Collectors.toSet());
 

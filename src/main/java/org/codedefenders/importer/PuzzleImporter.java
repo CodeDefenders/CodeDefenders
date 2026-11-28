@@ -26,6 +26,8 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -65,6 +67,7 @@ import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.DateUtils;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.SimpleFile;
@@ -192,8 +195,67 @@ public class PuzzleImporter {
             CompileException, BackendExecutorService.ExecutionException {
         var chapterPaths = listDefaultPuzzleChapters();
         for (var path : chapterPaths) {
-            importPuzzleChapter(path);
+            ChapterData data = readChapterData(walkDirectory(path));
+            PuzzleChapter chapter = findChapter(data.properties);
+            if (chapter == null) {
+                chapter = storePuzzleChapterToDB(data.properties);
+            } else {
+                /* the following block is not really necessary, it just updates the puzzle properties when they changed
+                 * since the last default puzzle import */
+                var props = readPuzzleChapterProperties(data.properties);
+                chapter.setCalendarDate(props.calendarDate());
+                chapter.setDaysAvailable(props.daysAvailable());
+                puzzleRepo.updatePuzzleChapter(chapter);
+                puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(
+                        chapter.getId(),
+                        i18nService.getDefaultLocale().getLanguage(),
+                        props.title(),
+                        props.description(),
+                        props.completionText()
+                ));
+                logger.info("Updated existing default puzzle chapter '{}'.", props.title());
+            }
+
+            for (PuzzleData puzzleData : data.puzzles) {
+                if (findPuzzle(chapter.getId(), puzzleData) == null) {
+                    importPuzzle(puzzleData, chapter.getId());
+                } else {
+                    logger.info("Skipping existing default puzzle '{}'.", readPuzzleTitle(puzzleData));
+                }
+            }
         }
+    }
+
+    private PuzzleChapter findChapter(SimpleFile propertiesFile) throws IOException {
+        String title = readPuzzleChapterProperties(propertiesFile).title();
+        String defaultLanguage = i18nService.getDefaultLocale().getLanguage();
+
+        return puzzleRepo.getPuzzleChapters().stream()
+                .filter(chapter -> {
+                    var text = puzzleRepo.getPuzzleChapterText(chapter.getId(), defaultLanguage);
+                    return text != null && Objects.equals(text.title(), title);
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Puzzle findPuzzle(int chapterId, PuzzleData puzzleData) throws IOException {
+        String title = readPuzzleTitle(puzzleData);
+        String defaultLanguage = i18nService.getDefaultLocale().getLanguage();
+
+        return puzzleRepo.getAllPuzzlesForChapterId(chapterId).stream()
+                .filter(puzzle -> {
+                    var text = puzzleRepo.getPuzzleText(puzzle.getPuzzleId(), defaultLanguage);
+                    return text != null && Objects.equals(text.title(), title);
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String readPuzzleTitle(PuzzleData puzzleData) throws IOException {
+        Properties cfg = new Properties();
+        cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
+        return cfg.getProperty("title");
     }
 
     private List<Path> listDefaultPuzzleChapters() throws IOException {
@@ -219,7 +281,9 @@ public class PuzzleImporter {
         return files;
     }
 
-    public record PuzzleChapterProperties(String title, String description) { }
+    public record PuzzleChapterProperties(
+            String title, String description, LocalDate calendarDate, int daysAvailable, String completionText
+    ) {}
 
     public PuzzleChapterProperties readPuzzleChapterProperties(SimpleFile propertiesFile) throws IOException {
         Properties cfg = new Properties();
@@ -231,17 +295,46 @@ public class PuzzleImporter {
         }
 
         String description = cfg.getProperty("description");
-        return new PuzzleChapterProperties(title, description);
+        String startDate = cfg.getProperty("startDate");
+
+        LocalDate calendarDate = null;
+        if (startDate != null && !startDate.isBlank()) {
+            try {
+                calendarDate = DateUtils.parseSeasonalDate(startDate.strip());
+            } catch (DateTimeParseException e) {
+                throw new ValidationException("Invalid startDate format. Use MM-dd.");
+            }
+        }
+
+        int daysAvailable = 30;
+        String daysAvailableProperty = cfg.getProperty("daysAvailable");
+        if (daysAvailableProperty != null && !daysAvailableProperty.isBlank()) {
+            try {
+                daysAvailable = Integer.parseInt(daysAvailableProperty.strip());
+                if (daysAvailable <= 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                throw new ValidationException("Invalid daysAvailable value. Use a positive integer.");
+            }
+        }
+
+        String completionText = cfg.getProperty("completionText");
+        return new PuzzleChapterProperties(title, description, calendarDate, daysAvailable, completionText);
     }
 
     private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
         var props = readPuzzleChapterProperties(propertiesFile);
 
         PuzzleChapter chapter = puzzleRepo.createNewPuzzleChapter();
+        chapter.setCalendarDate(props.calendarDate());
+        chapter.setDaysAvailable(props.daysAvailable());
+        puzzleRepo.updatePuzzleChapter(chapter);
 
         // Store chapter text using the default locale
         String language = i18nService.getDefaultLocale().getLanguage();
-        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(chapter.getId(), language, props.title, props.description));
+        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(
+                chapter.getId(), language, props.title, props.description, props.completionText()));
 
         logger.info("Stored puzzle chapter with id {}", chapter.getId());
         return chapter;
@@ -458,9 +551,13 @@ public class PuzzleImporter {
                                        String description, Integer editableLinesStart, Integer editableLinesEnd) { }
 
         public void readPuzzleProperties() throws IOException {
+            this.properties = readPuzzleProperties(puzzleData);
+        }
+
+        private PuzzleProperties readPuzzleProperties(PuzzleData data) throws IOException {
             // Load config.
             Properties cfg = new Properties();
-            cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
+            cfg.load(new ByteArrayInputStream(data.properties.getContent()));
 
             // Read values from specification file
             PuzzleType type = PuzzleType.valueOf(cfg.getProperty("type"));
@@ -477,7 +574,7 @@ public class PuzzleImporter {
                     .map(Integer::parseInt)
                     .orElse(null);
 
-            this.properties = new PuzzleProperties(type, isEquivalent, level, title, description, editableLinesStart,
+            return new PuzzleProperties(type, isEquivalent, level, title, description, editableLinesStart,
                     editableLinesEnd);
         }
 

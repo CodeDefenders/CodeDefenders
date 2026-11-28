@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -83,7 +82,6 @@ or are locked for the logged in user.
             </c:if>
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
-                <c:set var="chapter" value="${ChapterEntry.chapter}"/>
                 <div class="chapter">
                     <div class="chapter__title">
                         <h2>${ChapterEntry.title}</h2>
@@ -91,6 +89,7 @@ or are locked for the logged in user.
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
+                            <%-- puzzleEntry.locked does not work for type GAME --%>
                             <c:set var="status"
                                    value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
                             <a class="chapter__level puzzle-${status}"
@@ -102,6 +101,9 @@ or are locked for the logged in user.
                                             disabled="disabled"
                                             data-bs-toggle="tooltip"
                                             title="${i18n.tr('This puzzle is locked.')}"
+                                            role="link"
+                                            aria-disabled="true"
+                                            tabindex="0"
                                         </c:otherwise>
                                     </c:choose>
                             >
@@ -146,5 +148,6 @@ or are locked for the logged in user.
                 </div>
             </c:forEach>
         </div>
+
     </jsp:body>
 </p:main_page>

@@ -805,7 +805,7 @@
                         <form class="" novalidate>
                             <div class="row mb-3">
                                 <div class="form-group">
-                                    <label class="form-label">Title</label>
+                                    <label class="form-label">${i18n.tr('Title')}</label>
                                     <input type="text" name="title" class="form-control" value=""
                                         placeholder="Title"
                                         required minlength="1" maxlength="100">
@@ -815,12 +815,38 @@
 
                             <div class="row mb-2">
                                 <div class="form-group">
-                                    <label class="form-label">Description</label>
+                                    <label class="form-label">${i18n.tr('Description')}</label>
                                     <input type="text" name="description" class="form-control" value=""
                                         placeholder="${i18n.tr('Description')}"
                                         maxlength="1000">
                                 </div>
                             </div>
+
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">${i18n.tr("Start date for seasonal chapters (MM-dd, keep empty to keep this chapter available all year)")}</label>
+                                    <input type="text" name="date" class="form-control" value=""
+                                        placeholder=""
+                                        maxlength="1000">
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">${i18n.tr("Days available after the start date")}</label>
+                                    <input type="number" name="daysAvailable" class="form-control" min="1" step="1"
+                                        required>
+                                    <div class="invalid-feedback">${i18n.tr('Enter a positive number of days.')}</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">${i18n.tr("HTML shown after completing the chapter")}</label>
+                                    <textarea name="completionText" class="form-control" rows="5"></textarea>
+                                </div>
+                            </div>
+
                         </form>`;
                     modal.title.innerText = '${i18n.tr("Edit Chapter")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
@@ -828,6 +854,10 @@
                     const chapterText = getTextForLang(chapter.texts, currentLanguage);
                     modal.body.querySelector('input[name="title"]').value = chapterText.isFallback ? '' : chapterText.title;
                     modal.body.querySelector('input[name="description"]').value = chapterText.isFallback ? '' : chapterText.description;
+                    modal.body.querySelector('input[name="date"]').value = chapter.date;
+                    modal.body.querySelector('input[name="daysAvailable"]').value = chapter.daysAvailable;
+                    modal.body.querySelector('textarea[name="completionText"]').value =
+                        chapterText.isFallback ? '' : (chapterText.completionText || '');
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
@@ -844,12 +874,20 @@
 
                         const title = modal.body.querySelector('input[name="title"]').value;
                         const description = modal.body.querySelector('input[name="description"]').value;
+                        const date = modal.body.querySelector('input[name="date"]').value;
+                        const daysAvailable = Number(modal.body.querySelector('input[name="daysAvailable"]').value);
+                        const completionText = modal.body.querySelector('textarea[name="completionText"]').value;
 
                         PuzzleAPI.updatePuzzleChapter(chapter.id, {
                             title: title,
-                            description: description
+                            description: description,
+                            date: date,
+                            daysAvailable: daysAvailable,
+                            completionText: completionText
                         }, currentLanguage).then(response => {
                             chapter.texts = response.chapter.texts;
+                            chapter.date = response.chapter.date;
+                            chapter.daysAvailable = response.chapter.daysAvailable;
                             chapterComp.updateDisplay();
                             ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {

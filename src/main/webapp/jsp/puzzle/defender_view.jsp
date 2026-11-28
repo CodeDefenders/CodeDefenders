@@ -56,6 +56,7 @@
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
     pageContext.setAttribute("title", title);
+    request.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -96,15 +97,19 @@
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+
+        <c:if test="${puzzle.chapter.seasonalChapter}">
+            <link href="${url.forPath("/css/specific/advent_game.css")}" rel="stylesheet">
+        </c:if>
     </jsp:attribute>
 
     <jsp:body>
         <t:game_js_init/>
 
-        <div id="game-container" class="container-fluid">
+        <div id="game-container" class="container-fluid ${puzzle.chapter.seasonalStyle}">
 
             <h4><b>${title}</b></h4>
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div class="puzzle-header d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
@@ -120,6 +125,11 @@
                         <strong class="alert-heading">${i18n.tr('Congratulations!')}</strong>
                             ${i18n.tr('Your test solved the puzzle. {0}', requestScope.nextPuzzleMessage)}
                     </p>
+                </div>
+                <div class="alert alert-chapter-completed" role="alert">
+                    <c:if test="${not empty requestScope.chapterCompletionText}">
+                        ${requestScope.chapterCompletionText}
+                    </c:if>
                 </div>
             </c:if>
 
@@ -146,7 +156,7 @@
                         </c:choose>
                         <div>
                             <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
-                            <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
+                            <button type="submit" class="btn btn-defender btn-highlight ${season}" id="submitTest" form="def"
                                 ${game.state == GameState.SOLVED ? 'disabled' : ''}>
                                     ${i18n.tr('Defend')}
                             </button>
@@ -192,6 +202,13 @@
                 </div>
             </div>
         </div>
+
+        <c:if test="${puzzle.chapter.seasonalChapter}">
+            <script type="module">
+                import {Snow} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                Snow.init("#content");
+            </script>
+        </c:if>
     </jsp:body>
 </p:main_page>
 

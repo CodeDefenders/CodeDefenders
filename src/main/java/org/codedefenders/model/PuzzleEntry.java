@@ -51,8 +51,8 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
     private final PuzzleGame game;
 
     private boolean locked;
-    private boolean solved;
-    private int rounds;
+    private final boolean solved;
+    private final int rounds;
     private String title;
     private String description;
     private String chapterTitle;

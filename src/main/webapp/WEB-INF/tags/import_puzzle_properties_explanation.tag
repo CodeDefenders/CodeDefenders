@@ -26,7 +26,7 @@
     ${i18n.tr('The text area below shows the supported properties for puzzles:')}
 </p>
 
-<pre class="mb-0 p-3 bg-light" style="line-height: 1.15;">${i18n.tr('# Type of the puzzle. Can be ATTACKER or DEFENDER.')}
+<pre class="mb-0 p-3 bg-light" style="line-height: 1.15;">${i18n.tr('# Type of the puzzle. Can be ATTACKER, DEFENDER, or EQUIVALENCE.')}
 type=ATTACKER
 
 ${i18n.tr('# Title of the puzzle.')}
@@ -40,10 +40,14 @@ ${i18n.tr('# EASY allows players to see all tests and mutants in the game.')}
 ${i18n.tr('# HARD hides tests from attacker players and hides mutants from defender players.')}
 gameLevel=EASY
 
-${i18n.tr('# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive).')}
-${i18n.tr('# This is ignored for DEFENDER puzzles.')}
+${i18n.tr('# (Only for attacker puzzles) The fist line of the CUT that attackers are allowed to edit (inclusive).')}
+${i18n.tr('# This is ignored for DEFENDER/EQUIVALENCE puzzles.')}
 editableLinesStart=4
 
-${i18n.tr('# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive).')}
-${i18n.tr('# This is ignored for DEFENDER puzzles.')}
-editableLinesEnd=4</pre>
+${i18n.tr('# (Only for attacker puzzles) The fist last of the CUT, that attackers are allowed to edit (inclusive).')}
+${i18n.tr('# This is ignored for DEFENDER/EQUIVALENCE puzzles.')}
+editableLinesEnd=4
+
+${i18n.tr('# (Only for equivalence puzzles) Whether the flagged mutant is equivalent to the CUT or not.')}
+${i18n.tr('# This is ignored for ATTACKER/DEFENDER puzzles.')}
+isEquivalent=true</pre>

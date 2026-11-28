@@ -136,6 +136,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.PUZZLE_GAME = "/puzzlegame";
         // org.codedefenders.util.Paths.PUZZLE_GAME_SELECTION = "/puzzle/games";
         fcMan.createChain("/puzzle**", "authc");
+        fcMan.createChain(Paths.SEASONAL_CHAPTERS, "authc");
 
         fcMan.createChain(Paths.MUTLE, "anon");
         fcMan.createChain(Paths.MUTLE + "/**", "anon");

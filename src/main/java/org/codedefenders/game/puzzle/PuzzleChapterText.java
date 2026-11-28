@@ -24,6 +24,12 @@ package org.codedefenders.game.puzzle;
  * @param chapterId   The chapter ID.
  * @param language    The language code (e.g. "en", "de").
  * @param title       The localized title.
- * @param description The localized description.
+ * @param description   The localized description.
+ * @param completionText HTML shown after completing the chapter.
  */
-public record PuzzleChapterText(int chapterId, String language, String title, String description) {}
+public record PuzzleChapterText(int chapterId, String language, String title, String description,
+                                String completionText) {
+    public PuzzleChapterText(int chapterId, String language, String title, String description) {
+        this(chapterId, language, title, description, null);
+    }
+}

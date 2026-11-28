@@ -31,6 +31,8 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="seasonStyle" type="org.codedefenders.service.SeasonalStylingService"--%>
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%
     List<MultiplayerGame> openMultiplayerGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
@@ -40,14 +42,55 @@
     pageContext.setAttribute("openMeleeGames", openMeleeGames);
     pageContext.setAttribute("gameCreatorNames", gameCreatorNames);
 %>
+<c:set var="season" value="${seasonStyle.currentSeasonalChapter}"/>
 
 <p:main_page title="${i18n.tr('Welcome to Code Defenders')}">
     <jsp:attribute name="additionalImports">
+        <c:if test="${season.present}">
+            <link href="${url.forPath("/css/specific/advent_calendar.css")}" rel="stylesheet">
+        </c:if>
         <link href="${url.forPath("/css/specific/landing_page.css")}" rel="stylesheet">
         <link href="${url.forPath('/css/mutle.css')}" rel="stylesheet">
     </jsp:attribute>
 
     <jsp:body>
+        <c:if test="${season.present}">
+            <section class="advent-calendar-promo" aria-labelledby="advent-calendar-title">
+                <div class="container">
+                    <div class="advent-calendar-promo__gifts" aria-hidden="true">
+                            <span class="advent-gift">
+                                    <span class="advent-gift__box"></span>
+                                    <span class="advent-gift__top">
+                                        <span class="advent-gift__bow"></span>
+                                        <span class="advent-gift__lid"></span>
+                                    </span>
+                            </span>
+                        <span class="advent-gift">
+                                    <span class="advent-gift__box"></span>
+                                    <span class="advent-gift__top">
+                                        <span class="advent-gift__bow"></span>
+                                        <span class="advent-gift__lid"></span>
+                                    </span>
+                            </span>
+                    </div>
+                    <h2 id="advent-calendar-title">${i18n.tr('Code Defenders Advent Calendar')}</h2>
+                    <p>
+                            ${i18n.tr('You cannot wait until Christmas arrives?')}<br>
+                            ${i18n.tr('Code Defenders offers you something new for this holiday season:')}<br>
+                            ${i18n.tr('24 little challenges to shorten the time until Christmas arrives.')}
+                    </p>
+                    <a class="btn btn-lg btn-light" href="${url.forPath(Paths.SEASONAL_CHAPTERS)}">
+                            ${i18n.tr('Solve today\'s puzzle')}
+                    </a>
+                    <c:if test="${not auth.loggedIn}">
+                        <p class="login-note">
+                                ${i18n.tr('You will need to log in to open the windows of the advent calendar.')}
+                        </p>
+                    </c:if>
+                </div>
+            </section>
+        </c:if>
+
         <%-- Vertically align content if enough space is available. --%>
         <div class="container py-5 page">
             <div class="d-flex flex-column align-items-center gap-3 mb-3">
@@ -226,8 +269,13 @@
 
         <script type="module">
             import {runLandingPageAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
-
             runLandingPageAnimation();
         </script>
+        <c:if test="${season.present}">
+            <script type="module">
+                import {Snow} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                Snow.init(".advent-calendar-promo");
+            </script>
+        </c:if>
     </jsp:body>
 </p:main_page>

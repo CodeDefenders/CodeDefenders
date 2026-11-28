@@ -262,7 +262,14 @@ public class PuzzleGameManager extends HttpServlet {
         request.setAttribute("chapterTitle", chapterText != null ? chapterText.title() : "");
 
         if (game.getState() == GameState.SOLVED) {
-            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
+            request.setAttribute("nextPuzzleMessage",
+                    generateNextPuzzleMessage(game, new StringBuilder(), i18n, request));
+        }
+
+        if (game.getPuzzle().isBlockedBySeason()) {
+            logger.error("Trying to enter a seasonal puzzle that is not yet unlocked");
+            response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
+            return;
         }
 
         if (game.getType() == PuzzleType.DEFENDER) {
@@ -315,9 +322,9 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        // check if puzzle is locked
-        Optional<Puzzle> nextPuzzle = getNextPuzzleForUser(userId);
-        if (nextPuzzle.isPresent() && nextPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()) {
+        Optional<Puzzle> nextNormalPuzzle = getNextPuzzleForUser(false);
+        if (nextNormalPuzzle.isPresent() && nextNormalPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()
+                && !puzzle.getChapter().isSeasonalChapter()) {
             logger.error("Cannot create puzzle game for puzzleId: {}. Puzzle is locked.", puzzleId);
             response.setStatus(SC_FORBIDDEN);
             Redirect.redirectBack(request, response);
@@ -987,33 +994,37 @@ public class PuzzleGameManager extends HttpServlet {
     }
 
     /**
-     * Retrieves the first puzzle that has not been solved yet by the given user.
+     * Retrieves the first puzzle that has not been solved yet by the logged-in user.
      *
-     * @param userId The user to retrieve the next puzzle for.
+     * @param seasonal If true, check the first available seasonal puzzle. If false, check the first available
+     *                 non-seasonal puzzle.
      * @return The next puzzle for the given user, or an empty Optional if no puzzle is available / all puzzles were
      * solved.
      */
-    private Optional<Puzzle> getNextPuzzleForUser(int userId) {
+    private Optional<Puzzle> getNextPuzzleForUser(boolean seasonal) {
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
-                // TODO Should he make PuzzleDAO inject dependencies instead
-                PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
-                        puzzle.getPuzzleId(),
-                        login.getUserId()
-                );
+            if (puzzleChapter.isSeasonalChapter() == seasonal) {
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    // TODO Should he make PuzzleDAO inject dependencies instead
+                    PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
+                            puzzle.getPuzzleId(),
+                            login.getUserId()
+                    );
 
-                if (playedGame == null // Not yet played this puzzle
-                        || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
-                ) {
-                    // first not solved puzzle
-                    return Optional.of(puzzle);
+                    if (playedGame == null // Not yet played this puzzle
+                            || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
+                    ) {
+                        // first not solved puzzle
+                        return Optional.of(puzzle);
+                    }
                 }
             }
         }
         return Optional.empty();
     }
 
-    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n) {
+    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n,
+                                             HttpServletRequest request) {
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
@@ -1023,14 +1034,34 @@ public class PuzzleGameManager extends HttpServlet {
          * {@link PuzzleGameManager#getNextPuzzleForUser(int)} cannot be used here, because the puzzle is marked as
          * solved only after this message is generated.
          */
-        for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            // Check in current and next chapters
-            if (puzzleChapter.getId() >= currentChapter) {
+        var puzzleChapters = puzzleRepo.getPuzzleChapters();
+        boolean currentChapterIsSeasonal = puzzleChapters.stream()
+                .filter(puzzleChapter -> puzzleChapter.getId() == currentChapter)
+                .findFirst()
+                .map(PuzzleChapter::isSeasonalChapter)
+                .orElse(false);
+        for (PuzzleChapter puzzleChapter : puzzleChapters) {
+            // Check in the current chapter and later chapters of the same type
+            if (puzzleChapter.getId() >= currentChapter
+                    && puzzleChapter.isSeasonalChapter() == currentChapterIsSeasonal
+                    && puzzleChapter.isVisible()) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * an empty, not-null list if there are no puzzles
                  */
                 for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    if (puzzle.isBlockedBySeason()) {
+                        //If this puzzle is an invisible seasonal puzzle, all other puzzles in this chapter will be too.
+                        if (puzzleChapter.getId() == currentChapter) {
+                            message.append(i18n.tr(
+                                    "You solved today's puzzle, come back tomorrow for the next one! (<a href='{0}'>Advent Calendar</a>).",
+                                    url.forPath(Paths.SEASONAL_CHAPTERS)
+                            ));
+                            return message.toString();
+                        }
+                        break;
+                    }
+
                     if (puzzleChapter.getId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
@@ -1044,7 +1075,9 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
+                        var puzzleOverview = puzzleChapter.isSeasonalChapter() ? Paths.SEASONAL_CHAPTERS : Paths.PUZZLE_OVERVIEW;
                         if (puzzleChapter.getId() > currentChapter) {
+                            setChapterCompletionText(request, currentChapter, i18n);
                             var chapterText = puzzleRepo.getPuzzleChapterText(
                                     puzzleChapter.getId(),
                                     i18n.getLocale().getLanguage()
@@ -1055,21 +1088,23 @@ public class PuzzleGameManager extends HttpServlet {
                                             Start with the
                                             <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
                                             of the next chapter "{2}", or go back to the
-                                            <a href="{0}">Puzzle Overview</a>.
+                                            <a href="{3}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId(),
-                                    chapterText.title()
+                                    chapterText.title(),
+                                    url.forPath(puzzleOverview)
                             ));
                         } else {
                             message.append(i18n.tr("""
                                             Try to solve the
                                             <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
                                             or go back to the
-                                            <a href="{0}">Puzzle Overview</a>.
+                                            <a href="{2}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
-                                    puzzle.getPuzzleId()
+                                    puzzle.getPuzzleId(),
+                                    url.forPath(puzzleOverview)
                             ));
                         }
                         return message.toString();
@@ -1081,6 +1116,7 @@ public class PuzzleGameManager extends HttpServlet {
         /*
          * If we got here, the user has solved all the puzzles in a chapter
          */
+        setChapterCompletionText(request, currentChapter, i18n);
         message.append(" ").append(
                 i18n.tr(
                         "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>.",
@@ -1088,5 +1124,15 @@ public class PuzzleGameManager extends HttpServlet {
                 )
         );
         return message.toString();
+    }
+
+    private void setChapterCompletionText(HttpServletRequest request, int chapterId, I18n i18n) {
+        var chapterText = puzzleRepo.getPuzzleChapterTextWithFallback(
+                chapterId,
+                i18n.getLocale().getLanguage(),
+                i18nService.getDefaultLocale().getLanguage()
+        );
+        request.setAttribute("chapterCompletionText",
+                chapterText != null ? chapterText.completionText() : null);
     }
 }

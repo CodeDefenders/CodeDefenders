@@ -1,0 +1,444 @@
+/**
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.chapter.christmas-season {
+    --gift-ink: #103c57;
+    --gift-number-size: clamp(1.5rem, 2.4vw, 2rem);
+}
+
+.chapter.christmas-season .chapter__levels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem .75rem;
+    padding: 1rem .5rem;
+
+    counter-reset: advent-day;
+}
+
+.chapter.christmas-season .chapter__level,
+.chapter.christmas-season .chapter__level:hover,
+.chapter.christmas-season .chapter__level:focus,
+.chapter.christmas-season .chapter__level:focus-within {
+    display: grid;
+    place-items: end center;
+    position: relative;
+    min-width: 0;
+    min-height: 12.5rem;
+    padding: 3rem .75rem 1rem;
+    gap: 0;
+    color: var(--gift-ink);
+    background: transparent;
+    border: 0;
+    border-radius: .5rem;
+    outline: 3px solid transparent;
+    outline-offset: 3px;
+    text-decoration: none;
+    overflow: visible;
+}
+
+.chapter.christmas-season .chapter__level {
+    counter-increment: advent-day;
+}
+
+.chapter.christmas-season .chapter__level:focus-visible {
+    outline-color: var(--gift-ink);
+}
+
+.chapter.christmas-season .chapter__level:not([href]) {
+    cursor: not-allowed;
+}
+
+.chapter.christmas-season .chapter__level__watermark,
+.chapter.christmas-season .chapter__level__image,
+.chapter.christmas-season .chapter__level__title {
+    display: none;
+}
+
+/* inspired by https://codepen.io/stephenpierceio/pen/aPZdgo */
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift {
+    --paper: #f36a70;
+    --pattern: #ffe8a0;
+    --ribbon: #5cbef0;
+    --gift-width: 8rem;
+    --gift-height: 6.75rem;
+    --wrapping: radial-gradient(circle, var(--pattern) 2.5px, transparent 3px);
+    --pattern-size: 17px 17px;
+    display: block;
+    position: relative;
+    width: min(100%, var(--gift-width));
+    height: var(--gift-height);
+    isolation: isolate;
+    filter: drop-shadow(0 5px 0 #103c5714);
+    transition: transform 220ms ease, filter 220ms ease;
+}
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 2),
+    :nth-child(24n + 9),
+    :nth-child(24n + 13),
+    :nth-child(24n + 24)
+) .advent-gift {
+    --paper: #51b996;
+    --pattern: #8ed8b7;
+    --ribbon: #ff8581;
+    --gift-width: 6.75rem;
+    --gift-height: 7.75rem;
+    --wrapping: repeating-linear-gradient(135deg,
+    transparent 0 12px, var(--pattern) 12px 22px);
+    --pattern-size: auto;
+}
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 4),
+    :nth-child(24n + 12),
+    :nth-child(24n + 15),
+    :nth-child(24n + 22)
+) .advent-gift {
+    --paper: #f5c450;
+    --pattern: #ffecaa;
+    --ribbon: #64bce9;
+    --gift-width: 9rem;
+    --gift-height: 5.75rem;
+}
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 3),
+    :nth-child(24n + 7),
+    :nth-child(24n + 17),
+    :nth-child(24n + 20)
+) .advent-gift {
+    --paper: #71c5e0;
+    --pattern: #b9e9f1;
+    --ribbon: #ffce64;
+    --gift-width: 7rem;
+    --gift-height: 7.25rem;
+    --wrapping: repeating-linear-gradient(90deg,
+    transparent 0 13px, var(--pattern) 13px 18px);
+    --pattern-size: auto;
+}
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 6),
+    :nth-child(24n + 10),
+    :nth-child(24n + 14),
+    :nth-child(24n + 23)
+) .advent-gift {
+    --paper: #f09e87;
+    --pattern: #ffdac2;
+    --ribbon: #87cbb2;
+    --gift-width: 8.5rem;
+    --gift-height: 6.25rem;
+    --pattern-size: 22px 22px;
+}
+.chapter.christmas-season .chapter__level:is(
+    :nth-child(24n + 5),
+    :nth-child(24n + 8),
+    :nth-child(24n + 16),
+    :nth-child(24n + 19)
+) .advent-gift {
+    --paper: #65afa4;
+    --pattern: #a1dbca;
+    --ribbon: #ffe18a;
+    --gift-width: 7.5rem;
+    --gift-height: 7rem;
+    --wrapping: repeating-linear-gradient(135deg,
+    transparent 0 7px, var(--pattern) 7px 10px);
+    --pattern-size: auto;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__box {
+    position: absolute;
+    inset: 0;
+    background-color: var(--paper);
+    background-image: var(--wrapping);
+    background-size: var(--pattern-size);
+    border: 3px solid var(--gift-ink);
+    border-radius: 3px 3px 5px 5px;
+    box-shadow: inset 4px 0 #ffffff40, inset -5px -5px #103c5715;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__box::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: calc(50% - 12px);
+    width: 24px;
+    background: var(--ribbon);
+    border-inline: 3px solid var(--gift-ink);
+    box-shadow: inset 3px 0 #ffffff55;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__top {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: -8px;
+    left: -5%;
+    width: 110%;
+    height: 25px;
+    transform-origin: 20% 100%;
+    transition: transform 220ms ease;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__lid {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border: 3px solid var(--gift-ink);
+    border-radius: 4px;
+    box-shadow: inset 3px 3px #ffffff55, 0 3px #103c5725;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__lid::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: calc(50% - 14px);
+    width: 28px;
+    background: var(--ribbon);
+    border: 3px solid var(--gift-ink);
+    box-shadow: inset 3px 0 #ffffff55;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow {
+    position: absolute;
+    bottom: 23px;
+    left: 50%;
+    width: 0;
+    height: 0;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::before,
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 35px;
+    height: 23px;
+    background: var(--ribbon);
+    border: 3px solid var(--gift-ink);
+    box-shadow: inset 3px 3px #ffffff55;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::before {
+    right: -2px;
+    border-radius: 65% 65% 0 65%;
+    transform: rotate(24deg);
+    transform-origin: bottom right;
+}
+
+:is(.chapter.christmas-season, .advent-calendar-promo) .advent-gift__bow::after {
+    left: -2px;
+    border-radius: 65% 65% 65% 0;
+    transform: rotate(-24deg);
+    transform-origin: bottom left;
+}
+
+.chapter.christmas-season .advent-gift__number {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    z-index: 3;
+    top: 36%;
+    left: 57%;
+    width: 2.9rem;
+    height: 3.3rem;
+    background: #fff9e9;
+    color: var(--gift-ink);
+    border: 2px solid var(--gift-ink);
+    border-radius: 4px 4px 7px 4px;
+    box-shadow: 2px 3px #103c5725;
+    transform: rotate(8deg);
+    font-family: inherit;
+    font-size: var(--gift-number-size);
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.chapter.christmas-season .advent-gift__number::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 9px;
+    width: 2px;
+    height: 23px;
+    background: var(--gift-ink);
+    transform: rotate(-23deg);
+    transform-origin: bottom;
+}
+.chapter.christmas-season .advent-gift__number::after {
+    content: counter(advent-day);
+}
+
+.chapter.christmas-season .chapter__level .advent-gift {
+    filter: drop-shadow(2px 5px 12px #103c5744);
+}
+
+/* lid is a bit open for the next playable level. Lift up lid on hover. */
+.chapter.christmas-season .chapter__level.puzzle-next[href] .advent-gift {
+    transform: translateY(-7px);
+    filter: drop-shadow(2px 5px 12px #103c57aa);
+}
+.chapter.christmas-season .chapter__level.puzzle-next[href] .advent-gift__top,
+.chapter.christmas-season .chapter__level.puzzle-next[href] .advent-gift__top {
+    transform: translateY(-12px) rotate(-5deg);
+}
+.chapter.christmas-season .chapter__level.puzzle-next[href]:hover .advent-gift,
+.chapter.christmas-season .chapter__level.puzzle-next[href]:focus-visible .advent-gift {
+    transform: translateY(0) rotate(2deg);
+}
+.chapter.christmas-season .chapter__level.puzzle-next[href]:hover .advent-gift__top,
+.chapter.christmas-season .chapter__level.puzzle-next[href]:focus-visible .advent-gift__top {
+    transform: translateY(-26px) rotate(-7deg);
+}
+
+/* lid next to gift for solved puzzles. Lift up gift on hover. */
+.chapter.christmas-season .chapter__level.puzzle-solved[href] .advent-gift__top {
+    transform: translate(-15%, 40%) rotate(-70deg);
+    transform-origin: center left;
+    bottom: 0;
+    top: unset;
+}
+.chapter.christmas-season .chapter__level.puzzle-solved[href]:hover .advent-gift,
+.chapter.christmas-season .chapter__level.puzzle-solved[href]:focus-visible .advent-gift {
+    transform: translateY(-7px);
+}
+.chapter.christmas-season .chapter__level.puzzle-solved[href]:hover .advent-gift__top {
+    transform: translate(-20%, calc(40% + 7px)) rotate(-72deg);
+}
+/* make solved puzzles b/w */
+.chapter.christmas-season .chapter__level.puzzle-solved {
+    filter: grayscale(1);
+}
+
+@media (min-width: 576px) {
+    .chapter.christmas-season .chapter__levels {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (min-width: 900px) {
+    .chapter.christmas-season .chapter__levels {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (min-width: 1200px) {
+    .chapter.christmas-season .chapter__levels {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+@media (max-width: 359px) {
+    .chapter.christmas-season .chapter__levels {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .chapter.christmas-season .advent-gift,
+    .chapter.christmas-season .advent-gift__top {
+        transition: none;
+    }
+}
+
+
+/* SNOW */
+.chapter.christmas-season {
+    --christmas-scene-background: #0c2233;
+    --christmas-scene-foreground: #edf6fc;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding: 3rem 0 3.5rem;
+    border: 0;
+    border-radius: 0;
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    background: var(--christmas-scene-background);
+    color: var(--christmas-scene-foreground);
+}
+.container .chapter.christmas-season:first-child {
+    margin-block-start: -2rem;
+}
+.container .chapter.christmas-season:last-child {
+    margin-block-end: -2rem;
+}
+#content {
+    overflow-x: clip;
+}
+
+/* full width */
+.chapter.christmas-season::before,
+.chapter.christmas-season > .christmas-scene__snow {
+    position: absolute;
+    top: 0;
+    left: var(--christmas-scene-left, -50vw);
+    width: var(--christmas-scene-width, 150vw);
+    height: 100%;
+    pointer-events: none;
+}
+
+.chapter.christmas-season::before {
+    content: "";
+    z-index: -1;
+    background: var(--christmas-scene-background);
+}
+
+/* Snow is behind content, never over numbers, watermarks or links. */
+.chapter.christmas-season > :not(.christmas-scene__snow) {
+    position: relative;
+    z-index: 1;
+}
+
+.chapter.christmas-season > .chapter__title,
+.chapter.christmas-season > .chapter__title :is(h1, h2, h3, p) {
+    color: var(--christmas-scene-foreground);
+}
+
+.chapter.christmas-season > .christmas-scene__snow {
+    z-index: 0;
+    display: block;
+    user-select: none;
+}
+
+.chapter.christmas-season .chapter__level:focus-visible {
+    outline: 3px solid #edf6fc;
+    outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chapter.christmas-season > .christmas-scene__snow {
+        display: none;
+    }
+}
+
+@media print {
+    .chapter.christmas-season {
+        width: 100%;
+        margin-inline: 0;
+        padding: 2rem 0;
+        background: white;
+        color: #103c57;
+    }
+    .chapter.christmas-season > .chapter__title,
+    .chapter.christmas-season > .chapter__title :is(h1, h2, h3, p) {
+        color: #103c57;
+    }
+    .chapter.christmas-season::before,
+    .chapter.christmas-season > .christmas-scene__snow {
+        display: none;
+    }
+}

@@ -1,0 +1,56 @@
+/**
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+/* Snow, white text on dark blue bg */
+body {
+    background: #0c2233;
+}
+.christmas-scene__snow {
+    position: absolute;
+    z-index: -1;
+    user-select: none;
+    width: 100%;
+
+    /* padding block of #content */
+    margin-top: -2rem;
+}
+#game-container.christmas-season :is(h3, h4, h3 + p, hr, .puzzle-header, .puzzle-header button:not(.dropdown-item)) {
+    color: #fff;
+}
+#game-container.christmas-season .puzzle-header .modal-dialog {
+    color: #212529;
+}
+#game-container.christmas-season #ma-filter .btn-check:not(:checked)+.btn-outline-secondary:not(:hover) {
+    background: #fff; /* give ma filter buttons white bg only in default state */
+}
+/* candy cane border */
+#game-container.christmas-season .equivalence-container {
+    border: 8px solid var(--bs-danger);
+    border-image: repeating-linear-gradient(45deg, var(--bs-danger), var(--bs-danger) 8px, white 8px, white 16px) 8;
+}
+
+/* Chapter completed message  */
+#game-container.christmas-season .alert-chapter-completed {
+    color: #e7e200;
+    text-align: center;
+}
+
+/* keep description and puzzle header controls next to each other */
+#game-container.christmas-season .puzzle-header h4 {
+    max-width: 1000px;
+}
