@@ -30,13 +30,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 @WebServlet("/api/invite-link")
 public class InviteLinkAPI extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(InviteLinkAPI.class);
 
     @Inject
     private GameRepository gameRepository;
@@ -47,11 +52,18 @@ public class InviteLinkAPI extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         Integer gameId = null;
-        if(request.getParameter("gameId") != null) {
+        if (request.getParameter("gameId") != null) {
             try {
                 gameId = Integer.parseInt(request.getParameter("gameId"));
+                if (!login.isAdmin() && gameRepository.getGame(gameId).getCreatorId() != login.getUserId()) {
+                    logger.warn("User {} tried to create an invitation link for game {}", login.getUserId(), gameId);
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+
             } catch (NumberFormatException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid game ID");
                 return;
